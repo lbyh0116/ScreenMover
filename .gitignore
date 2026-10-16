@@ -1,0 +1,17 @@
+**/bin/
+**/obj/
+.vs/
+dist/
+*.user
+/work/
+/evidence/
+/reference/
+/CODEX_PROMPT.md
+/EVIDENCE.md
+/release/
+ScreenMover/Helpers/*.exe
+*.pdb
+*.log
+.env
+.env.*
+*.zip

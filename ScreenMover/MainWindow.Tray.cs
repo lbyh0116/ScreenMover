@@ -1,0 +1,66 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using ScreenMover.Models;
+using ScreenMover.Services;
+namespace ScreenMover;
+public sealed partial class MainWindow {
+    TrayIcon? tray;
+    QuickWindow? quick;
+    public bool Exiting {get;private set;}
+    public AppSettings CurrentSettings=>settings;
+    void SetupTrayLifecycle(){
+        ConfigureTray();
+        AppWindow.Closing+=(_,e)=>{
+            if(!Exiting&&settings.CloseToTray&&tray?.Installed==true){
+                e.Cancel=true;AppWindow.Hide();
+            }
+        };
+        Closed+=(_,_)=>{Exiting=true;tray?.Dispose();quick?.Close();};
+    }
+    void ConfigureTray(){
+        if(!initialized)return;
+        if(!settings.TrayEnabled){tray?.Dispose();tray=null;return;}
+        if(tray!=null)return;
+        try{
+            tray=new(WinRT.Interop.WindowNative.GetWindowHandle(this),()=>DispatcherQueue.TryEnqueue(async()=>await OpenQuick()),()=>DispatcherQueue.TryEnqueue(ShowMain),()=>DispatcherQueue.TryEnqueue(ExitApp));
+            if(!tray.Installed)Notice("托盘图标创建失败；关闭主窗口时将正常退出");
+        }catch(Exception ex){Notice("托盘不可用："+ex.Message);}
+    }
+    public void ShowMain(){AppWindow.Show();if(AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter p&&p.State==Microsoft.UI.Windowing.OverlappedPresenterState.Minimized)p.Restore();Activate();}
+    public void ShowHidden(){ShowMain();HiddenClicked(this,new RoutedEventArgs());}
+    public void ExitApp(){Exiting=true;Close();}
+    async Task OpenQuick(){
+        if(dialogOpen){ShowMain();return;}if(busy)return;
+        try{quick??=new QuickWindow(this);if(quick.IsPanelVisible)quick.Dismiss();else await quick.ShowPanel();}
+        catch(Exception ex){Notice("快捷面板无法打开："+ex.Message);ShowMain();}
+    }
+    async void QuickClicked(object sender,RoutedEventArgs e)=>await OpenQuick();
+    public async Task<(List<DisplayInfo> Displays,List<WindowInfo> Windows,Dictionary<string,ImageSource> Previews)> QuickData(){
+        var cached=iconCache.Keys.ToHashSet();bool capture=settings.ScreenPreviews;
+        var data=await Task.Run(()=>{
+            var ds=displays.Read().Displays;var ws=windows.Read();
+            var icons=new Dictionary<string,SnapshotFrame>();var previews=new Dictionary<string,SnapshotFrame>();
+            foreach(var w in ws.Where(w=>!cached.Contains(w.OrderKey))){var f=IconService.Read(w);if(f!=null)icons[w.OrderKey]=f;}
+            if(capture)foreach(var d in ds.Where(d=>d.Active)){try{previews[d.Key]=SnapshotService.Screen(d.Bounds);}catch{}}
+            return (ds,ws,icons,previews);
+        });
+        foreach(var entry in data.icons)iconCache[entry.Key]=Bitmap(entry.Value);
+        foreach(var w in data.ws)w.SetIcon(iconCache.GetValueOrDefault(w.OrderKey),settings.IconFallback);
+        var images=data.previews.ToDictionary(p=>p.Key,p=>(ImageSource)Bitmap(p.Value));
+        return (data.ds,order.Sort(data.ws),images);
+    }
+    public async Task<string> QuickDrop(WindowInfo window,DisplayInfo target){
+        if(busy)return "有操作正在进行，请稍后重试";
+        busy=true;UpdateStatus();
+        try{
+            var result=await Task.Run(()=>{
+                var current=windows.Read().FirstOrDefault(w=>w.Handle==window.Handle&&w.Pid==window.Pid&&w.ProcessStartedTicks==window.ProcessStartedTicks);
+                if(current==null)return new OperationResult(window.Title,false,"窗口已关闭或已不在当前虚拟桌面");
+                var destination=displays.Read().Displays.FirstOrDefault(d=>d.Active&&d.Key==target.Key);
+                if(destination==null)return new OperationResult(window.Title,false,"目标屏幕已断开");
+                return destination.Gdi==current.Gdi?hidden.Hide(current):moves.Move([current],destination,settings.MoveMargin,settings.ShrinkToFit).Single();
+            });
+            Notice($"快捷操作：{result.Title} · {result.Message}");return result.Message;
+        }finally{busy=false;await Refresh();UpdateStatus();}
+    }
+}
