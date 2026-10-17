@@ -8,6 +8,7 @@ Console.WriteLine("PASS tray icon registered: "+trayRect);return;
 Console.WriteLine($"Timestamp {DateTimeOffset.Now:O}");
 Console.WriteLine($"PATH_INFO={Marshal.SizeOf<PathInfo>()} MODE_INFO={Marshal.SizeOf<ModeInfo>()}");
 Regression.Pure();
+if(args.Length==1&&args[0]=="--pure")return;
 var d=new DisplayService().Read();
 Console.WriteLine($"AllPaths={d.AllPaths} ActivePaths={d.ActivePaths} DesktopCount={d.DesktopCount} Inactive={d.Displays.Count(x=>!x.Active)}");
 foreach(var m in d.Displays) Console.WriteLine($"{(m.Active?"ACTIVE":"NOT-IN-USE")} Key={m.Key} Gdi={m.Gdi} Name={m.Name} Driver={m.Driver} Bounds={m.Bounds} Work={m.Work} Hz={m.Hertz}");

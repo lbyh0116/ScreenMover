@@ -22,7 +22,7 @@ public sealed partial class MainWindow {
             if(r.Bottom<viewport.Top||r.Top>viewport.Bottom)continue;
             double dx=point.X-(r.Left+r.Width/2),dy=point.Y-(r.Top+r.Height/2);
             double d=dx*dx+dy*dy;
-            if(d<distance){distance=d;closest=(item,gallery==true?(point.Y>r.Bottom||point.Y>=r.Top&&dx>0):dy>0,r);}
+            if(d<distance){distance=d;closest=(item,point.Y>r.Bottom||point.Y>=r.Top&&dx>0,r);}
         }
         return closest;
     }
@@ -30,10 +30,10 @@ public sealed partial class MainWindow {
         InsertionMark.Visibility=Visibility.Collapsed;
         var slot=FindInsertion(point);
         if(slot.Window==null||dragItems.Any(w=>w.OrderKey==slot.Window.OrderKey))return;
-        var r=slot.Bounds;bool tile=gallery==true;
-        var p=Root.TransformToVisual(DragLayer).TransformPoint(new(tile?(slot.After?r.Right:r.Left):r.Left,tile?r.Top:(slot.After?r.Bottom:r.Top)));
+        var r=slot.Bounds;
+        var p=Root.TransformToVisual(DragLayer).TransformPoint(new(slot.After?r.Right:r.Left,r.Top));
         Canvas.SetLeft(InsertionMark,p.X);Canvas.SetTop(InsertionMark,p.Y);
-        InsertionMark.Width=tile?3:r.Width;InsertionMark.Height=tile?r.Height:3;InsertionMark.Visibility=Visibility.Visible;
+        InsertionMark.Width=3;InsertionMark.Height=r.Height;InsertionMark.Visibility=Visibility.Visible;
         GhostText.Text=$"排序：放到「{WindowTitle.Middle(slot.Window.Title,20)}」{(slot.After?"之后":"之前")}";
         cursorHost.SetDragCursor(true,true);
     }

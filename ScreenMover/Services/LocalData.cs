@@ -28,8 +28,8 @@ public sealed record AppSettings {
     public bool IconFallback {get;set;}=true;
     public bool TrayEnabled {get;set;}=true;
     public bool CloseToTray {get;set;}=true;
+    public string QuickHotkey {get;set;}="";
     public string Theme {get;set;}="System";
-    public string Layout {get;set;}="Auto";
     public bool ShowInactive {get;set;}=true;
     public bool RefreshOnActivate {get;set;}=true;
     public int RefreshSeconds {get;set;}=60; // 0 disables the periodic trigger.
@@ -39,14 +39,15 @@ public sealed record AppSettings {
     public bool ShrinkToFit {get;set;}=true;
     public int NoticeSeconds {get;set;}=5;
     public bool RememberSize {get;set;}=true;
+    public bool SizeInDips {get;set;}
     public int Width {get;set;}=1320;
     public int Height {get;set;}=1080;
     public void Normalize() {
+        try{QuickHotkey=HotkeySpec.Parse(QuickHotkey)?.Name??"";}catch(FormatException){QuickHotkey="";}
         if(Theme is not ("System" or "Light" or "Dark"))Theme="System";
-        if(Layout is not ("Auto" or "List" or "Gallery"))Layout="Auto";
         RefreshSeconds=RefreshSeconds==0?0:Math.Clamp(RefreshSeconds,15,3600);
         MoveMargin=Math.Clamp(MoveMargin,0,300);NoticeSeconds=Math.Clamp(NoticeSeconds,2,30);
-        Width=Math.Clamp(Width,720,4000);Height=Math.Clamp(Height,700,2400);
+        Width=Math.Clamp(Width,720,4000);Height=Math.Clamp(Height,640,2400);
     }
     public static string FilePath=>Path.Combine(LocalData.Folder,"settings.json");
 }

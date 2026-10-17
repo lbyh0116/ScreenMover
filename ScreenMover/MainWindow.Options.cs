@@ -43,11 +43,16 @@ public sealed partial class MainWindow {
             var control=new NumberBox{Header=title,Value=value,Minimum=min,Maximum=max,SpinButtonPlacementMode=NumberBoxSpinButtonPlacementMode.Compact};
             panel.Children.Add(control);return control;
         }
-        var themes=new[]{"System","Light","Dark"};var layouts=new[]{"Auto","List","Gallery"};
+        var themes=new[]{"System","Light","Dark"};
         var theme=Choice("外观",["跟随系统","浅色","深色"],Array.IndexOf(themes,settings.Theme));
-        var layout=Choice("窗口排列",["根据窗口比例自动切换","始终使用列表","始终使用相册"],Array.IndexOf(layouts,settings.Layout));
         var trayEnabled=Toggle("在任务栏通知区域显示快捷操作图标",settings.TrayEnabled);
         var closeToTray=Toggle("关闭主窗口时保留托盘运行",settings.CloseToTray);
+        var hotkeyBox=HotkeyCapture(settings.QuickHotkey);panel.Children.Add(hotkeyBox);
+        var clearHotkey=new Button{Content="清除快捷键"};clearHotkey.Click+=(_,_)=>hotkeyBox.Text="";panel.Children.Add(clearHotkey);
+        var startupState=StartupService.ReadState(out var startupError);bool startupWasEnabled=startupState==true;
+        var startup=Toggle("登录 Windows 后启动到托盘",startupWasEnabled);
+        startup.IsEnabled=startupState!=null;
+        if(startupError!=null)panel.Children.Add(new TextBlock{Text=startupError,TextWrapping=TextWrapping.Wrap,MaxWidth=430});
         var fallback=Toggle("没有截图时用软件图标代替",settings.IconFallback);
         var inactive=Toggle("显示未启用的屏幕",settings.ShowInactive);
         var remember=Toggle("记住软件窗口尺寸",settings.RememberSize);
@@ -61,34 +66,68 @@ public sealed partial class MainWindow {
         var duration=Number("操作提示停留时间（秒）",settings.NoticeSeconds,2,30);
         var reset=new Button{Content="恢复默认设置"};
         reset.Click+=(_,_)=>{
-            var d=new AppSettings();theme.SelectedIndex=0;layout.SelectedIndex=0;
+            var d=new AppSettings();theme.SelectedIndex=0;startup.IsOn=false;hotkeyBox.Text="";
             trayEnabled.IsOn=d.TrayEnabled;closeToTray.IsOn=d.CloseToTray;fallback.IsOn=d.IconFallback;inactive.IsOn=d.ShowInactive;remember.IsOn=d.RememberSize;activate.IsOn=d.RefreshOnActivate;
             interval.Value=d.RefreshSeconds;screen.IsOn=d.ScreenPreviews;windows.IsOn=d.WindowPreviews;
             margin.Value=d.MoveMargin;shrink.IsOn=d.ShrinkToFit;duration.Value=d.NoticeSeconds;
         };
         panel.Children.Add(reset);
+        ContentDialog? dialog=null;
+        var dataPanel=new StackPanel{Spacing=8};
+        var dataRow=new StackPanel{Orientation=Orientation.Horizontal,Spacing=8};
+        var export=new Button{Content="导出设置"};var import=new Button{Content="导入设置"};var diagnose=new Button{Content="诊断包"};
+        dataRow.Children.Add(export);dataRow.Children.Add(import);dataRow.Children.Add(diagnose);dataPanel.Children.Add(dataRow);
+        dataPanel.Children.Add(new TextBlock{Text="导出已保存的偏好；导入后需保存并应用。启动项、窗口尺寸、排序和隐藏记录不随文件迁移。诊断包仅含系统版本、匿名屏幕几何与软件设置。",TextWrapping=TextWrapping.Wrap,MaxWidth=430,Opacity=.7});
+        var dataStatus=new TextBlock{TextWrapping=TextWrapping.Wrap,MaxWidth=430};dataPanel.Children.Add(dataStatus);
+        bool dataBusy=false;
+        async Task DataAction(Func<Task<string>> action){
+            if(dataBusy)return;dataBusy=true;export.IsEnabled=import.IsEnabled=diagnose.IsEnabled=false;if(dialog!=null)dialog.IsPrimaryButtonEnabled=false;
+            try{dataStatus.Text=await action();}catch(Exception ex){dataStatus.Text="未完成："+ex.Message;}
+            finally{dataBusy=false;export.IsEnabled=import.IsEnabled=diagnose.IsEnabled=true;if(dialog!=null)dialog.IsPrimaryButtonEnabled=true;}
+        }
+        export.Click+=async(_,_)=>await DataAction(async()=>await ExportSettings()?"已导出已保存设置":"已取消");
+        diagnose.Click+=async(_,_)=>await DataAction(async()=>await ExportDiagnostics()?"诊断包已生成":"已取消");
+        import.Click+=async(_,_)=>await DataAction(async()=>{
+            var path=await OpenSettingsPath();if(path==null)return "已取消";
+            var loaded=await SettingsProfile.Read(path);
+            theme.SelectedIndex=Array.IndexOf(themes,loaded.Theme);trayEnabled.IsOn=loaded.TrayEnabled;closeToTray.IsOn=loaded.CloseToTray;
+            hotkeyBox.Text=loaded.QuickHotkey;fallback.IsOn=loaded.IconFallback;inactive.IsOn=loaded.ShowInactive;remember.IsOn=loaded.RememberSize;
+            activate.IsOn=loaded.RefreshOnActivate;interval.Value=loaded.RefreshSeconds;screen.IsOn=loaded.ScreenPreviews;windows.IsOn=loaded.WindowPreviews;
+            margin.Value=loaded.MoveMargin;shrink.IsOn=loaded.ShrinkToFit;duration.Value=loaded.NoticeSeconds;
+            return "已载入偏好，保存并应用后生效";
+        });
+        panel.Children.Add(new Expander{Header="设置备份与诊断",HorizontalAlignment=HorizontalAlignment.Stretch,Content=dataPanel});
+        panel.Children.Add(new Expander{Header="操作说明与快捷键",HorizontalAlignment=HorizontalAlignment.Stretch,Content=new TextBlock{
+            Text="主界面\n单击选择，Ctrl / Shift 多选，单击空白取消。按住卡片可拖动；拖到卡片之间排序，拖到屏幕移动。悬停屏幕会显示操作预告。双击激活窗口。\n\n快捷面板\n点击托盘图标打开。左边是窗口列表，右边是屏幕；拖到其他屏幕移动，拖到窗口所在屏幕隐藏到独立虚拟桌面。点击外部或按 Esc 收起。右上角按钮打开主界面；在主界面「已隐藏」中找回。\n\n快捷键\nCtrl+A 全选、Ctrl+F 搜索、F5 刷新。可在设置中录入全局组合键，在其他软件中也能打开快捷面板。\n\n截图与常驻\n截图是静态采样，只在内存中。关闭主窗口可继续驻留托盘；右键托盘图标退出。开机启动默认关闭，开启后请保留当前程序文件夹。",
+            TextWrapping=TextWrapping.Wrap,MaxWidth=430}});
         var error=new TextBlock{TextWrapping=TextWrapping.Wrap};panel.Children.Add(error);
-        var dialog=new ContentDialog{XamlRoot=Root.XamlRoot,Title="设置",PrimaryButtonText="保存并应用",CloseButtonText="取消",DefaultButton=ContentDialogButton.Primary,
+        dialog=new ContentDialog{XamlRoot=Root.XamlRoot,Title="设置",PrimaryButtonText="保存并应用",CloseButtonText="取消",DefaultButton=ContentDialogButton.Primary,
             Content=new ScrollViewer{Content=panel,MaxHeight=480,HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled}};
         dialog.PrimaryButtonClick+=(_,args)=>{
             try{
                 if(!double.IsFinite(interval.Value)||!double.IsFinite(margin.Value)||!double.IsFinite(duration.Value))throw new InvalidOperationException("请输入有效数字");
                 if(interval.Value>0&&interval.Value<15)throw new InvalidOperationException("定时刷新请设为 0 或至少 15 秒");
-                var next=settings with{Theme=themes[theme.SelectedIndex],Layout=layouts[layout.SelectedIndex],ShowInactive=inactive.IsOn,
+                if(startup.IsOn&&!trayEnabled.IsOn)throw new InvalidOperationException("登录后驻留需要开启托盘图标");
+                var shortcutName=HotkeySpec.Parse(hotkeyBox.Text)?.Name??"";
+                var next=settings with{QuickHotkey=shortcutName,Theme=themes[theme.SelectedIndex],ShowInactive=inactive.IsOn,
                     TrayEnabled=trayEnabled.IsOn,CloseToTray=closeToTray.IsOn,IconFallback=fallback.IsOn,RememberSize=remember.IsOn,RefreshOnActivate=activate.IsOn,RefreshSeconds=(int)interval.Value,
                     ScreenPreviews=screen.IsOn,WindowPreviews=windows.IsOn,MoveMargin=(int)margin.Value,ShrinkToFit=shrink.IsOn,NoticeSeconds=(int)duration.Value};
-                next.Normalize();LocalData.Write(AppSettings.FilePath,next);settings=next;
+                next.Normalize();using var shortcut=EnsureGlobalHotkey().Binding.Prepare(next.QuickHotkey);LocalData.Write(AppSettings.FilePath,next);
+                try{if(startup.IsOn||startup.IsOn!=startupWasEnabled)StartupService.SetEnabled(startup.IsOn);}
+                catch{LocalData.Write(AppSettings.FilePath,settings);throw;}
+                shortcut.Commit();settings=next;
             }catch(Exception ex){error.Text="未保存："+ex.Message;args.Cancel=true;}
         };
         try {
             if(await dialog.ShowAsync()==ContentDialogResult.Primary){
+                dialogOpen=false;
                 ApplySettings();displaySignature="";await RefreshWithPreviews();Notice("设置已保存并应用");
             }
         }finally{dialogOpen=false;}
     }
     void ApplySettings(){
         Root.RequestedTheme=settings.Theme switch{"Light"=>ElementTheme.Light,"Dark"=>ElementTheme.Dark,_=>ElementTheme.Default};
-        gallery=null;SetLayout();ConfigureTray();
+        SetLayout();ConfigureTray();ConfigureHotkey();
 foreach(var w in allWindows.Concat(WindowsList.Items.OfType<WindowInfo>()))w.SetIcon(iconCache.GetValueOrDefault(w.OrderKey),settings.IconFallback);
         previewCancellation?.Cancel();
         if(!settings.WindowPreviews){

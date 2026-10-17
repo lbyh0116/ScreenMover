@@ -9,6 +9,7 @@ public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
 public long ProcessStartedTicks {get;init;}
 public string OrderKey=>$"{Pid}:{ProcessStartedTicks}:{Handle.ToInt64()}";
 public string ShortTitle=>Services.WindowTitle.Middle(Title);
+public string AppName=>Services.ApplicationNames.Display(ProcessName);
 bool selected,iconFallback=true;
 object? icon;
 public object? AppIcon=>icon;
@@ -23,6 +24,7 @@ public object? Preview=>preview;
 public string PreviewCaption=>previewCaption;
 public void SetPreview(object? image,string caption){preview=image;previewCaption=caption;PropertyChanged?.Invoke(this,new(nameof(Preview)));PropertyChanged?.Invoke(this,new(nameof(PreviewLimit)));PropertyChanged?.Invoke(this,new(nameof(DisplayPreview)));PropertyChanged?.Invoke(this,new(nameof(PreviewCaption)));}
 public string State=>ShowCommand is 2 or 7?"最小化":ShowCommand==3?"最大化":"普通";
+public string Summary=>$"{ProcessName} · {State}";
 public string Details=>$"{ProcessName} · PID {Pid} · {State} · {Restore} · HWND 0x{Handle:X}";
 }
 public sealed record DisplaySnapshot(List<DisplayInfo> Displays,int AllPaths,int ActivePaths,int DesktopCount);

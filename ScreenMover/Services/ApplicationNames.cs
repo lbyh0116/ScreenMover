@@ -1,0 +1,15 @@
+namespace ScreenMover.Services;
+
+public static class ApplicationNames {
+    public static string Display(string? process){
+        string name=(process??"").Trim();
+        if(name.EndsWith(".exe",StringComparison.OrdinalIgnoreCase))name=name[..^4];
+        return name.ToUpperInvariant() switch{
+            "WINWORD"=>"Word","EXCEL"=>"Excel","POWERPNT"=>"PowerPoint","ONENOTE"=>"OneNote","OUTLOOK"=>"Outlook",
+            "CHROME"=>"Chrome","MSEDGE"=>"Edge","FIREFOX"=>"Firefox","EXPLORER"=>"文件资源管理器",
+            "WECHAT" or "WEIXIN"=>"微信","QQ"=>"QQ","CHATGPT"=>"ChatGPT","HERMES"=>"Hermes","CODE"=>"Visual Studio Code",
+            "MS-TEAMS"=>"Teams","WINDOWSTERMINAL"=>"Windows 终端","NOTEPAD"=>"记事本",
+            "" or "已退出 / 不可访问"=>"应用",_=>name
+        };
+    }
+}

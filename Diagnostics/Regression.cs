@@ -2,8 +2,57 @@ using ScreenMover.Models;
 using ScreenMover.Services;
 using static ScreenMover.Interop.Native;
 static class Regression {
+    static void Surfaces(){
+        RECT Box(int x,int y,int w,int h)=>new(){Left=x,Top=y,Right=x+w,Bottom=y+h};
+        var screen=Box(-1920,-1080,1920,1080);
+        var scenarios=new[]{
+            (Box(-1920,-1080,1920,1032),Box(-100,-48,32,32),SurfaceLayout.Edge.Bottom),
+            (Box(-1920,-1032,1920,1032),Box(-100,-1080,32,32),SurfaceLayout.Edge.Top),
+            (Box(-1872,-1080,1872,1080),Box(-1920,-100,32,32),SurfaceLayout.Edge.Left),
+            (Box(-1920,-1080,1872,1080),Box(-48,-100,32,32),SurfaceLayout.Edge.Right),
+            (screen,Box(-100,-2,32,2),SurfaceLayout.Edge.Bottom),
+            (screen,Box(-1920,-100,2,32),SurfaceLayout.Edge.Left)
+        };
+        foreach(var (work,anchor,edge) in scenarios)foreach(double scale in new[]{1,1.25,1.5,2})foreach(int count in new[]{0,1,30}){
+            var p=SurfaceLayout.Flyout(screen,work,anchor,scale,count,3);
+            Check(p.Edge==edge,"Flyout taskbar edge");
+            Check(p.Bounds.Left>=work.Left&&p.Bounds.Top>=work.Top&&p.Bounds.Right<=work.Right&&p.Bounds.Bottom<=work.Bottom,"Flyout escaped negative-coordinate work area");
+            Check(p.Bounds.Width>0&&p.Bounds.Height>0,"Flyout empty size");
+        }
+        var small=SurfaceLayout.Flyout(Box(0,0,800,600),Box(0,0,800,552),Box(760,552,32,32),2,50,8).Bounds;
+        Check(small.Right<=800&&small.Bottom<=552,"High-DPI small screen clamp");
+        foreach(double width in new[]{120,300,620,1000,1600}){
+            var grid=SurfaceLayout.GalleryGrid(width);
+            Check(grid.Width>0&&grid.Columns>=1&&grid.Width*grid.Columns<=Math.Max(1,width-20),"Gallery grid exceeded available width");
+        }
+        foreach(int rows in new[]{0,1,3,6,30,1000})foreach(int screens in new[]{1,2,4,10}){
+            var size=SurfaceLayout.FlyoutSize(rows,screens);
+            Check(size.Width<=480&&size.Height<=360&&Math.Abs(size.Width/size.Height-4.0/3)<.04,"Flyout lost compact 4:3 proportions");
+        }
+        Check(SurfaceLayout.FlyoutSize(3,1).Width<400,"Short application names still receive an oversized flyout");
+        Check(SurfaceLayout.FlyoutSize(6,1).Height>SurfaceLayout.FlyoutSize(1,1).Height,"Window count ignored in flyout sizing");
+        Check(SurfaceLayout.FlyoutSize(1,2).Height>SurfaceLayout.FlyoutSize(1,1).Height,"Display count ignored in flyout sizing");
+        Check(ApplicationNames.Display("WINWORD.exe")=="Word"&&ApplicationNames.Display("Weixin")=="微信"&&ApplicationNames.Display("Hermes")=="Hermes","Friendly application names");
+        var namedWindow=new WindowInfo(1,1,"WINWORD","Private document title",1,default,"one");
+        Check(namedWindow.AppName=="Word"&&!namedWindow.AppName.Contains("Private"),"Quick list label used the document title");
+        long style=0x16CF0000,extended=0x00020388;
+        Check((ScreenMover.Interop.FlyoutChrome.ClientStyle(style)&(0x00C00000L|0x40000))==0,"Flyout native frame flags survived");
+        Check((ScreenMover.Interop.FlyoutChrome.ClientStyle(style)&0x10000000)!=0,"Flyout lost visibility style");
+        Check((ScreenMover.Interop.FlyoutChrome.ClientExtendedStyle(extended)&0x20300)==0&&(ScreenMover.Interop.FlyoutChrome.ClientExtendedStyle(extended)&0x88)==0x88,"Flyout changed topmost/tool-window state");
+        Check(SurfaceLayout.GalleryGrid(300).Columns==1&&SurfaceLayout.GalleryGrid(1000).Columns==3,"Gallery responsive columns");
+        var config=new AppSettings{Width=1000,Height=800,SizeInDips=true};
+        Check(SurfaceLayout.InitialSize(config,1.5,Box(0,0,2560,1400))==(1500,1200),"DIP size restore");
+        config.SizeInDips=false;
+        Check(SurfaceLayout.InitialSize(config,1.25,Box(0,0,2560,1400))==(1000,800),"Legacy physical size migration");
+        Check(SurfaceLayout.InitialSize(config,2,Box(0,0,1280,720))==(1280,720),"Minimum size exceeded work area");
+        Console.WriteLine("PASS surface layout: 72 taskbar/negative-coordinate/DPI flyouts, auto-hide, small-screen clamping, gallery column sizing and size migration");
+    }
     static void Check(bool condition,string message){if(!condition)throw new Exception(message);}
     public static void Pure(){
+        Surfaces();
+        DropTargets();
+        Instances();
+        Preferences();
         RECT Box(int x,int y,int w,int h)=>new(){Left=x,Top=y,Right=x+w,Bottom=y+h};
         // Mixed resolutions and relative monitor positions, all in physical pixels.
         var works=new[]{Box(-1920,0,1920,1040),Box(0,-2160,3840,2100),Box(2560,0,1080,1880),Box(-1080,-1920,1080,1880),Box(48,40,1872,1040)};
@@ -32,10 +81,15 @@ static class Regression {
         Directory.CreateDirectory(folder);
         string path=Path.Combine(folder,"settings.json");
         try{
-            var config=new AppSettings{Layout="Gallery",Theme="Dark",RefreshSeconds=0,MoveMargin=125,WindowPreviews=false};
+            var config=new AppSettings{Theme="Dark",RefreshSeconds=0,MoveMargin=125,WindowPreviews=false};
             LocalData.Write(path,config);
             var copy=LocalData.Read(path,()=>new AppSettings(),out var warning);
-            Check(warning==null&&copy.Layout=="Gallery"&&copy.RefreshSeconds==0&&copy.MoveMargin==125&&!copy.WindowPreviews,"Settings roundtrip");
+            Check(warning==null&&copy.RefreshSeconds==0&&copy.MoveMargin==125&&!copy.WindowPreviews,"Settings roundtrip");
+            foreach(string legacy in new[]{"Auto","List","Gallery"}){
+                File.WriteAllText(path,"{\"Layout\":\""+legacy+"\",\"Theme\":\"Dark\"}");
+                var migrated=LocalData.Read(path,()=>new AppSettings(),out warning);
+                Check(warning==null&&migrated.Theme=="Dark","Legacy layout config failed to load");
+            }
             File.WriteAllText(path,"{broken");
             var recovered=LocalData.Read(path,()=>new AppSettings(),out warning);
             Check(warning!=null&&recovered.RefreshSeconds==60&&Directory.GetFiles(folder,"*.backup").Length==1,"Corrupt settings recovery");
@@ -59,6 +113,80 @@ static class Regression {
             Check(!unicode.Contains('\uFFFD')&&unicode.StartsWith("😀")&&unicode.EndsWith("😀"),"Unicode title split");
         }finally{if(File.Exists(orderPath))File.Delete(orderPath);}
         Console.WriteLine("PASS search, settings persistence, corrupt-file backup, validation, reorder persistence, group order, middle-ellipsis titles");
+    }
+    static void Preferences(){
+        Check(HotkeySpec.Parse("alt+control+space")?.Name=="Ctrl+Alt+Space","Hotkey canonicalization");
+        Check(HotkeySpec.Parse("")==null,"Disabled hotkey");
+        foreach(string bad in new[]{"A","Shift+A","Ctrl+F12","Win+L","Ctrl+Ctrl+A","Ctrl++A","Ctrl+Alt+Delete"}){
+            bool rejected=false;try{HotkeySpec.Parse(bad);}catch(FormatException){rejected=true;}Check(rejected,"Unsafe or malformed hotkey accepted: "+bad);
+        }
+        var registered=new Dictionary<int,string>();var occupied=new HashSet<string>();
+        using(var binding=new HotkeyBinding((id,spec)=>!occupied.Contains(spec.Name)&&registered.TryAdd(id,spec.Name),id=>registered.Remove(id))){
+            using(var first=binding.Prepare("Ctrl+Alt+Space"))first.Commit();
+            string previous=binding.Current;
+            using(var cancelled=binding.Prepare("Ctrl+Alt+K"))Check(registered.Count==2,"Previous hotkey was removed before commit");
+            Check(binding.Current==previous&&registered.Count==1,"Cancelled edit changed active hotkey");
+            occupied.Add("Ctrl+Alt+J");bool rejected=false;
+            try{using var conflict=binding.Prepare("Ctrl+Alt+J");conflict.Commit();}catch(InvalidOperationException){rejected=true;}
+            Check(rejected&&binding.Current==previous&&registered.Count==1,"Conflict lost old hotkey");
+            using(var saved=binding.Prepare("Ctrl+Alt+K"))saved.Commit();
+            Check(binding.Current=="Ctrl+Alt+K"&&registered.Count==1,"Hotkey commit leaked registration");
+            using(var disabled=binding.Prepare(""))disabled.Commit();Check(registered.Count==0,"Hotkey disable did not unregister");
+            using var pending=binding.Prepare("Ctrl+Alt+M");binding.Dispose();binding.Dispose();Check(registered.Count==0,"Dispose leaked pending registration");
+        }
+        var original=new AppSettings{Theme="Dark",QuickHotkey="Ctrl+Alt+K",MoveMargin=125,Width=2500,Height=1500};
+        string profile=SettingsProfile.Export(original);
+        var restored=SettingsProfile.Import(profile);
+        Check(restored.Theme=="Dark"&&restored.QuickHotkey==original.QuickHotkey&&restored.MoveMargin==125,"Preferences roundtrip");
+        Check(!profile.Contains("\"Width\"")&&!profile.Contains("\"Height\"")&&!profile.Contains("SizeInDips"),"Device geometry leaked into portable preferences");
+        Check(SettingsProfile.Import("{\"Theme\":\"Light\",\"Layout\":\"List\"}").Theme=="Light","Legacy preferences import");
+        foreach(string bad in new[]{"{broken","[]","{}","{\"Format\":\"Other\",\"Version\":1}","{\"Format\":\"ScreenMover.Settings\",\"Version\":99,\"Settings\":{\"Theme\":\"Dark\"}}","{\"QuickHotkey\":\"F12\"}",new string('x',256*1024+1)}){
+            bool rejected=false;try{SettingsProfile.Import(bad);}catch(Exception ex)when(ex is System.Text.Json.JsonException or InvalidDataException or FormatException){rejected=true;}Check(rejected,"Invalid settings profile accepted");
+        }
+        var display=new DisplayInfo("private-key",1,@"C:\Users\Private\device","PRIVATE MONITOR","PRIVATE SERIAL",true,true,new(){Right=1920,Bottom=1080},new(){Right=1920,Bottom=1040},60,0);
+        string report=DiagnosticReport.Build(original,new[]{display});
+        Check(!report.Contains("PRIVATE",StringComparison.OrdinalIgnoreCase)&&!report.Contains("C:\\",StringComparison.OrdinalIgnoreCase)&&!report.Contains("private-key"),"Diagnostic report exposed private display metadata");
+        string folder=Path.Combine(Path.GetTempPath(),"ScreenMover-profile-test-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(folder);
+        try{
+            string settings=Path.Combine(folder,"settings.json"),zipPath=Path.Combine(folder,"diagnostics.zip");
+            SettingsProfile.WriteText(settings,profile);Check(SettingsProfile.Read(settings).GetAwaiter().GetResult().MoveMargin==125,"Profile file roundtrip");
+            DiagnosticReport.Write(zipPath,report);
+            using var zip=System.IO.Compression.ZipFile.OpenRead(zipPath);
+            Check(zip.Entries.Count==2&&zip.GetEntry("diagnostics.json")!=null&&zip.GetEntry("README.txt")!=null,"Diagnostic package included unexpected files");
+            using var reader=new StreamReader(zip.GetEntry("diagnostics.json")!.Open());Check(reader.ReadToEnd()==report,"Diagnostic package corrupted report");
+        }finally{foreach(var file in Directory.GetFiles(folder))File.Delete(file);Directory.Delete(folder);}
+        Console.WriteLine("PASS preferences: hotkey parsing/conflict/prepare/commit/cancel/dispose; profile validation and roundtrip; diagnostic metadata allowlist and ZIP contents");
+    }
+    static void DropTargets(){
+        var one=new DisplayInfo("one",1,"one","One","",true,true,default,default,60,0);
+        var two=one with{Key="two",Gdi="two",Number=2};
+        WindowInfo[] windows=[new(1,1,"Test","Window",1,default,"one")];
+        Check(DropIntent.For(one,windows,false).Action==DropAction.Current&&!DropIntent.For(one,windows,false).Allowed,"Main same-screen drop should be a no-op");
+        Check(DropIntent.For(one,windows,true).Action==DropAction.Hide&&DropIntent.For(one,windows,true).Allowed,"Quick same-screen hide intent");
+        Check(DropIntent.For(two,windows,false).Action==DropAction.Move&&DropIntent.For(two,windows,true).Action==DropAction.Move,"Cross-screen drop intent");
+        Check(DropIntent.For(two with{Active=false},windows,true).Action==DropAction.Unavailable,"Inactive screen accepted");
+        Check(DropIntent.For(null,windows,false).Action==DropAction.None,"Empty drop target accepted");
+        Check(DropIntent.For(one,windows.Append(windows[0] with{Gdi="two"}).ToArray(),false).Action==DropAction.Move,"Mixed-screen batch intent");
+        var small=SurfaceLayout.Flyout(new(){Right=1920,Bottom=1080},new(){Right=1920,Bottom=1040},new(){Left=1800,Top=1040,Right=1832,Bottom=1072},1,3,1).Bounds;
+        Check(small.Width<400&&small.Height<280,"Small flyout left unnecessary empty space");
+        Check(StartupService.Command(@"C:\Program Files\ScreenMover\ScreenMover.exe")=="\"C:\\Program Files\\ScreenMover\\ScreenMover.exe\" --start-in-tray","Startup path was not quoted");
+        Console.WriteLine("PASS drop intents: move/current/hide/unavailable/mixed-screen batch; compact flyout and startup command quoting");
+    }
+    static void Instances(){
+        string name="ScreenMover-test-"+Guid.NewGuid().ToString("N");
+        int signals=0;
+        using(var owner=SingleInstance.Claim(name)){
+            Check(owner!=null,"First instance did not acquire ownership");
+            owner!.Listen(()=>Interlocked.Increment(ref signals));
+            var duplicate=Task.Run(()=>SingleInstance.Claim(name)).GetAwaiter().GetResult();
+            Check(duplicate==null,"Second instance acquired a held mutex");
+            Check(Task.Run(()=>SingleInstance.Activate(name)).GetAwaiter().GetResult(),"Second instance failed to signal owner");
+            Check(signals==1,"Activation was not delivered exactly once");
+            owner.Dispose();owner.Dispose();
+        }
+        using var reopened=SingleInstance.Claim(name);
+        Check(reopened!=null,"Ownership was not released on exit");
+        Console.WriteLine("PASS single instance: ownership exclusion, current-user IPC activation, release and relaunch (no UI)");
     }
     public static void Fixture(WindowInfo window,string helper){
         var displays=new DisplayService().Read().Displays.Where(d=>d.Active).DistinctBy(d=>d.Gdi).ToList();

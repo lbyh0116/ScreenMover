@@ -35,10 +35,12 @@ public sealed class TrayIcon : IDisposable {
         data=new(){Size=(uint)Marshal.SizeOf<NotifyData>(),Window=hwnd,Id=1,Flags=1|2|4,Callback=0x8000+27,Icon=icon,Tip="ScreenMover · 点击快捷操作 / 右键菜单",Info="",InfoTitle=""};
         taskbarCreated=RegisterWindowMessageW("TaskbarCreated");
         callback=(h,msg,w,l,id,refData)=>{
-            if(msg==taskbarCreated&&!disposed)Installed=Shell_NotifyIconW(0,ref data);
+            if(msg==taskbarCreated&&!disposed)Install();
             if(msg==data.Callback&&!disposed){
-                if(l.ToInt32() is 0x202 or 0x203)show();
-                else if(l.ToInt32()==0x205){
+                int message=l.ToInt32()&0xFFFF;
+                // Version 4 supports keyboard activation and sends one selection event per click.
+                if(message is 0x400 or 0x401)show();
+                else if(message==0x7B){
                     GetCursorPos(out var point);var menu=CreatePopupMenu();
                     try{
                         AppendMenuW(menu,0,1,"快捷操作");AppendMenuW(menu,0,2,"打开主界面");AppendMenuW(menu,0x800,0,"");AppendMenuW(menu,0,3,"退出 ScreenMover");
@@ -53,7 +55,11 @@ public sealed class TrayIcon : IDisposable {
             return DefSubclassProc(h,msg,w,l);
         };
         if(!SetWindowSubclass(hwnd,callback,42,0))throw new InvalidOperationException("无法创建托盘消息监听");
+        Install();
+    }
+    void Install(){
         Installed=Shell_NotifyIconW(0,ref data);
+        if(Installed){data.Version=4;Shell_NotifyIconW(4,ref data);}
     }
     public void Dispose(){
         if(disposed)return;disposed=true;Shell_NotifyIconW(2,ref data);Installed=false;

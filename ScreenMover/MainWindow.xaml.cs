@@ -15,13 +15,15 @@ using Windows.System;
 using Windows.UI.Core;
 namespace ScreenMover;
 public sealed partial class MainWindow : Window {
+Interop.WindowChrome? chrome;
+Views.DragFeedback? dragFeedback;
 readonly Views.PointerGrid cursorHost=new(); readonly DisplayService displays=new(); readonly WindowService windows=new();
 readonly Dictionary<string,(Image image,TextBlock label)> monitorPreviews=[];
 readonly Dictionary<(nint,int),(object? image,string caption)> windowPreviews=[];
 CancellationTokenSource? previewCancellation;
 bool previewing,pendingPreview;
 long lastAutoScroll;
-bool? gallery; bool refreshRequested=true; bool active;
+bool refreshRequested=true; bool active;
 DateTime lastSnapshot=DateTime.MinValue;
 int noticeVersion;
 readonly List<string> history=[];
@@ -36,30 +38,36 @@ readonly bool admin=new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(
 public MainWindow() {
 string? settingsWarning=null;
 try{settings=LocalData.Read(AppSettings.FilePath,()=>new AppSettings(),out settingsWarning);settings.Normalize();}catch(Exception ex){settingsWarning=ex.Message;}
-InitializeComponent();Content=null;cursorHost.Children.Add(Root);Content=cursorHost;
-var size=settings.RememberSize?(settings.Width,settings.Height):(1320,1080);
-try{var work=displays.Read().Displays.First(d=>d.Active&&d.Primary).Work;size=(Math.Min(size.Item1,work.Width),Math.Min(size.Item2,work.Height));}catch{}
-AppWindow.Resize(new Windows.Graphics.SizeInt32(size.Item1,size.Item2));
+InitializeComponent();dragFeedback=new(Root,DragLayer,Ghost,GhostImage,GhostCount);Content=null;cursorHost.Children.Add(Root);Content=cursorHost;
+var hwnd=WinRT.Interop.WindowNative.GetWindowHandle(this);
+try {
+    var primary=displays.Read().Displays.First(d=>d.Active&&d.Primary);
+    double scale=Interop.WindowChrome.ScaleAt(new(){X=primary.Work.Left+10,Y=primary.Work.Top+10});
+    var size=SurfaceLayout.InitialSize(settings,scale,primary.Work);
+    AppWindow.MoveAndResize(new(primary.Work.Left+(primary.Work.Width-size.Width)/2,primary.Work.Top+(primary.Work.Height-size.Height)/2,size.Width,size.Height));
+}catch{AppWindow.Resize(new(1060,820));}
+chrome=new(hwnd);
 initialized=true;ApplySettings();
 events=new(WinRT.Interop.WindowNative.GetWindowHandle(this));
 try {if(File.Exists(historyPath))history.AddRange(File.ReadAllLines(historyPath));}catch{}
-Root.Loaded+=async(_,_)=>{SetLayout();await RefreshWithPreviews();if(settingsWarning!=null)Notice(settingsWarning);if(hidden.LoadWarning!=null)Notice(hidden.LoadWarning);};
+Root.Loaded+=async(_,_)=>{SetLayout();Views.Motion.Enter(Root,0,8);await RefreshWithPreviews();if(settingsWarning!=null)Notice(settingsWarning);if(hidden.LoadWarning!=null)Notice(hidden.LoadWarning);};
 Root.SizeChanged+=(_,_)=>SetLayout();
 Activated+=(_,e)=>{bool now=e.WindowActivationState!=WindowActivationState.Deactivated;if(now&&!active&&settings.RefreshOnActivate)refreshRequested=true;active=now;};
 timer.Tick+=async(_,_)=>{ticks++; if(!busy&&pressed==null&&!refreshing&&!previewing&&(refreshRequested||(settings.RefreshSeconds>0&&DateTime.Now-lastSnapshot>=TimeSpan.FromSeconds(settings.RefreshSeconds)))){refreshRequested=false;await RefreshWithPreviews();}else if(ticks%8==0||Interlocked.Exchange(ref events.Dirty,0)!=0)await Refresh();};
 timer.Start();
 Closed+=(_,_)=>{try{if(settings.RememberSize){
 var p=WindowService.Placement(WinRT.Interop.WindowNative.GetWindowHandle(this));
-settings.Width=p.rcNormalPosition.Width;settings.Height=p.rcNormalPosition.Height;
+double scale=Math.Max(.75,Services.TrayIcon.GetDpiForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this))/96.0);
+settings.Width=(int)Math.Round(p.rcNormalPosition.Width/scale);settings.Height=(int)Math.Round(p.rcNormalPosition.Height/scale);settings.SizeInDips=true;
 settings.Normalize();LocalData.Write(AppSettings.FilePath,settings);
 }}catch{}
-closed=true;timer.Stop();events.Dispose();previewCancellation?.Cancel();};
+closed=true;globalHotkey?.Dispose();chrome?.Dispose();timer.Stop();events.Dispose();previewCancellation?.Cancel();};
 Root.AddHandler(UIElement.PointerPressedEvent,new PointerEventHandler(Pressed),true);
 Root.AddHandler(UIElement.PointerMovedEvent,new PointerEventHandler(Moved),true);
 Root.AddHandler(UIElement.PointerReleasedEvent,new PointerEventHandler(Released),true);
 Root.AddHandler(UIElement.PointerCanceledEvent,new PointerEventHandler(Canceled),true);
 Root.AddHandler(UIElement.PointerCaptureLostEvent,new PointerEventHandler(Canceled),true);
-var f5=new KeyboardAccelerator{Key=VirtualKey.F5}; f5.Invoked+=async(_,e)=>{e.Handled=true;await RefreshWithPreviews();};Root.KeyboardAccelerators.Add(f5);
+var f5=new KeyboardAccelerator{Key=VirtualKey.F5}; f5.Invoked+=async(_,e)=>{if(dialogOpen)return;e.Handled=true;await RefreshWithPreviews();};Root.KeyboardAccelerators.Add(f5);
 var all=new KeyboardAccelerator{Key=VirtualKey.A,Modifiers=VirtualKeyModifiers.Control};all.Invoked+=(_,e)=>{if(!dialogOpen&&!ReferenceEquals(FocusManager.GetFocusedElement(Root.XamlRoot),SearchBox)){WindowsList.SelectAll();e.Handled=true;}};Root.KeyboardAccelerators.Add(all);
 var esc=new KeyboardAccelerator{Key=VirtualKey.Escape};esc.Invoked+=(_,e)=>{if(dialogOpen)return;if(pressed!=null){RestoreSelection();CancelDrag();e.Handled=true;}else if(SearchBox.Text.Length>0){SearchBox.Text="";e.Handled=true;}};Root.KeyboardAccelerators.Add(esc);
 var find=new KeyboardAccelerator{Key=VirtualKey.F,Modifiers=VirtualKeyModifiers.Control};find.Invoked+=(_,e)=>{if(!dialogOpen){SearchBox.Focus(FocusState.Keyboard);SearchBox.SelectAll();e.Handled=true;}};Root.KeyboardAccelerators.Add(find);
@@ -90,13 +98,13 @@ var stack=new StackPanel{Spacing=4,Width=240,Height=180};
 stack.Children.Add(new TextBlock{Text=d.Heading,FontSize=d.Active?22:16,FontWeight=Microsoft.UI.Text.FontWeights.SemiBold});
 if(d.Active) {
 var preview=new Image{Width=240,Height=90,Stretch=Stretch.Uniform};
-var label=new TextBlock{Text=settings.ScreenPreviews?"等待截图":"屏幕预览已关闭",FontSize=10,Opacity=.65};
+var label=new TextBlock{Visibility=Visibility.Collapsed};
 stack.Children.Add(new Border{Child=preview,Background=new SolidColorBrush(Colors.Black),CornerRadius=new CornerRadius(5)});
-stack.Children.Add(new TextBlock{Text=$"{d.Gdi} · {d.Name}\n{d.Bounds.Width}×{d.Bounds.Height} · {d.Hertz:0.##} Hz · ({d.Bounds.Left},{d.Bounds.Top})",FontSize=11,TextWrapping=TextWrapping.Wrap,Opacity=.8});
+stack.Children.Add(new TextBlock{Text=$"{d.Name}\n{d.Bounds.Width} × {d.Bounds.Height} · {d.Hertz:0.##} Hz",FontSize=11,TextWrapping=TextWrapping.Wrap,Opacity=.8});
 stack.Children.Add(label);monitorPreviews[d.Key]=(preview,label);
 ToolTipService.SetToolTip(stack,d.Details);
 }else {stack.Children.Add(new Border{Height=90,Child=new TextBlock{Text="未启用",HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center,Opacity=.5}});stack.Children.Add(new TextBlock{Text=d.Name+"\n系统编号：未分配",TextWrapping=TextWrapping.Wrap,FontSize=11});}
-var border=new Border{Child=stack,Padding=new Thickness(10),CornerRadius=new CornerRadius(8),BorderThickness=new Thickness(1),BorderBrush=new SolidColorBrush(Colors.Gray),Tag=d,Opacity=d.Active?1:.65};
+var border=new Border{Child=stack,Padding=new Thickness(10),CornerRadius=new CornerRadius(8),BorderThickness=new Thickness(0),Tag=d,Opacity=d.Active?1:.65};
 if(!d.Active) {
 var dash=new Microsoft.UI.Xaml.Shapes.Rectangle{Stroke=new SolidColorBrush(Colors.Gray),StrokeDashArray=new DoubleCollection{4,3},StrokeThickness=1,RadiusX=8,RadiusY=8,IsHitTestVisible=false};
 var grid=new Grid();border.BorderThickness=new Thickness(0);grid.Children.Add(border);grid.Children.Add(dash);grid.Tag=d;MonitorTiles.Items.Add(grid);
@@ -104,7 +112,7 @@ var grid=new Grid();border.BorderThickness=new Thickness(0);grid.Children.Add(bo
 }
 MonitorTiles.SelectedItem=MonitorTiles.Items.OfType<FrameworkElement>().FirstOrDefault(b=>(b.Tag as DisplayInfo)?.Key==selected?.Key);
 MonitorHeading.Text=$"系统正在使用的显示器 · {snapshot.DesktopCount}";
-RebuildButtons();
+RebuildButtons();UpdateMonitorDensity();
 }
 UpdateWindows();
 } catch(Exception ex) {Notice("刷新失败："+ex.Message);}
@@ -122,6 +130,7 @@ string signature=string.Join("|",items.Select(w=>$"{w.Handle},{w.Title},{w.Detai
 if(signature!=windowSignature) {
 windowSignature=signature;var chosen=WindowsList.SelectedItems.Cast<WindowInfo>().Select(w=>w.Handle).ToHashSet();
 WindowsList.ItemsSource=items;
+DispatcherQueue.TryEnqueue(UpdateGalleryWidth);
 foreach(var w in items.Where(w=>chosen.Contains(w.Handle)))WindowsList.SelectedItems.Add(w);
 }
 EmptyState.Text=SearchBox.Text.Length>0?"没有匹配的窗口，试试更短的关键词或「所有屏幕」":"此屏幕上暂无可管理的窗口";
@@ -141,14 +150,14 @@ void UpdateStatus() {
 if(!initialized)return;
 int count=WindowsList.SelectedItems.Count;
 UndoButton.IsEnabled=moves.Count>0&&!busy;UndoButton.Content=moves.Count>0?$"撤销移动 · {moves.Count}":"撤销移动";HiddenButton.Content=$"已隐藏 · {hidden.Read().Count}";SettingsButton.IsEnabled=HiddenButton.IsEnabled=!busy;
-SelectionStatus.Text=$"{(selected==null?"未选择屏幕":$"当前：{selected.Gdi}")}  ·  已选 {count} 个窗口  ·  {(admin?"管理员运行":"普通权限")}";
+SelectionStatus.Text=count>0?$"已选 {count} 个窗口":"";
 HideButton.IsEnabled=MinButton.IsEnabled=RestoreButton.IsEnabled=MaxButton.IsEnabled=count>0&&!busy;
 foreach(var b in MoveButtons.Children.OfType<Button>())b.IsEnabled=count>0&&!busy&&(AllScreens.IsChecked==true||(b.Tag as DisplayInfo)?.Key!=selected?.Key);
 }
 async void MonitorSelectionChanged(object sender,SelectionChangedEventArgs e) {
 if((MonitorTiles.SelectedItem as FrameworkElement)?.Tag is DisplayInfo d){
 if(!d.Active){MonitorTiles.SelectedItem=MonitorTiles.Items.OfType<FrameworkElement>().FirstOrDefault(x=>(x.Tag as DisplayInfo)?.Key==selected?.Key);Notice("此显示器未启用，请在系统显示设置中启用。");return;}
-selected=d;windowSignature="";UpdateWindows();RebuildButtons();
+selected=d;windowSignature="";UpdateWindows();Views.Motion.Enter(WindowsList,0,8);RebuildButtons();UpdateMonitorDensity();
 }
 await Task.CompletedTask;
 }
@@ -177,10 +186,11 @@ while(source!=null){if(source is FrameworkElement f&&f.DataContext is WindowInfo
 }
 void Pressed(object sender,PointerRoutedEventArgs e) {
 if(busy||!e.GetCurrentPoint(Root).Properties.IsLeftButtonPressed)return;
-var item=FindWindow(e.OriginalSource as DependencyObject);if(item==null)return;
+var item=FindWindow(e.OriginalSource as DependencyObject);if(item==null){if(Views.SelectionInput.IsBackground(e.OriginalSource as DependencyObject,Root)){WindowsList.SelectedItems.Clear();lastClickHandle=0;}return;}
 WindowsList.Focus(FocusState.Pointer);pressed=item;start=e.GetCurrentPoint(Root).Position;initialSelection=WindowsList.SelectedItems.Cast<WindowInfo>().ToList();
 capture=Root;
 if(!capture.CapturePointer(e.Pointer)){pressed=null;capture=null;}
+else dragFeedback?.Press(WindowsList.ContainerFromItem(item) as FrameworkElement,start,item.DisplayPreview as ImageSource);
 }
 void Moved(object sender,PointerRoutedEventArgs e) {
 if(pressed==null)return;var p=e.GetCurrentPoint(Root).Position;
@@ -188,14 +198,14 @@ if(!dragging&&Math.Abs(p.X-start.X)+Math.Abs(p.Y-start.Y)>6) {
 dragging=true;
 dragItems=initialSelection.Any(w=>w.Handle==pressed.Handle)?initialSelection:[pressed];
 WindowsList.SelectedItems.Clear();foreach(var w in dragItems)WindowsList.SelectedItems.Add(w);
-Ghost.Visibility=Visibility.Visible;
+dragFeedback?.Start(dragItems.Select(w=>WindowsList.ContainerFromItem(w)).OfType<FrameworkElement>(),dragItems.Count);
 }
 if(!dragging)return;
-AutoScrollMonitors(p);AutoScrollWindows(p);hover=Hit(p);cursorHost.SetDragCursor(true,hover?.Active==true);
-GhostText.Text=hover?.Active==true?$"移动 {dragItems.Count} 个窗口 → 屏幕 {hover.Number}":hover!=null?"此显示器未启用 · 无法移动":$"{dragItems.Count} 个窗口 · 拖至屏幕磁贴";
+AutoScrollMonitors(p);AutoScrollWindows(p);hover=Hit(p);var intent=DropIntent.For(hover,dragItems,false);cursorHost.SetDragCursor(true,intent.Allowed);
+GhostText.Text=hover!=null?intent.Label:WindowTitle.Middle(pressed.Title,24);
 if(hover==null)ShowInsertion(p);else InsertionMark.Visibility=Visibility.Collapsed;
-Canvas.SetLeft(Ghost,Math.Min(p.X+14,Math.Max(0,Root.ActualWidth-300)));Canvas.SetTop(Ghost,Math.Max(0,p.Y-50));
-foreach(var b in MonitorTiles.Items.OfType<Border>())b.BorderBrush=new SolidColorBrush((b.Tag as DisplayInfo)?.Key==hover?.Key?Colors.DodgerBlue:Colors.Gray);
+dragFeedback?.Move(p);
+foreach(var el in MonitorTiles.Items.OfType<FrameworkElement>())if(MonitorTiles.ContainerFromItem(el) is FrameworkElement container&&Descendant<Views.SelectionSurface>(container) is {} surface){surface.DropLabel=intent.Label;surface.IsDropTarget=(el.Tag as DisplayInfo)?.Key==hover?.Key;}
 e.Handled=true;
 }
 DisplayInfo? Hit(Point p) {
@@ -215,7 +225,7 @@ var insertion=wasDrag&&target==null?FindInsertion(e.GetCurrentPoint(Root).Positi
 CancelDrag();
 if(wasDrag) {
 e.Handled=true;
-if(target?.Active==true&&(AllScreens.IsChecked==true||target.Key!=selected?.Key))await MoveBatch(list,target);
+if(target!=null&&DropIntent.For(target,list,false).Action==DropAction.Move)await MoveBatch(list,target);
 else if(insertion.Window!=null)Reorder(list,insertion.Window,insertion.After);
 else {RestoreSelection();if(target is {Active:false})Notice("此显示器未启用，窗口无法移过去。请在系统显示设置中启用。");}
 } else {
@@ -230,7 +240,7 @@ else {WindowsList.SelectedItems.Clear();WindowsList.SelectedItems.Add(item); if(
 }
 void RestoreSelection(){WindowsList.SelectedItems.Clear();foreach(var w in initialSelection)if(WindowsList.Items.Contains(w))WindowsList.SelectedItems.Add(w);}
 void Canceled(object sender,PointerRoutedEventArgs e){if(pressed!=null){RestoreSelection();CancelDrag();}}
-void CancelDrag() {InsertionMark.Visibility=Visibility.Collapsed;cursorHost.SetDragCursor(false,false);pressed=null;dragging=false;hover=null;Ghost.Visibility=Visibility.Collapsed;var c=capture;capture=null;c?.ReleasePointerCaptures();foreach(var b in MonitorTiles.Items.OfType<Border>())b.BorderBrush=new SolidColorBrush(Colors.Gray);}
+void CancelDrag() {InsertionMark.Visibility=Visibility.Collapsed;cursorHost.SetDragCursor(false,false);pressed=null;dragging=false;hover=null;dragFeedback?.End();var c=capture;capture=null;c?.ReleasePointerCaptures();foreach(var el in MonitorTiles.Items.OfType<FrameworkElement>())if(MonitorTiles.ContainerFromItem(el) is FrameworkElement container&&Descendant<Views.SelectionSurface>(container) is {} surface)surface.IsDropTarget=false;}
 
 static WriteableBitmap Bitmap(SnapshotFrame frame) {
 var image=new WriteableBitmap(frame.Width,frame.Height);
@@ -283,11 +293,30 @@ var scroll=Descendant<ScrollViewer>(MonitorTiles);if(scroll==null)return;
 double delta=p.X<bounds.Left+36?-24:p.X>bounds.Right-36?24:0;
 if(delta!=0){scroll.ChangeView(Math.Clamp(scroll.HorizontalOffset+delta,0,scroll.ScrollableWidth),null,null,true);lastAutoScroll=Environment.TickCount64;}
 }void SetLayout(){
-SelectionHint.Visibility=Root.ActualWidth<760?Visibility.Collapsed:Visibility.Visible;
-bool next=settings.Layout=="Gallery"||(settings.Layout=="Auto"&&Root.ActualWidth>Root.ActualHeight);
-if(gallery==next)return;gallery=next;
-WindowsList.ItemTemplate=(DataTemplate)Root.Resources[next?"GalleryTemplate":"RowTemplate"];
-WindowsList.ItemsPanel=(ItemsPanelTemplate)Root.Resources[next?"GalleryPanel":"RowsPanel"];
+if(Root.ActualWidth<=0||Root.ActualHeight<=0)return;
+
+UpdateGalleryWidth();UpdateMonitorDensity();
+}
+void WindowListSizeChanged(object sender,SizeChangedEventArgs e)=>UpdateGalleryWidth();
+void UpdateGalleryWidth(){
+    if(WindowsList.ActualWidth<=0)return;
+    if(Descendant<ItemsWrapGrid>(WindowsList) is not {} panel)return;
+    double width=SurfaceLayout.GalleryGrid(WindowsList.ActualWidth).Width;
+    if(Math.Abs(panel.ItemWidth-width)>.5)panel.ItemWidth=width;
+}
+void UpdateMonitorDensity(){
+    bool compact=Root.ActualHeight<720;
+    MonitorHeading.Visibility=compact?Visibility.Collapsed:Visibility.Visible;
+    HeadingGrid.RowSpacing=compact?0:6;
+    foreach(var element in MonitorTiles.Items.OfType<FrameworkElement>()){
+        var border=element as Border??(element as Grid)?.Children.OfType<Border>().FirstOrDefault();
+        if(border?.Child is not StackPanel stack)continue;
+        stack.Width=compact?216:240;stack.Height=compact?116:180;
+        if(stack.Children.FirstOrDefault() is TextBlock heading)heading.FontSize=compact?16:22;
+        if(border.Tag is DisplayInfo d&&d.Active&&monitorPreviews.TryGetValue(d.Key,out var preview)){
+            preview.image.Width=compact?216:240;preview.image.Height=compact?44:90;preview.label.Visibility=Visibility.Collapsed;
+        }else if(stack.Children.ElementAtOrDefault(1) is Border empty)empty.Height=compact?44:90;
+    }
 }
 async Task RefreshWithPreviews(){
 if(busy||pressed!=null){refreshRequested=true;return;}
@@ -300,12 +329,10 @@ string entry=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+"  "+message.Replace("
 history.Add(entry);
 try {Directory.CreateDirectory(Path.GetDirectoryName(historyPath)!);File.AppendAllText(historyPath,entry+Environment.NewLine);}catch{}
 int version=++noticeVersion;
-HistoryButton.Visibility=Visibility.Collapsed;NoticePanel.Visibility=Visibility.Visible;ResultStatus.Opacity=1;ResultStatus.Text=message;
+HistoryButton.Visibility=Visibility.Collapsed;NoticePanel.Visibility=Visibility.Visible;ResultStatus.Opacity=1;ResultStatus.Text=message;Views.Motion.Enter(NoticePanel,0,4);
 await Task.Delay(settings.NoticeSeconds*1000);
-for(int i=1;i<=12;i++){
 if(version!=noticeVersion||closed)return;
-ResultStatus.Opacity=1-i/12.0;await Task.Delay(30);
-}
+await Views.Motion.Exit(NoticePanel,0,-4);
 if(version==noticeVersion){ResultStatus.Text="";NoticePanel.Visibility=Visibility.Collapsed;HistoryButton.Visibility=Visibility.Visible;}
 }
 async void HistoryClicked(object sender,RoutedEventArgs e){
@@ -314,7 +341,7 @@ var text=new TextBlock{Text=history.Count==0?"暂无操作记录":string.Join("\
 var dialog=new ContentDialog{XamlRoot=Root.XamlRoot,Title="操作记录",CloseButtonText="关闭",Content=new ScrollViewer{Content=text,MaxHeight=520}};
 try{await dialog.ShowAsync();}finally{dialogOpen=false;}
 }void AdminClicked(object sender,RoutedEventArgs e) {
-try {var p=Process.Start(new ProcessStartInfo(Environment.ProcessPath!){UseShellExecute=true,Verb="runas"});if(p!=null)Close();}
+try {var p=Process.Start(new ProcessStartInfo(Environment.ProcessPath!,"--elevated-restart"){UseShellExecute=true,Verb="runas"});if(p!=null)ExitApp();}
 catch(Exception ex){Notice("未重启："+ex.Message);}
 }
 }

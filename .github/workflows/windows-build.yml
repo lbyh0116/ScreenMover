@@ -1,0 +1,30 @@
+name: Windows build
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-2025
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.400'
+      - name: Build, run headless regression and publish
+        shell: pwsh
+        run: ./build.ps1 -PureTest
+      - name: Package portable build
+        shell: pwsh
+        run: Compress-Archive -Path dist/ScreenMover -DestinationPath dist/ScreenMover-win-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ScreenMover-win-x64
+          path: dist/ScreenMover-win-x64.zip
+          retention-days: 14

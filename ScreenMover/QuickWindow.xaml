@@ -1,25 +1,31 @@
 <Window x:Class="ScreenMover.QuickWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:views="using:ScreenMover.Views" Title="ScreenMover · 快捷操作">
-<Window.SystemBackdrop><DesktopAcrylicBackdrop/></Window.SystemBackdrop>
-<Border CornerRadius="14" BorderThickness="1" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-<Grid x:Name="QuickRoot" Padding="18" RowSpacing="12">
-<Grid.Resources><views:SelectionBrushConverter x:Key="SelectedBrush"/></Grid.Resources>
-<Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-<Grid><TextBlock Text="快捷操作" FontSize="22" FontWeight="SemiBold"/><Button Content="×" Click="DismissClicked" HorizontalAlignment="Right" AutomationProperties.Name="收起快捷面板"/></Grid>
-<Grid Grid.Row="1" ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="200"/></Grid.ColumnDefinitions>
-<ComboBox x:Name="SourceScreen" Header="当前屏幕的窗口" HorizontalAlignment="Stretch" SelectionChanged="SourceChanged"/>
-<TextBlock Grid.Column="1" Text="拖到其他屏幕：移动&#x0a;拖到所在屏幕：隐藏到新桌面" TextWrapping="Wrap" FontSize="12" Opacity=".7" VerticalAlignment="Bottom"/>
-</Grid>
-<Grid Grid.Row="2" ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="200"/></Grid.ColumnDefinitions>
-<ListView x:Name="QuickList" SelectionMode="Single" SelectionChanged="SelectionChanged">
-<ListView.ItemContainerStyle><Style TargetType="ListViewItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/></Style></ListView.ItemContainerStyle>
-<ListView.ItemTemplate><DataTemplate><Border BorderThickness="2" CornerRadius="6" BorderBrush="{Binding Selected, Converter={StaticResource SelectedBrush}}">
-<Grid Padding="6,9" ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="24"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Image Source="{Binding AppIcon}" Width="24" Height="24"/><views:MiddleTitle Grid.Column="1" FullText="{Binding Title}" VerticalAlignment="Center"/></Grid>
-</Border></DataTemplate></ListView.ItemTemplate>
-</ListView>
-<TextBlock x:Name="QuickEmpty" Text="此屏幕暂无窗口" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity=".6" IsHitTestVisible="False"/>
-<ScrollViewer Grid.Column="1" x:Name="ScreenScroll" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="Screens" Spacing="8"/></ScrollViewer>
-</Grid>
-<TextBlock Grid.Row="3" x:Name="QuickStatus" Text="拖动左侧窗口到右侧屏幕" TextWrapping="Wrap" FontSize="12" MinHeight="32" Opacity=".8"/>
-<Grid Grid.Row="4"><Button Content="打开主界面" Click="MainClicked"/><StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8"><Button Content="已隐藏 / 找回" Click="HiddenClicked"/><Button Content="退出" Click="QuitClicked"/></StackPanel></Grid>
-<Canvas Grid.RowSpan="5" x:Name="QuickDragLayer" IsHitTestVisible="False"><Border x:Name="QuickGhost" Visibility="Collapsed" Background="{ThemeResource SystemControlHighlightAccentBrush}" Padding="10" CornerRadius="6"><TextBlock x:Name="QuickGhostText" Foreground="White"/></Border></Canvas>
-</Grid></Border></Window>
+    <Window.SystemBackdrop><MicaBackdrop/></Window.SystemBackdrop>
+    <Border x:Name="PanelSurface" CornerRadius="8" Background="Transparent">
+        <Grid x:Name="QuickRoot" Background="Transparent">
+            <Grid.RowDefinitions><RowDefinition Height="52"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+            <Grid Padding="16,8,8,4" ColumnSpacing="4">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <TextBlock Text="ScreenMover" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Style="{StaticResource SubtleButtonStyle}" Click="MainClicked" ToolTipService.ToolTip="打开主界面" AutomationProperties.Name="打开主界面"><FontIcon Glyph="&#xE8A7;" FontSize="16"/></Button>
+                <Button Grid.Column="2" Style="{StaticResource SubtleButtonStyle}" Click="DismissClicked" ToolTipService.ToolTip="收起" AutomationProperties.Name="收起快捷面板"><FontIcon Glyph="&#xE711;" FontSize="14"/></Button>
+            </Grid>
+            <Grid Grid.Row="1" Margin="10,0,10,10" ColumnSpacing="10">
+                <Grid.ColumnDefinitions><ColumnDefinition x:Name="WindowColumn" Width="172"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Grid RowSpacing="6">
+                    <Grid.RowDefinitions><RowDefinition Height="32"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <ComboBox x:Name="SourceScreen" HorizontalAlignment="Stretch" SelectionChanged="SourceChanged" AutomationProperties.Name="窗口所在屏幕"/>
+                    <Grid Grid.Row="1" Background="Transparent">
+                        <ListView x:Name="QuickList" SelectionMode="Single" SelectionChanged="SelectionChanged" ItemContainerStyle="{StaticResource WindowItemStyle}" ScrollViewer.HorizontalScrollMode="Disabled">
+                            <ListView.ItemContainerTransitions><TransitionCollection><AddDeleteThemeTransition/><RepositionThemeTransition/></TransitionCollection></ListView.ItemContainerTransitions>
+                            <ListView.ItemTemplate><DataTemplate><Grid Padding="8,7" ColumnSpacing="8" MinHeight="34"><Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Image Source="{Binding AppIcon}" Width="20" Height="20"/><views:MiddleTitle Grid.Column="1" FullText="{Binding AppName}" ToolTipService.ToolTip="{Binding Title}" VerticalAlignment="Center"/></Grid></DataTemplate></ListView.ItemTemplate>
+                        </ListView>
+                        <TextBlock x:Name="QuickEmpty" Text="暂无窗口" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity=".6" IsHitTestVisible="False"/>
+                    </Grid>
+                </Grid>
+                <ScrollViewer Grid.Column="1" x:Name="ScreenScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"><StackPanel x:Name="Screens" Spacing="6"/></ScrollViewer>
+                <Border x:Name="QuickNotice" Grid.ColumnSpan="2" Visibility="Collapsed" VerticalAlignment="Bottom" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="8" Padding="10" Margin="4"><TextBlock x:Name="QuickStatus" TextWrapping="Wrap" FontSize="12"/></Border>
+            </Grid>
+            <Canvas Grid.RowSpan="2" x:Name="QuickDragLayer" IsHitTestVisible="False"><Border x:Name="QuickGhost" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Padding="0"><Grid><StackPanel><Image x:Name="QuickGhostImage" Stretch="Uniform"/><TextBlock x:Name="QuickGhostText" Visibility="Collapsed"/></StackPanel><TextBlock x:Name="QuickGhostCount" Visibility="Collapsed"/></Grid></Border></Canvas>
+        </Grid>
+    </Border>
+</Window>

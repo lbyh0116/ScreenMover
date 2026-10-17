@@ -8,6 +8,7 @@ public sealed partial class MainWindow {
     QuickWindow? quick;
     public bool Exiting {get;private set;}
     public AppSettings CurrentSettings=>settings;
+    public bool CanStartInTray=>tray?.Installed==true;
     void SetupTrayLifecycle(){
         ConfigureTray();
         AppWindow.Closing+=(_,e)=>{
@@ -22,20 +23,28 @@ public sealed partial class MainWindow {
         if(!settings.TrayEnabled){tray?.Dispose();tray=null;return;}
         if(tray!=null)return;
         try{
-            tray=new(WinRT.Interop.WindowNative.GetWindowHandle(this),()=>DispatcherQueue.TryEnqueue(async()=>await OpenQuick()),()=>DispatcherQueue.TryEnqueue(ShowMain),()=>DispatcherQueue.TryEnqueue(ExitApp));
+            tray=new(WinRT.Interop.WindowNative.GetWindowHandle(this),()=>DispatcherQueue.TryEnqueue(async()=>await OpenQuick(true)),()=>DispatcherQueue.TryEnqueue(ShowMain),()=>DispatcherQueue.TryEnqueue(ExitApp));
             if(!tray.Installed)Notice("托盘图标创建失败；关闭主窗口时将正常退出");
         }catch(Exception ex){Notice("托盘不可用："+ex.Message);}
     }
     public void ShowMain(){AppWindow.Show();if(AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter p&&p.State==Microsoft.UI.Windowing.OverlappedPresenterState.Minimized)p.Restore();Activate();}
     public void ShowHidden(){ShowMain();HiddenClicked(this,new RoutedEventArgs());}
+    public void ShowSettings(){ShowMain();SettingsClicked(this,new RoutedEventArgs());}
     public void ExitApp(){Exiting=true;Close();}
-    async Task OpenQuick(){
+    async Task OpenQuick(bool fromTray=false){
         if(dialogOpen){ShowMain();return;}if(busy)return;
-        try{quick??=new QuickWindow(this);if(quick.IsPanelVisible)quick.Dismiss();else await quick.ShowPanel();}
+        try{quick??=new QuickWindow(this);if(quick.IsPanelVisible)quick.Dismiss();else if(!fromTray||!quick.JustDeactivated)await quick.ShowPanel(fromTray);}
         catch(Exception ex){Notice("快捷面板无法打开："+ex.Message);ShowMain();}
     }
     async void QuickClicked(object sender,RoutedEventArgs e)=>await OpenQuick();
-    public async Task<(List<DisplayInfo> Displays,List<WindowInfo> Windows,Dictionary<string,ImageSource> Previews)> QuickData(){
+    public async Task<(List<DisplayInfo> Displays,List<WindowInfo> Windows,Dictionary<string,ImageSource> Previews)> QuickData(bool force=false){
+        // The main window keeps its data current while in the tray. Reuse static previews
+        // so opening the flyout does not wait for another round of native icon/capture calls.
+        if(!force&&snapshot!=null&&lastSnapshot!=DateTime.MinValue){
+            var cachedImages=monitorPreviews.Where(p=>p.Value.image.Source!=null)
+                .ToDictionary(p=>p.Key,p=>p.Value.image.Source!);
+            return (snapshot.Displays.ToList(),order.Sort(allWindows),cachedImages);
+        }
         var cached=iconCache.Keys.ToHashSet();bool capture=settings.ScreenPreviews;
         var data=await Task.Run(()=>{
             var ds=displays.Read().Displays;var ws=windows.Read();
