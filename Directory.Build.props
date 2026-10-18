@@ -1,3 +1,9 @@
 <Project>
   <PropertyGroup><Version>0.2.0-preview.5</Version></PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'ScreenMover' or '$(MSBuildProjectName)' == 'CaptureWorker'">
+    <ScreenMoverArchitecture Condition="'$(ScreenMoverArchitecture)' == '' and '$(RuntimeIdentifier)' != ''">$([System.String]::Copy('$(RuntimeIdentifier)').Replace('win-', ''))</ScreenMoverArchitecture>
+    <ScreenMoverArchitecture Condition="'$(ScreenMoverArchitecture)' == ''">x64</ScreenMoverArchitecture>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-$(ScreenMoverArchitecture)</RuntimeIdentifier>
+    <PlatformTarget>$(ScreenMoverArchitecture)</PlatformTarget>
+  </PropertyGroup>
 </Project>

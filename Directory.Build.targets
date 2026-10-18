@@ -1,0 +1,11 @@
+<Project>
+  <Target Name="ValidateScreenMoverArchitecture" BeforeTargets="PrepareForBuild;Publish"
+          Condition="'$(MSBuildProjectName)' == 'ScreenMover' or '$(MSBuildProjectName)' == 'CaptureWorker'">
+    <Error Condition="'$(RuntimeIdentifier)' != 'win-$(ScreenMoverArchitecture)'"
+           Text="RuntimeIdentifier and ScreenMoverArchitecture must match." />
+    <Error Condition="'$(PlatformTarget)' != '$(ScreenMoverArchitecture)'"
+           Text="PlatformTarget and ScreenMoverArchitecture must match." />
+    <Error Condition="'$(ScreenMoverArchitecture)' != 'x64'"
+           Text="Only x64 is currently implemented and verified. x86/arm64 are reserved build targets; see docs/ARCHITECTURE.md before enabling them." />
+  </Target>
+</Project>

@@ -40,3 +40,17 @@ Copilot 键能力的技术前提是“已打包、已签名、正确注册”，
 
 
 Preview 5 补充：便携原版增加 Win10 22H2 基础兼容路径；Copilot 键系统选择入口依然是后续 MSIX 工作，只在实际提供该设置的 Windows 版本启用，不把它作为 Win10 基础功能承诺。C 图标已定稿应用。
+
+## 提交就绪清单（2026-10-18 核对）
+
+- [ ] 注册并验证 Partner Center 开发者账户，预留可用商品名；收费需完成适用的收款及税务资料。
+- [ ] 接入真实包 Identity/Publisher，生成 MSIX；先只提交通过验收的 x64，不要求等齐 x86/ARM64。
+- [ ] 适配包内启动项、单实例/数据路径、辅助进程与管理员重启。默认普通权限运行；核对实际需要的能力声明及其审核要求。
+- [ ] Copilot provider 扩展、签名和激活路由实测；不自动改写用户选择。
+- [ ] 安装、升级、卸载、便携/商店版共存、隐藏窗口恢复及权限边界验收；运行 Windows App Certification Kit，准备认证操作说明。
+- [ ] 发布可访问的隐私政策 URL、支持入口、商店截图/图标、描述、系统要求、年龄评级和发行说明；确认原创及第三方授权。
+- [ ] 设置价格、地区与发布范围，先做受控测试，再提交认证。隐藏功能的未公开虚拟桌面接口是兼容和审核风险，应明确说明并保留降级路径。
+
+Store 分发 MSIX 的最终签名由微软处理，无需为此先购买商业代码签名证书；本地侧载测试仍需测试签名和信任流程。若选择 MSI/EXE 商店路线，则需另行满足安装器托管、静默安装及可信代码签名等要求，不能直接上传目前的便携 ZIP。
+
+参考：[Store 提交流程](https://learn.microsoft.com/en-us/windows/apps/publish/faq/get-started-with-the-microsoft-store)、[签名选项](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/code-signing-options)、[MSI/EXE 认证](https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/msi/app-certification-process)。

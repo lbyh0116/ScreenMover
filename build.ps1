@@ -1,16 +1,18 @@
-param([switch]$Test,[switch]$PureTest,[string]$OutputPath='dist\ScreenMover')
+param([switch]$Test,[switch]$PureTest,[string]$OutputPath='dist\ScreenMover',
+    [ValidateSet('x64','x86','arm64')][string]$Architecture='x64')
 $ErrorActionPreference = 'Stop'
+if ($Architecture -ne 'x64') { throw 'x86/arm64 targets are reserved, not yet implemented or verified. See docs/ARCHITECTURE.md.' }
 if ($Test -and $PureTest) { throw 'Choose either -Test (window integration) or -PureTest (no UI)' }
 Push-Location $PSScriptRoot
 try {
     $releasePath = if ([IO.Path]::IsPathRooted($OutputPath)) { [IO.Path]::GetFullPath($OutputPath) } else { [IO.Path]::GetFullPath((Join-Path $PSScriptRoot $OutputPath)) }
-    dotnet build ScreenMover.slnx
+    dotnet build ScreenMover.slnx -p:ScreenMoverArchitecture=$Architecture
     if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
     if ($PureTest) {
         dotnet run --project Diagnostics -- --pure
         if ($LASTEXITCODE -ne 0) { throw 'Pure diagnostics failed' }
     }
-    dotnet publish ScreenMover\ScreenMover.csproj -c Release -r win-x64 --self-contained true -p:PublishTrimmed=false -p:PublishReadyToRun=false -o $releasePath
+    dotnet publish ScreenMover\ScreenMover.csproj -c Release -r "win-$Architecture" -p:ScreenMoverArchitecture=$Architecture --self-contained true -p:PublishTrimmed=false -p:PublishReadyToRun=false -o $releasePath
     if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
     foreach ($required in @('ScreenMover.exe','Assets\AppIcon.ico','ScreenMover.CaptureWorker.exe','ScreenMover.CaptureWorker.dll','ScreenMover.CaptureWorker.runtimeconfig.json','ScreenMover.pri','MainWindow.xbf','QuickWindow.xbf','Helpers\ScreenMover.DesktopHelper.exe','Helpers\VirtualDesktop-LICENSE.txt')) {
         if (-not (Test-Path (Join-Path $releasePath $required))) { throw "Missing release resource: $required" }

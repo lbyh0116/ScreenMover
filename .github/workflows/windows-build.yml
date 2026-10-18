@@ -10,6 +10,9 @@ jobs:
   build:
     runs-on: windows-2025
     timeout-minutes: 25
+    strategy:
+      matrix:
+        architecture: [x64] # Enable more targets after adaptation and device validation.
     steps:
       - uses: actions/checkout@v6
         with:
@@ -19,12 +22,12 @@ jobs:
           dotnet-version: '10.0.400'
       - name: Build, run headless regression and publish
         shell: pwsh
-        run: ./build.ps1 -PureTest
+        run: ./build.ps1 -PureTest -Architecture ${{ matrix.architecture }}
       - name: Package portable build
         shell: pwsh
-        run: Compress-Archive -Path dist/ScreenMover -DestinationPath dist/ScreenMover-win-x64.zip
+        run: Compress-Archive -Path dist/ScreenMover -DestinationPath dist/ScreenMover-win-${{ matrix.architecture }}.zip
       - uses: actions/upload-artifact@v4
         with:
-          name: ScreenMover-win-x64
-          path: dist/ScreenMover-win-x64.zip
+          name: ScreenMover-win-${{ matrix.architecture }}
+          path: dist/ScreenMover-win-${{ matrix.architecture }}.zip
           retention-days: 14
