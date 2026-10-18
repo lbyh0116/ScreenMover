@@ -11,12 +11,12 @@ Windows 11 多屏窗口管理工具，使用 C# / WinUI 3 开发。目前为 **D
 ## 功能
 
 - 屏幕磁贴横向排列，显示静态截图；未启用屏幕以虚线标记。
-- 主窗口固定为相册网格，支持截图预览、图标回退、搜索和多选；快捷面板使用图标与标题列表。
+- 主窗口固定为相册网格，支持截图预览、图标回退、搜索和多选；快捷面板使用图标与软件名列表。
 - 拖到屏幕磁贴移动窗口，支持批量移动及撤销上一次移动。
 - 选中窗口以主题色边框高亮；拖拽调整顺序，刷新及重启 ScreenMover 后保留仍打开窗口的顺序。
 - 隐藏窗口到以软件名命名的新虚拟桌面并最小化，可通过“已隐藏 / 找回”恢复。
-- 托盘快捷面板：左侧窗口图标与标题，右侧屏幕预览；拖到其他屏幕移动，拖到所在屏幕隐藏。长标题保留首尾。云母面板点击外部自动收起，右上角可打开主界面。
-- 设置支持主题、截图、刷新间隔、移动留白、窗口尺寸记忆与托盘常驻。
+- 托盘快捷面板：左侧窗口图标与软件名（完整标题可悬停查看），右侧屏幕预览；拖到其他屏幕移动，拖到所在屏幕隐藏。长标题保留首尾。云母面板点击外部自动收起，右上角可打开主界面。
+- 完整设置页面支持浅色/深色外观、自定义或系统主题色、截图、刷新间隔、移动留白、窗口尺寸记忆与托盘常驻。
 
 默认在启动、重新激活、每分钟及 F5 时更新截图。截图为静态采样，不录屏；普通窗口事件只更新列表。默认关闭主窗口后留在托盘，右键托盘图标选择“退出”可彻底退出。
 
@@ -91,12 +91,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test
 - 重复启动会唤醒已有实例，截图和测试进程仍独立运行。
 - 设置可选“登录 Windows 后启动到托盘”，默认关闭；使用当前用户 Run 启动项，不需要管理员权限。移动/删除程序前应关闭此选项。
 
-当前本地预览位于 `dist\ScreenMover-preview-2\ScreenMover.exe`，最新公开预发布为 v0.2.0-preview.2，v0.1.0-demo 为较早版本。见 [开发清单](docs/ROADMAP.md) 与 [手动验收清单](docs/MANUAL_TEST.md)。
+当前本地预览位于 `dist\ScreenMover-preview-3\ScreenMover.exe`，最新公开预发布为 v0.2.0-preview.3，v0.1.0-demo 为较早版本。见 [开发清单](docs/ROADMAP.md) 与 [手动验收清单](docs/MANUAL_TEST.md)。
 
 
 ## 继续完善：快捷键、偏好备份与诊断
 
-当前构建标记为 `0.2.0-preview.2`，尚待人工界面验收。
+当前构建标记为 `0.2.0-preview.3`，尚待人工界面验收。
 
 - 设置中可录入快捷面板的全局组合键；默认关闭，冲突或保存失败会保留原绑定，退出释放。
 - “设置备份与诊断”可导出已保存偏好、读取偏好文件；导入后保存并应用才生效。设备尺寸、窗口排序、启动项和隐藏记录不随偏好文件迁移。
@@ -106,7 +106,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test
 本轮没有注册实际全局快捷键、修改开机启动或启动图形界面验收；这些入口只在运行软件后由使用者操作。测试使用模拟注册器验证冲突与回退，使用临时文件验证偏好和诊断包。
 
 
-## 0.2.0-preview.2：紧凑快捷面板
+## 0.2.0-preview.3：紧凑快捷面板
 
 快捷面板随窗口数与屏幕数变化，接近 4:3；少量内容约 350 × 258 DIP，较多内容最多约 480 × 360 DIP 并滚动。软件名列保持紧凑，只显示 Word、ChatGPT 等软件名，完整窗口标题放在悬停提示里。拖拽预览不再叠加外层边框。原生白边增加非客户区与样式处理，实际观感仍需要人工确认。
 
@@ -114,7 +114,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test
 # 构建、发布、纯逻辑回归（不启动软件窗口）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest
 # 输出到指定目录，避免覆盖正在运行的文件
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest -OutputPath dist\ScreenMover-preview-2
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest -OutputPath dist\ScreenMover-preview-3
 ```
 
 每次 push 到 main 或提交 PR，GitHub Actions 会执行 Windows 构建、无界面回归并保存便携包产物。它不会代替视觉和实体多屏验收。更新详情见 [CHANGELOG](CHANGELOG.md)。
+
+
+### Preview 3 界面修复
+
+修复空屏幕旧卡片残留与浅色云母主题不同步；设置变为主窗口内页面，可自定义主题色或跟随系统；标题栏与内容背景融合。拖入屏幕时改为高不透明度遮罩、白字和边框，收起跟随预览以避免叠加。上述视觉表现仍需手动验收，详见 MANUAL_TEST.md。

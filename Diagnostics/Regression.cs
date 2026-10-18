@@ -77,14 +77,30 @@ static class Regression {
         Check(WindowQuery.Filter(windows,"one","Browser",false).Count==0,"Current-screen search");
         Check(WindowQuery.Filter(windows,"one","102",true).Count==1,"All-screen PID search");
         Check(WindowQuery.Filter(windows,"one","missing",true).Count==0,"Empty search result");
+        Check(WindowQuery.Filter(windows,"clean-virtual-display","",false).Count==0,"Clean virtual display leaked main-screen windows");
+        var revision=new WindowListRevision();
+        Check(revision.Update("main-screen-windows"),"Initial list binding skipped");
+        revision.Invalidate();
+        Check(revision.Update(""),"Selecting an empty display retained the previous list");
+        Check(!revision.Update(""),"Unchanged empty list rebound");
+        revision.Invalidate();
+        Check(revision.Update(""),"Invalidated empty list was treated as unchanged");
+        Check(revision.Update("main-screen-windows"),"Returning from an empty display did not rebind");
+        Check(AccentColors.Normalize(" #12abEF ")=="#12ABEF"&&AccentColors.Normalize("#abc")==""&&AccentColors.Normalize("#12FFZZ")=="","Accent validation");
+        foreach(var rgb in new[]{((byte)255,(byte)255,(byte)255),((byte)255,(byte)255,(byte)0),((byte)255,(byte)0,(byte)0),((byte)0,(byte)0,(byte)0)}){
+            var drop=AccentColors.Overlay(rgb.Item1,rgb.Item2,rgb.Item3);
+            double Linear(byte v){double x=v/255.0;return x<=.04045?x/12.92:Math.Pow((x+.055)/1.055,2.4);}
+            double luminance=.2126*Linear(drop.R)+.7152*Linear(drop.G)+.0722*Linear(drop.B);
+            Check(1.05/(luminance+.05)>=4.5,"Pale custom accent makes white drop text unreadable");
+        }
         string folder=Path.Combine(Path.GetTempPath(),"ScreenMover-tests-"+Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(folder);
         string path=Path.Combine(folder,"settings.json");
         try{
-            var config=new AppSettings{Theme="Dark",RefreshSeconds=0,MoveMargin=125,WindowPreviews=false};
+            var config=new AppSettings{Theme="Dark",AccentColor="#12ABEF",RefreshSeconds=0,MoveMargin=125,WindowPreviews=false};
             LocalData.Write(path,config);
             var copy=LocalData.Read(path,()=>new AppSettings(),out var warning);
-            Check(warning==null&&copy.RefreshSeconds==0&&copy.MoveMargin==125&&!copy.WindowPreviews,"Settings roundtrip");
+            Check(warning==null&&copy.AccentColor=="#12ABEF"&&copy.RefreshSeconds==0&&copy.MoveMargin==125&&!copy.WindowPreviews,"Settings roundtrip");
             foreach(string legacy in new[]{"Auto","List","Gallery"}){
                 File.WriteAllText(path,"{\"Layout\":\""+legacy+"\",\"Theme\":\"Dark\"}");
                 var migrated=LocalData.Read(path,()=>new AppSettings(),out warning);
@@ -112,7 +128,7 @@ static class Regression {
             var unicode=WindowTitle.Middle("😀😀😀😀😀😀😀😀😀😀😀😀",7);
             Check(!unicode.Contains('\uFFFD')&&unicode.StartsWith("😀")&&unicode.EndsWith("😀"),"Unicode title split");
         }finally{if(File.Exists(orderPath))File.Delete(orderPath);}
-        Console.WriteLine("PASS search, settings persistence, corrupt-file backup, validation, reorder persistence, group order, middle-ellipsis titles");
+        Console.WriteLine("PASS empty-display filtering and list invalidation, accent contrast/persistence, search, settings persistence, corrupt-file backup, validation, reorder persistence, group order, middle-ellipsis titles");
     }
     static void Preferences(){
         Check(HotkeySpec.Parse("alt+control+space")?.Name=="Ctrl+Alt+Space","Hotkey canonicalization");
@@ -134,10 +150,10 @@ static class Regression {
             using(var disabled=binding.Prepare(""))disabled.Commit();Check(registered.Count==0,"Hotkey disable did not unregister");
             using var pending=binding.Prepare("Ctrl+Alt+M");binding.Dispose();binding.Dispose();Check(registered.Count==0,"Dispose leaked pending registration");
         }
-        var original=new AppSettings{Theme="Dark",QuickHotkey="Ctrl+Alt+K",MoveMargin=125,Width=2500,Height=1500};
+        var original=new AppSettings{Theme="Dark",AccentColor="#12ABEF",QuickHotkey="Ctrl+Alt+K",MoveMargin=125,Width=2500,Height=1500};
         string profile=SettingsProfile.Export(original);
         var restored=SettingsProfile.Import(profile);
-        Check(restored.Theme=="Dark"&&restored.QuickHotkey==original.QuickHotkey&&restored.MoveMargin==125,"Preferences roundtrip");
+        Check(restored.AccentColor==original.AccentColor&&restored.Theme=="Dark"&&restored.QuickHotkey==original.QuickHotkey&&restored.MoveMargin==125,"Preferences roundtrip");
         Check(!profile.Contains("\"Width\"")&&!profile.Contains("\"Height\"")&&!profile.Contains("SizeInDips"),"Device geometry leaked into portable preferences");
         Check(SettingsProfile.Import("{\"Theme\":\"Light\",\"Layout\":\"List\"}").Theme=="Light","Legacy preferences import");
         foreach(string bad in new[]{"{broken","[]","{}","{\"Format\":\"Other\",\"Version\":1}","{\"Format\":\"ScreenMover.Settings\",\"Version\":99,\"Settings\":{\"Theme\":\"Dark\"}}","{\"QuickHotkey\":\"F12\"}",new string('x',256*1024+1)}){

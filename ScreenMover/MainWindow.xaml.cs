@@ -31,14 +31,15 @@ readonly string historyPath=Path.Combine(Environment.GetFolderPath(Environment.S
 readonly DispatcherTimer timer=new(){Interval=TimeSpan.FromMilliseconds(250)};
 WindowEvents? events; DisplaySnapshot? snapshot; List<WindowInfo> allWindows=[];
 DisplayInfo? selected; bool refreshing,busy,closed; int ticks;
-string displaySignature="",windowSignature="";
+string displaySignature="";readonly WindowListRevision windowRevision=new();
 long lastClickTime; nint lastClickHandle; Point start; WindowInfo? pressed; List<WindowInfo> dragItems=[]; bool dragging;
 UIElement? capture; DisplayInfo? hover; List<WindowInfo> initialSelection=[];
 readonly bool admin=new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 public MainWindow() {
 string? settingsWarning=null;
 try{settings=LocalData.Read(AppSettings.FilePath,()=>new AppSettings(),out settingsWarning);settings.Normalize();}catch(Exception ex){settingsWarning=ex.Message;}
-InitializeComponent();dragFeedback=new(Root,DragLayer,Ghost,GhostImage,GhostCount);Content=null;cursorHost.Children.Add(Root);Content=cursorHost;
+Views.Appearance.InitializeResources();
+InitializeComponent();dragFeedback=new(Root,DragLayer,Ghost,GhostImage,GhostCount);Content=null;cursorHost.Children.Add(Shell);Content=cursorHost;
 var hwnd=WinRT.Interop.WindowNative.GetWindowHandle(this);
 try {
     var primary=displays.Read().Displays.First(d=>d.Active&&d.Primary);
@@ -47,6 +48,9 @@ try {
     AppWindow.MoveAndResize(new(primary.Work.Left+(primary.Work.Width-size.Width)/2,primary.Work.Top+(primary.Work.Height-size.Height)/2,size.Width,size.Height));
 }catch{AppWindow.Resize(new(1060,820));}
 chrome=new(hwnd);
+ExtendsContentIntoTitleBar=true;SetTitleBar(TitleDragRegion);
+cursorHost.ActualThemeChanged+=(_,_)=>UpdateCaptionTheme();
+appearanceSettings.ColorValuesChanged+=SystemColorsChanged;
 initialized=true;ApplySettings();
 events=new(WinRT.Interop.WindowNative.GetWindowHandle(this));
 try {if(File.Exists(historyPath))history.AddRange(File.ReadAllLines(historyPath));}catch{}
@@ -61,16 +65,16 @@ double scale=Math.Max(.75,Services.TrayIcon.GetDpiForWindow(WinRT.Interop.Window
 settings.Width=(int)Math.Round(p.rcNormalPosition.Width/scale);settings.Height=(int)Math.Round(p.rcNormalPosition.Height/scale);settings.SizeInDips=true;
 settings.Normalize();LocalData.Write(AppSettings.FilePath,settings);
 }}catch{}
-closed=true;globalHotkey?.Dispose();chrome?.Dispose();timer.Stop();events.Dispose();previewCancellation?.Cancel();};
+closed=true;appearanceSettings.ColorValuesChanged-=SystemColorsChanged;globalHotkey?.Dispose();chrome?.Dispose();timer.Stop();events.Dispose();previewCancellation?.Cancel();};
 Root.AddHandler(UIElement.PointerPressedEvent,new PointerEventHandler(Pressed),true);
 Root.AddHandler(UIElement.PointerMovedEvent,new PointerEventHandler(Moved),true);
 Root.AddHandler(UIElement.PointerReleasedEvent,new PointerEventHandler(Released),true);
 Root.AddHandler(UIElement.PointerCanceledEvent,new PointerEventHandler(Canceled),true);
 Root.AddHandler(UIElement.PointerCaptureLostEvent,new PointerEventHandler(Canceled),true);
-var f5=new KeyboardAccelerator{Key=VirtualKey.F5}; f5.Invoked+=async(_,e)=>{if(dialogOpen)return;e.Handled=true;await RefreshWithPreviews();};Root.KeyboardAccelerators.Add(f5);
-var all=new KeyboardAccelerator{Key=VirtualKey.A,Modifiers=VirtualKeyModifiers.Control};all.Invoked+=(_,e)=>{if(!dialogOpen&&!ReferenceEquals(FocusManager.GetFocusedElement(Root.XamlRoot),SearchBox)){WindowsList.SelectAll();e.Handled=true;}};Root.KeyboardAccelerators.Add(all);
-var esc=new KeyboardAccelerator{Key=VirtualKey.Escape};esc.Invoked+=(_,e)=>{if(dialogOpen)return;if(pressed!=null){RestoreSelection();CancelDrag();e.Handled=true;}else if(SearchBox.Text.Length>0){SearchBox.Text="";e.Handled=true;}};Root.KeyboardAccelerators.Add(esc);
-var find=new KeyboardAccelerator{Key=VirtualKey.F,Modifiers=VirtualKeyModifiers.Control};find.Invoked+=(_,e)=>{if(!dialogOpen){SearchBox.Focus(FocusState.Keyboard);SearchBox.SelectAll();e.Handled=true;}};Root.KeyboardAccelerators.Add(find);
+var f5=new KeyboardAccelerator{Key=VirtualKey.F5}; f5.Invoked+=async(_,e)=>{if(dialogOpen)return;e.Handled=true;await RefreshWithPreviews();};Shell.KeyboardAccelerators.Add(f5);
+var all=new KeyboardAccelerator{Key=VirtualKey.A,Modifiers=VirtualKeyModifiers.Control};all.Invoked+=(_,e)=>{if(!dialogOpen&&!ReferenceEquals(FocusManager.GetFocusedElement(Root.XamlRoot),SearchBox)){WindowsList.SelectAll();e.Handled=true;}};Shell.KeyboardAccelerators.Add(all);
+var esc=new KeyboardAccelerator{Key=VirtualKey.Escape};esc.Invoked+=(_,e)=>{if(settingsReturn!=null){settingsReturn(false);e.Handled=true;return;}if(dialogOpen)return;if(pressed!=null){RestoreSelection();CancelDrag();e.Handled=true;}else if(SearchBox.Text.Length>0){SearchBox.Text="";e.Handled=true;}};Shell.KeyboardAccelerators.Add(esc);
+var find=new KeyboardAccelerator{Key=VirtualKey.F,Modifiers=VirtualKeyModifiers.Control};find.Invoked+=(_,e)=>{if(!dialogOpen){SearchBox.Focus(FocusState.Keyboard);SearchBox.SelectAll();e.Handled=true;}};Shell.KeyboardAccelerators.Add(find);
 AdminButton.Visibility=admin?Visibility.Collapsed:Visibility.Visible;SetupTrayLifecycle();
 }
 async Task Refresh() {
@@ -127,8 +131,8 @@ else w.SetPreview(null,w.ShowCommand is 2 or 7?"最小化 · 暂无截图":"等�
 }
 foreach(var key in windowPreviews.Keys.Where(k=>!allWindows.Any(w=>w.Handle==k.Item1&&w.Pid==k.Item2)).ToList())windowPreviews.Remove(key);
 string signature=string.Join("|",items.Select(w=>$"{w.Handle},{w.Title},{w.Details}"));
-if(signature!=windowSignature) {
-windowSignature=signature;var chosen=WindowsList.SelectedItems.Cast<WindowInfo>().Select(w=>w.Handle).ToHashSet();
+if(windowRevision.Update(signature)) {
+var chosen=WindowsList.SelectedItems.Cast<WindowInfo>().Select(w=>w.Handle).ToHashSet();
 WindowsList.ItemsSource=items;
 DispatcherQueue.TryEnqueue(UpdateGalleryWidth);
 foreach(var w in items.Where(w=>chosen.Contains(w.Handle)))WindowsList.SelectedItems.Add(w);
@@ -157,7 +161,7 @@ foreach(var b in MoveButtons.Children.OfType<Button>())b.IsEnabled=count>0&&!bus
 async void MonitorSelectionChanged(object sender,SelectionChangedEventArgs e) {
 if((MonitorTiles.SelectedItem as FrameworkElement)?.Tag is DisplayInfo d){
 if(!d.Active){MonitorTiles.SelectedItem=MonitorTiles.Items.OfType<FrameworkElement>().FirstOrDefault(x=>(x.Tag as DisplayInfo)?.Key==selected?.Key);Notice("此显示器未启用，请在系统显示设置中启用。");return;}
-selected=d;windowSignature="";UpdateWindows();Views.Motion.Enter(WindowsList,0,8);RebuildButtons();UpdateMonitorDensity();
+selected=d;windowRevision.Invalidate();UpdateWindows();Views.Motion.Enter(WindowsList,0,8);RebuildButtons();UpdateMonitorDensity();
 }
 await Task.CompletedTask;
 }
@@ -204,7 +208,7 @@ if(!dragging)return;
 AutoScrollMonitors(p);AutoScrollWindows(p);hover=Hit(p);var intent=DropIntent.For(hover,dragItems,false);cursorHost.SetDragCursor(true,intent.Allowed);
 GhostText.Text=hover!=null?intent.Label:WindowTitle.Middle(pressed.Title,24);
 if(hover==null)ShowInsertion(p);else InsertionMark.Visibility=Visibility.Collapsed;
-dragFeedback?.Move(p);
+dragFeedback?.Move(p,hover!=null);
 foreach(var el in MonitorTiles.Items.OfType<FrameworkElement>())if(MonitorTiles.ContainerFromItem(el) is FrameworkElement container&&Descendant<Views.SelectionSurface>(container) is {} surface){surface.DropLabel=intent.Label;surface.IsDropTarget=(el.Tag as DisplayInfo)?.Key==hover?.Key;}
 e.Handled=true;
 }

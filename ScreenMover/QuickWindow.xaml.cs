@@ -149,7 +149,7 @@ public sealed partial class QuickWindow : Window {
         hover=Hit(p);
         var intent=DropIntent.For(hover,new[]{pressed},true);
         QuickGhostText.Text=hover==null?WindowTitle.Middle(pressed.Title,24):intent.Label;
-        dragFeedback.Move(p);
+        dragFeedback.Move(p,hover!=null);
         foreach(var b in targets.Values){b.DropLabel=intent.Label;b.IsDropTarget=(b.Tag as DisplayInfo)?.Key==hover?.Key;}
         var area=ScreenScroll.TransformToVisual(QuickRoot).TransformBounds(new(0,0,ScreenScroll.ActualWidth,ScreenScroll.ActualHeight));
         if(area.Contains(p)){double dy=p.Y<area.Top+24?-12:p.Y>area.Bottom-24?12:0;if(dy!=0)ScreenScroll.ChangeView(null,Math.Clamp(ScreenScroll.VerticalOffset+dy,0,ScreenScroll.ScrollableHeight),null,true);}

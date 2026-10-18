@@ -10,7 +10,7 @@ public sealed class SelectionSurface : ContentControl {
     public static readonly DependencyProperty DropLabelProperty=DependencyProperty.Register(nameof(DropLabel),typeof(string),typeof(SelectionSurface),new PropertyMetadata(""));
     public string DropLabel {get=>(string)GetValue(DropLabelProperty);set=>SetValue(DropLabelProperty,value);}
     public UIElement? Child {get=>Content as UIElement;set=>Content=value;}
-    bool over;
+    bool over,dropShown;
     public SelectionSurface(){
         Loaded+=(_,_)=>Update();
         PointerEntered+=(_,_)=>{over=true;Update();};
@@ -27,6 +27,10 @@ public sealed class SelectionSurface : ContentControl {
     void Update(){
         string key=IsSelected||IsDropTarget?"SurfaceSelected":over?"SurfaceHover":"SurfaceNormal";
         if(Application.Current.Resources.TryGetValue(key,out var value)&&value is Style style&&!ReferenceEquals(Style,style))Style=style;
-        if(GetTemplateChild("DropOverlay") is UIElement overlay)overlay.Visibility=IsDropTarget?Visibility.Visible:Visibility.Collapsed;
+        if(GetTemplateChild("DropOverlay") is UIElement overlay){
+            overlay.Visibility=IsDropTarget?Visibility.Visible:Visibility.Collapsed;
+            if(IsDropTarget&&!dropShown)Motion.Enter(overlay,0,3);
+            dropShown=IsDropTarget;
+        }
     }
 }

@@ -33,7 +33,8 @@ public sealed class DragFeedback(FrameworkElement root,Canvas layer,Border ghost
         if(count.Parent is Border badge)badge.Visibility=count.Visibility;
         ghost.Visibility=Visibility.Visible;Motion.Enter(ghost,0,3);
     }
-    public void Move(Point point){
+    public void Move(Point point,bool overTarget=false){
+        ghost.Visibility=overTarget?Visibility.Collapsed:Visibility.Visible;
         var p=root.TransformToVisual(layer).TransformPoint(point);
         Canvas.SetLeft(ghost,p.X-grip.X);Canvas.SetTop(ghost,p.Y-grip.Y);
     }

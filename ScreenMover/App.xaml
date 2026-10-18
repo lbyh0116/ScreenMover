@@ -10,6 +10,8 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="AppAccentBrush" Color="#0078D4"/><SolidColorBrush x:Key="AppDropBrush" Color="#005A9E"/>
+            <Style TargetType="HyperlinkButton"><Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}"/></Style>
             <Style x:Key="SurfaceNormal" TargetType="views:SelectionSurface">
                 <Setter Property="IsTabStop" Value="False"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="VerticalContentAlignment" Value="Stretch"/>
                 <Setter Property="CornerRadius" Value="8"/><Setter Property="BorderThickness" Value="2"/>
@@ -20,17 +22,18 @@
                         <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
                     </Border>
                     <Grid x:Name="DropOverlay" Visibility="Collapsed" IsHitTestVisible="False">
-                        <Border CornerRadius="{TemplateBinding CornerRadius}" Background="{ThemeResource AccentFillColorDefaultBrush}" Opacity=".36"/>
-                        <Border VerticalAlignment="Center" HorizontalAlignment="Center" Background="{ThemeResource AccentFillColorDefaultBrush}" CornerRadius="6" Padding="10,7" Margin="8"><TextBlock Text="{TemplateBinding DropLabel}" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" TextWrapping="Wrap" TextAlignment="Center" FontWeight="SemiBold"/></Border>
+                        <Border CornerRadius="{TemplateBinding CornerRadius}" Background="{ThemeResource AppDropBrush}" Opacity=".94"/>
+                        <Border CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{ThemeResource AppAccentBrush}" BorderThickness="3"/>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12" Text="{TemplateBinding DropLabel}" Foreground="White" FontSize="20" TextWrapping="Wrap" TextAlignment="Center" FontWeight="SemiBold"/>
                     </Grid>
                 </Grid></ControlTemplate></Setter.Value></Setter>
             </Style>
             <Style x:Key="SurfaceHover" TargetType="views:SelectionSurface" BasedOn="{StaticResource SurfaceNormal}">
-                <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}"/>
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
             </Style>
             <Style x:Key="SurfaceSelected" TargetType="views:SelectionSurface" BasedOn="{StaticResource SurfaceNormal}">
-                <Setter Property="BorderBrush" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
-                <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}"/>
+                <Setter Property="BorderBrush" Value="{ThemeResource AppAccentBrush}"/>
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
             </Style>
             <Style x:Key="WindowItemStyle" TargetType="ListViewItem">
                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="VerticalContentAlignment" Value="Stretch"/>
