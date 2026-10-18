@@ -6,7 +6,7 @@ namespace ScreenMover;
 public sealed partial class MainWindow {
     readonly UISettings appearanceSettings=new();
     void SystemColorsChanged(UISettings sender,object args)=>DispatcherQueue.TryEnqueue(()=>{
-        if(!closed){Views.Appearance.Apply(settings.AccentColor,appearanceSettings);UpdateCaptionTheme();}
+        if(!closed){Views.Appearance.Apply(settings.AccentColor,appearanceSettings,cursorHost.ActualTheme);UpdateCaptionTheme();}
     });
     void UpdateCaptionTheme(){
         var title=AppWindow.TitleBar;

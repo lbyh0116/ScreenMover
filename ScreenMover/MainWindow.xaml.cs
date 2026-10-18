@@ -49,7 +49,7 @@ try {
 }catch{AppWindow.Resize(new(1060,820));}
 chrome=new(hwnd);
 ExtendsContentIntoTitleBar=true;SetTitleBar(TitleDragRegion);
-cursorHost.ActualThemeChanged+=(_,_)=>UpdateCaptionTheme();
+cursorHost.ActualThemeChanged+=(_,_)=>{Views.Appearance.Apply(settings.AccentColor,appearanceSettings,cursorHost.ActualTheme);UpdateCaptionTheme();};
 appearanceSettings.ColorValuesChanged+=SystemColorsChanged;
 initialized=true;ApplySettings();
 events=new(WinRT.Interop.WindowNative.GetWindowHandle(this));
@@ -65,7 +65,7 @@ double scale=Math.Max(.75,Services.TrayIcon.GetDpiForWindow(WinRT.Interop.Window
 settings.Width=(int)Math.Round(p.rcNormalPosition.Width/scale);settings.Height=(int)Math.Round(p.rcNormalPosition.Height/scale);settings.SizeInDips=true;
 settings.Normalize();LocalData.Write(AppSettings.FilePath,settings);
 }}catch{}
-closed=true;appearanceSettings.ColorValuesChanged-=SystemColorsChanged;globalHotkey?.Dispose();chrome?.Dispose();timer.Stop();events.Dispose();previewCancellation?.Cancel();};
+closed=true;hideHotkey?.Dispose();appearanceSettings.ColorValuesChanged-=SystemColorsChanged;globalHotkey?.Dispose();chrome?.Dispose();timer.Stop();events.Dispose();previewCancellation?.Cancel();};
 Root.AddHandler(UIElement.PointerPressedEvent,new PointerEventHandler(Pressed),true);
 Root.AddHandler(UIElement.PointerMovedEvent,new PointerEventHandler(Moved),true);
 Root.AddHandler(UIElement.PointerReleasedEvent,new PointerEventHandler(Released),true);
@@ -98,16 +98,16 @@ displaySignature=signature;string? key=selected?.Key;
 selected=snapshot.Displays.FirstOrDefault(d=>d.Key==key&&d.Active)??snapshot.Displays.FirstOrDefault(d=>d.Active);
 pendingPreview=true;monitorPreviews.Clear();MonitorTiles.Items.Clear();
 foreach(var d in snapshot.Displays.Where(d=>d.Active||settings.ShowInactive).OrderByDescending(d=>d.Active)) {
-var stack=new StackPanel{Spacing=4,Width=240,Height=180};
-stack.Children.Add(new TextBlock{Text=d.Heading,FontSize=d.Active?22:16,FontWeight=Microsoft.UI.Text.FontWeights.SemiBold});
+var stack=new StackPanel{Spacing=4};
+stack.Children.Add(new TextBlock{Text=d.Heading,FontSize=d.Active?22:16,FontWeight=Microsoft.UI.Text.FontWeights.SemiBold,TextTrimming=TextTrimming.CharacterEllipsis});
 if(d.Active) {
 var preview=new Image{Width=240,Height=90,Stretch=Stretch.Uniform};
 var label=new TextBlock{Visibility=Visibility.Collapsed};
 stack.Children.Add(new Border{Child=preview,Background=new SolidColorBrush(Colors.Black),CornerRadius=new CornerRadius(5)});
-stack.Children.Add(new TextBlock{Text=$"{d.Name}\n{d.Bounds.Width} × {d.Bounds.Height} · {d.Hertz:0.##} Hz",FontSize=11,TextWrapping=TextWrapping.Wrap,Opacity=.8});
+stack.Children.Add(new TextBlock{Text=$"{d.Name}\n{d.Bounds.Width} × {d.Bounds.Height} · {d.Hertz:0.##} Hz",FontSize=11,TextTrimming=TextTrimming.CharacterEllipsis,Opacity=.8});
 stack.Children.Add(label);monitorPreviews[d.Key]=(preview,label);
 ToolTipService.SetToolTip(stack,d.Details);
-}else {stack.Children.Add(new Border{Height=90,Child=new TextBlock{Text="未启用",HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center,Opacity=.5}});stack.Children.Add(new TextBlock{Text=d.Name+"\n系统编号：未分配",TextWrapping=TextWrapping.Wrap,FontSize=11});}
+}else {stack.Children.Add(new Border{Height=90,Child=new TextBlock{Text="未启用",HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center,Opacity=.5}});stack.Children.Add(new TextBlock{Text=d.Name+"\n系统编号：未分配",TextWrapping=TextWrapping.Wrap,TextTrimming=TextTrimming.CharacterEllipsis,MaxLines=2,FontSize=11});}
 var border=new Border{Child=stack,Padding=new Thickness(10),CornerRadius=new CornerRadius(8),BorderThickness=new Thickness(0),Tag=d,Opacity=d.Active?1:.65};
 if(!d.Active) {
 var dash=new Microsoft.UI.Xaml.Shapes.Rectangle{Stroke=new SolidColorBrush(Colors.Gray),StrokeDashArray=new DoubleCollection{4,3},StrokeThickness=1,RadiusX=8,RadiusY=8,IsHitTestVisible=false};
@@ -315,11 +315,15 @@ void UpdateMonitorDensity(){
     foreach(var element in MonitorTiles.Items.OfType<FrameworkElement>()){
         var border=element as Border??(element as Grid)?.Children.OfType<Border>().FirstOrDefault();
         if(border?.Child is not StackPanel stack)continue;
-        stack.Width=compact?216:240;stack.Height=compact?116:180;
-        if(stack.Children.FirstOrDefault() is TextBlock heading)heading.FontSize=compact?16:22;
-        if(border.Tag is DisplayInfo d&&d.Active&&monitorPreviews.TryGetValue(d.Key,out var preview)){
-            preview.image.Width=compact?216:240;preview.image.Height=compact?44:90;preview.label.Visibility=Visibility.Collapsed;
-        }else if(stack.Children.ElementAtOrDefault(1) is Border empty)empty.Height=compact?44:90;
+        if(border.Tag is not DisplayInfo d)continue;
+        var ratio=SurfaceLayout.Ratio(d.Bounds);
+        if(!d.Active&&d.Bounds.Height<=0)ratio=SurfaceLayout.Ratio(snapshot?.Displays.FirstOrDefault(x=>x.Active&&x.Primary)?.Bounds??default);
+        var size=SurfaceLayout.ScreenPreview(ratio,compact?76:120);
+        stack.Width=size.Width;stack.Height=compact?146:196;
+        if(stack.Children.FirstOrDefault() is TextBlock heading)heading.FontSize=compact?16:18;
+        if(d.Active&&monitorPreviews.TryGetValue(d.Key,out var preview)){
+            preview.image.Width=size.Width;preview.image.Height=size.Height;preview.label.Visibility=Visibility.Collapsed;
+        }else if(stack.Children.ElementAtOrDefault(1) is Border empty)empty.Height=size.Height;
     }
 }
 async Task RefreshWithPreviews(){

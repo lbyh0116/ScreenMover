@@ -20,8 +20,8 @@ public static class Appearance {
         resources["TextOnAccentFillColorSecondaryBrush"]=accentText;
     }
     public static Color Parse(string hex)=>Color.FromArgb(255,Convert.ToByte(hex.Substring(1,2),16),Convert.ToByte(hex.Substring(3,2),16),Convert.ToByte(hex.Substring(5,2),16));
-    public static void Apply(string custom,UISettings system) {
-        var color=AccentColors.Normalize(custom)==""?system.GetColorValue(UIColorType.Accent):Parse(custom);
+    public static void Apply(string custom,UISettings system,ElementTheme theme) {
+        var color=AccentColors.Normalize(custom)==""?system.GetColorValue(theme==ElementTheme.Dark?UIColorType.AccentLight2:UIColorType.AccentDark1):Parse(custom);
         ((SolidColorBrush)Application.Current.Resources["AppAccentBrush"]).Color=color;
         secondary.Color=Color.FromArgb(230,color.R,color.G,color.B);
         tertiary.Color=Color.FromArgb(204,color.R,color.G,color.B);

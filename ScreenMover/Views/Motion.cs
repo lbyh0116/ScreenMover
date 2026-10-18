@@ -32,6 +32,19 @@ public static class Motion {
         var move=compositor.CreateVector3KeyFrameAnimation();move.InsertKeyFrame(0,new(x,y,0));move.InsertKeyFrame(1,Vector3.Zero,ease);move.Duration=TimeSpan.FromMilliseconds(240);
         visual.StartAnimation("Opacity",opacity);visual.StartAnimation("Translation",move);
     }
+    public static void PrepareSlide(UIElement element,float x,float y){
+        Reset(element);if(!Enabled)return;
+        var visual=ElementCompositionPreview.GetElementVisual(element);
+        visual.Opacity=0;visual.Properties.InsertVector3("Translation",new(x,y,0));
+    }
+    public static void SlideIn(UIElement element,float x,float y){
+        if(!Enabled){Reset(element);return;}
+        var visual=ElementCompositionPreview.GetElementVisual(element);var compositor=visual.Compositor;
+        var ease=compositor.CreateCubicBezierEasingFunction(new(.16f,1),new(.3f,1));
+        var move=compositor.CreateVector3KeyFrameAnimation();move.InsertKeyFrame(0,new(x,y,0));move.InsertKeyFrame(1,Vector3.Zero,ease);move.Duration=TimeSpan.FromMilliseconds(320);
+        var opacity=compositor.CreateScalarKeyFrameAnimation();opacity.InsertKeyFrame(0,0);opacity.InsertKeyFrame(.25f,1);opacity.InsertKeyFrame(1,1);opacity.Duration=move.Duration;
+        visual.StartAnimation("Translation",move);visual.StartAnimation("Opacity",opacity);
+    }
     public static async Task Exit(UIElement element,float x=0,float y=6) {
         if(!Enabled)return;
         var visual=ElementCompositionPreview.GetElementVisual(element);var compositor=visual.Compositor;

@@ -23,10 +23,10 @@ public sealed partial class QuickWindow : Window {
     DisplayInfo? source,hover,anchor;
     WindowInfo? pressed;Point start;bool dragging,loading,acting,panelActive,pendingDismiss;
     int generation,visibilityVersion;
-    long deactivatedAt;
+    readonly TrayClickGate trayClick=new();
     RECT panelAnchor;
     SurfaceLayout.Edge edge;
-    public bool JustDeactivated=>Environment.TickCount64-deactivatedAt<300;
+    public bool ConsumeTrayDismiss()=>trayClick.Consume(Environment.TickCount64);
     public bool IsPanelVisible {get;private set;}
     public QuickWindow(MainWindow parent){
         owner=parent;InitializeComponent();dragFeedback=new(QuickRoot,QuickDragLayer,QuickGhost,QuickGhostImage,QuickGhostCount);
@@ -35,7 +35,7 @@ public sealed partial class QuickWindow : Window {
         AppWindow.SetPresenter(presenter);AppWindow.IsShownInSwitchers=false;
         frame=new(WinRT.Interop.WindowNative.GetWindowHandle(this));
         PanelSurface.ActualThemeChanged+=(_,_)=>frame.Apply(PanelSurface.ActualTheme==ElementTheme.Dark);
-        Activated+=(_,e)=>{panelActive=e.WindowActivationState!=WindowActivationState.Deactivated;if(!panelActive&&!acting&&IsPanelVisible){deactivatedAt=Environment.TickCount64;Cancel();Dismiss();}};
+        Activated+=(_,e)=>{panelActive=e.WindowActivationState!=WindowActivationState.Deactivated;if(!panelActive&&!acting&&IsPanelVisible){if(TrayIcon.GetCursorPos(out var point))RememberTrayClick(point);Cancel();Dismiss();}};
         AppWindow.Closing+=(_,e)=>{if(!owner.Exiting){e.Cancel=true;Dismiss();}};
         Closed+=(_,_)=>{frame.Dispose();outside?.Dispose();IsPanelVisible=false;generation++;visibilityVersion++;};
         QuickRoot.AddHandler(UIElement.PointerPressedEvent,new PointerEventHandler(Pressed),true);
@@ -47,6 +47,7 @@ public sealed partial class QuickWindow : Window {
         var refresh=new KeyboardAccelerator{Key=VirtualKey.F5};refresh.Invoked+=async(_,e)=>{e.Handled=true;await Reload(true);};QuickRoot.KeyboardAccelerators.Add(refresh);
     }
     public async Task ShowPanel(bool fromTray=false){
+        trayClick.Reset();
         var displays=new DisplayService().Read().Displays.Where(d=>d.Active).ToList();
         if(displays.Count==0)return;
         var hwnd=WinRT.Interop.WindowNative.GetWindowHandle(owner);
@@ -70,11 +71,18 @@ public sealed partial class QuickWindow : Window {
         await Reload();
         if(!IsPanelVisible||version!=visibilityVersion)return;
         PlacePanel();QuickNotice.Visibility=Visibility.Collapsed;QuickList.SelectedItem=null;
+        var offset=EnterOffset();Motion.PrepareSlide(PanelSurface,offset.X,offset.Y);
         AppWindow.Show();Activate();frame.Apply(PanelSurface.ActualTheme==ElementTheme.Dark);SetForegroundWindow(WinRT.Interop.WindowNative.GetWindowHandle(this));
-        outside?.Dispose();outside=new FlyoutDismiss(WinRT.Interop.WindowNative.GetWindowHandle(this),()=>DispatcherQueue.TryEnqueue(()=>{if(!IsPanelVisible)return;if(acting)pendingDismiss=true;else Dismiss();}));
-        var offset=EnterOffset();Motion.Enter(PanelSurface,offset.X,offset.Y);
+        outside?.Dispose();outside=new FlyoutDismiss(WinRT.Interop.WindowNative.GetWindowHandle(this),point=>DispatcherQueue.TryEnqueue(()=>{
+            RememberTrayClick(point);
+            if(!IsPanelVisible)return;if(acting)pendingDismiss=true;else Dismiss();
+        }));
+        Motion.SlideIn(PanelSurface,offset.X,offset.Y);
     }
-    (float X,float Y) EnterOffset()=>edge switch{SurfaceLayout.Edge.Top=>(0,-16),SurfaceLayout.Edge.Left=>(-16,0),SurfaceLayout.Edge.Right=>(16,0),_=>(0,16)};
+    void RememberTrayClick(POINT point){
+        if(TrayIcon.TryGetBounds(WinRT.Interop.WindowNative.GetWindowHandle(owner),out var rect)&&point.X>=rect.Left&&point.X<rect.Right&&point.Y>=rect.Top&&point.Y<rect.Bottom)trayClick.DismissFromTray(Environment.TickCount64);
+    }
+    (float X,float Y) EnterOffset()=>edge switch{SurfaceLayout.Edge.Top=>(0,-48),SurfaceLayout.Edge.Left=>(-48,0),SurfaceLayout.Edge.Right=>(48,0),_=>(0,48)};
     public async void Dismiss(){
         if(acting||!IsPanelVisible)return;
         IsPanelVisible=false;generation++;int version=++visibilityVersion;outside?.Dispose();outside=null;
@@ -87,9 +95,16 @@ public sealed partial class QuickWindow : Window {
     void PlacePanel(){
         if(anchor==null)return;
         double scale=WindowChrome.ScaleAt(new(){X=anchor.Work.Left+10,Y=anchor.Work.Top+10});
-        var placement=SurfaceLayout.Flyout(anchor.Bounds,anchor.Work,panelAnchor,scale,QuickList.Items.Count,targets.Count);
+        var placement=SurfaceLayout.Flyout(anchor.Bounds,anchor.Work,panelAnchor,scale,QuickList.Items.Count,targets.Count,targets.Values.Select(b=>SurfaceLayout.Ratio(((DisplayInfo)b.Tag).Bounds)).DefaultIfEmpty(16.0/9).Max());
         edge=placement.Edge;var rect=placement.Bounds;
         WindowColumn.Width=new GridLength(Math.Min(176,Math.Max(80,(rect.Width/scale-30)*.55)));
+        double available=Math.Max(1,rect.Width/scale-30-WindowColumn.Width.Value-16);
+        double maxRatio=targets.Values.Select(b=>SurfaceLayout.Ratio(((DisplayInfo)b.Tag).Bounds)).DefaultIfEmpty(16.0/9).Max();
+        double previewHeight=Math.Min(64,available/maxRatio);
+        foreach(var b in targets.Values)if(b.Child is StackPanel stack&&stack.Children.FirstOrDefault() is Image image){
+            var size=SurfaceLayout.ScreenPreview(SurfaceLayout.Ratio(((DisplayInfo)b.Tag).Bounds),previewHeight);
+            image.Width=size.Width;image.Height=size.Height;b.Width=size.Width+14;b.HorizontalAlignment=HorizontalAlignment.Left;
+        }
         AppWindow.MoveAndResize(new(rect.Left,rect.Top,rect.Width,rect.Height));
     }
     async Task Reload(bool force=false){

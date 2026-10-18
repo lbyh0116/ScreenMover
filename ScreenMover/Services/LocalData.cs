@@ -28,6 +28,7 @@ public sealed record AppSettings {
     public bool IconFallback {get;set;}=true;
     public bool TrayEnabled {get;set;}=true;
     public bool CloseToTray {get;set;}=true;
+    public string HideHotkey {get;set;}="";
     public string QuickHotkey {get;set;}="";
     public string Theme {get;set;}="System";
     public string AccentColor {get;set;}="";
@@ -45,6 +46,8 @@ public sealed record AppSettings {
     public int Height {get;set;}=1080;
     public void Normalize() {
         try{QuickHotkey=HotkeySpec.Parse(QuickHotkey)?.Name??"";}catch(FormatException){QuickHotkey="";}
+        try{HideHotkey=HotkeySpec.Parse(HideHotkey)?.Name??"";}catch(FormatException){HideHotkey="";}
+        if(HideHotkey!=""&&HideHotkey==QuickHotkey)HideHotkey="";
         if(Theme is not ("System" or "Light" or "Dark"))Theme="System";
         AccentColor=AccentColors.Normalize(AccentColor);
         RefreshSeconds=RefreshSeconds==0?0:Math.Clamp(RefreshSeconds,15,3600);

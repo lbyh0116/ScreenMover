@@ -24,7 +24,8 @@ public static class SettingsProfile {
         var known=typeof(AppSettings).GetProperties().Where(p=>p.CanWrite).Select(p=>p.Name).ToHashSet();
         if(!settings.EnumerateObject().Any(p=>known.Contains(p.Name)))throw new InvalidDataException("文件不包含 ScreenMover 设置");
         var value=settings.Deserialize<AppSettings>(LocalData.Json)??throw new InvalidDataException("设置为空");
-        HotkeySpec.Parse(value.QuickHotkey);
+        var quick=HotkeySpec.Parse(value.QuickHotkey);var hide=HotkeySpec.Parse(value.HideHotkey);
+        if(quick!=null&&quick.Name==hide?.Name)throw new FormatException("两个操作不能使用相同的快捷键");
         value.Normalize();return value;
     }
     public static async Task<AppSettings> Read(string path){

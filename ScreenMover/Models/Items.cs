@@ -13,7 +13,7 @@ public string AppName=>Services.ApplicationNames.Display(ProcessName);
 bool selected,iconFallback=true;
 object? icon;
 public object? AppIcon=>icon;
-public double PreviewLimit=>preview==null?48:360;
+public double PreviewLimit=>preview==null?48:double.PositiveInfinity;
 public object? DisplayPreview=>preview??(iconFallback?icon:null);
 public bool Selected=>selected;
 public void SetSelected(bool value){if(selected==value)return;selected=value;PropertyChanged?.Invoke(this,new(nameof(Selected)));}

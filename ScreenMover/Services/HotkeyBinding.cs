@@ -1,6 +1,6 @@
 namespace ScreenMover.Services;
 
-public sealed class HotkeyBinding(Func<int,HotkeySpec,bool> register,Action<int> unregister) : IDisposable {
+public sealed class HotkeyBinding(Func<int,HotkeySpec,bool> register,Action<int> unregister,int firstId=0x5301) : IDisposable {
     readonly Action<int> release=unregister;
     public int CurrentId {get;private set;}
     public string Current {get;private set;}="";
@@ -9,7 +9,7 @@ public sealed class HotkeyBinding(Func<int,HotkeySpec,bool> register,Action<int>
         ObjectDisposedException.ThrowIf(disposed,this);
         if(preparing)throw new InvalidOperationException("快捷键正在修改");
         var spec=HotkeySpec.Parse(value);string name=spec?.Name??"";
-        int id=name==Current?CurrentId:spec==null?0:CurrentId==0x5301?0x5302:0x5301;
+        int id=name==Current?CurrentId:spec==null?0:CurrentId==firstId?firstId+1:firstId;
         bool reserved=id!=0&&id!=CurrentId;
         if(reserved&&!register(id,spec!))throw new InvalidOperationException("该快捷键已被占用或被系统保留，请换一个组合");
         preparing=true;pendingId=reserved?id:0;return new(this,id,name,reserved);

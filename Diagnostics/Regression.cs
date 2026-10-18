@@ -40,6 +40,19 @@ static class Regression {
         Check((ScreenMover.Interop.FlyoutChrome.ClientStyle(style)&0x10000000)!=0,"Flyout lost visibility style");
         Check((ScreenMover.Interop.FlyoutChrome.ClientExtendedStyle(extended)&0x20300)==0&&(ScreenMover.Interop.FlyoutChrome.ClientExtendedStyle(extended)&0x88)==0x88,"Flyout changed topmost/tool-window state");
         Check(SurfaceLayout.GalleryGrid(300).Columns==1&&SurfaceLayout.GalleryGrid(1000).Columns==3,"Gallery responsive columns");
+        foreach(double ratio in new[]{9.0/16,16.0/9,21.0/9,32.0/9}){
+            var preview=SurfaceLayout.ScreenPreview(ratio,120);
+            Check(preview.Height==120&&Math.Abs(preview.Width/preview.Height-ratio)<.001,"Screen preview forced a fixed aspect ratio");
+            var compact=SurfaceLayout.ScreenPreview(ratio,64,130);
+            Check(compact.Width<=130.001&&Math.Abs(compact.Width/compact.Height-ratio)<.001,"Quick preview distorted a wide monitor");
+        }
+        Check(SurfaceLayout.ScreenPreview(9.0/16,120).Width<SurfaceLayout.ScreenPreview(16.0/9,120).Width,"Portrait monitor card not narrower");
+        Check(SurfaceLayout.FlyoutSize(1,1,32.0/9).Width>SurfaceLayout.FlyoutSize(1,1).Width,"Ultrawide target receives no extra popup width");
+        var gate=new TrayClickGate();
+        Check(!gate.Consume(1),"First tray click suppressed");gate.DismissFromTray(10);
+        Check(gate.Consume(50)&&!gate.Consume(60),"Tray down/up dismissal reopened the panel or swallowed the next click");
+        gate.DismissFromTray(100);Check(!gate.Consume(2000),"Cancelled tray click blocked a later open");
+        gate.DismissFromTray(2100);gate.Reset();Check(!gate.Consume(2150),"Keyboard activation retained a stale mouse dismissal");
         var config=new AppSettings{Width=1000,Height=800,SizeInDips=true};
         Check(SurfaceLayout.InitialSize(config,1.5,Box(0,0,2560,1400))==(1500,1200),"DIP size restore");
         config.SizeInDips=false;
@@ -78,6 +91,11 @@ static class Regression {
         Check(WindowQuery.Filter(windows,"one","102",true).Count==1,"All-screen PID search");
         Check(WindowQuery.Filter(windows,"one","missing",true).Count==0,"Empty search result");
         Check(WindowQuery.Filter(windows,"clean-virtual-display","",false).Count==0,"Clean virtual display leaked main-screen windows");
+        Check(WindowQuery.Foreground(windows,2,1,102)?.Handle==2,"Foreground hotkey did not prefer the active window");
+        Check(WindowQuery.Foreground(windows,99,1,101)?.Handle==1,"Owned modal window did not resolve to its software window");
+        Check(WindowQuery.Foreground(windows,2,1,999)==null,"Foreground target ignored captured process identity");
+        var fill=windows[0] with{};fill.SetPreview(new object(),"capture");
+        Check(double.IsPositiveInfinity(fill.PreviewLimit),"Gallery fill constrained a wide thumbnail");
         var revision=new WindowListRevision();
         Check(revision.Update("main-screen-windows"),"Initial list binding skipped");
         revision.Invalidate();
@@ -150,13 +168,24 @@ static class Regression {
             using(var disabled=binding.Prepare(""))disabled.Commit();Check(registered.Count==0,"Hotkey disable did not unregister");
             using var pending=binding.Prepare("Ctrl+Alt+M");binding.Dispose();binding.Dispose();Check(registered.Count==0,"Dispose leaked pending registration");
         }
-        var original=new AppSettings{Theme="Dark",AccentColor="#12ABEF",QuickHotkey="Ctrl+Alt+K",MoveMargin=125,Width=2500,Height=1500};
+        bool Register(int id,HotkeySpec spec)=>!occupied.Contains(spec.Name)&&!registered.Values.Contains(spec.Name)&&registered.TryAdd(id,spec.Name);
+        using(var quick=new HotkeyBinding(Register,id=>registered.Remove(id)))
+        using(var hide=new HotkeyBinding(Register,id=>registered.Remove(id),0x5311)){
+            using(var q=quick.Prepare("Ctrl+Alt+Space"))q.Commit();
+            using(var h=hide.Prepare("Ctrl+Alt+H"))h.Commit();
+            Check(quick.CurrentId!=hide.CurrentId&&registered.Count==2,"Two shortcuts reused a native registration ID");
+            bool rejected=false;
+            try{using var q=quick.Prepare("Ctrl+Alt+M");using var h=hide.Prepare("Ctrl+Alt+J");q.Commit();h.Commit();}catch(InvalidOperationException){rejected=true;}
+            Check(rejected&&quick.Current=="Ctrl+Alt+Space"&&hide.Current=="Ctrl+Alt+H"&&registered.Count==2,"Failure of the second shortcut did not roll back both edits");
+        }
+        Check(registered.Count==0,"Multiple shortcut disposal leaked registrations");
+        var original=new AppSettings{Theme="Dark",AccentColor="#12ABEF",QuickHotkey="Ctrl+Alt+K",HideHotkey="Ctrl+Alt+H",MoveMargin=125,Width=2500,Height=1500};
         string profile=SettingsProfile.Export(original);
         var restored=SettingsProfile.Import(profile);
-        Check(restored.AccentColor==original.AccentColor&&restored.Theme=="Dark"&&restored.QuickHotkey==original.QuickHotkey&&restored.MoveMargin==125,"Preferences roundtrip");
+        Check(restored.HideHotkey==original.HideHotkey&&restored.AccentColor==original.AccentColor&&restored.Theme=="Dark"&&restored.QuickHotkey==original.QuickHotkey&&restored.MoveMargin==125,"Preferences roundtrip");
         Check(!profile.Contains("\"Width\"")&&!profile.Contains("\"Height\"")&&!profile.Contains("SizeInDips"),"Device geometry leaked into portable preferences");
         Check(SettingsProfile.Import("{\"Theme\":\"Light\",\"Layout\":\"List\"}").Theme=="Light","Legacy preferences import");
-        foreach(string bad in new[]{"{broken","[]","{}","{\"Format\":\"Other\",\"Version\":1}","{\"Format\":\"ScreenMover.Settings\",\"Version\":99,\"Settings\":{\"Theme\":\"Dark\"}}","{\"QuickHotkey\":\"F12\"}",new string('x',256*1024+1)}){
+        foreach(string bad in new[]{"{broken","[]","{}","{\"Format\":\"Other\",\"Version\":1}","{\"Format\":\"ScreenMover.Settings\",\"Version\":99,\"Settings\":{\"Theme\":\"Dark\"}}","{\"QuickHotkey\":\"F12\"}","{\"HideHotkey\":\"F12\"}","{\"QuickHotkey\":\"Ctrl+Alt+H\",\"HideHotkey\":\"Ctrl+Alt+H\"}",new string('x',256*1024+1)}){
             bool rejected=false;try{SettingsProfile.Import(bad);}catch(Exception ex)when(ex is System.Text.Json.JsonException or InvalidDataException or FormatException){rejected=true;}Check(rejected,"Invalid settings profile accepted");
         }
         var display=new DisplayInfo("private-key",1,@"C:\Users\Private\device","PRIVATE MONITOR","PRIVATE SERIAL",true,true,new(){Right=1920,Bottom=1080},new(){Right=1920,Bottom=1040},60,0);

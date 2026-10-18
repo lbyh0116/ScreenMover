@@ -23,7 +23,7 @@ public sealed partial class MainWindow {
         if(!settings.TrayEnabled){tray?.Dispose();tray=null;return;}
         if(tray!=null)return;
         try{
-            tray=new(WinRT.Interop.WindowNative.GetWindowHandle(this),()=>DispatcherQueue.TryEnqueue(async()=>await OpenQuick(true)),()=>DispatcherQueue.TryEnqueue(ShowMain),()=>DispatcherQueue.TryEnqueue(ExitApp));
+            tray=new(WinRT.Interop.WindowNative.GetWindowHandle(this),mouse=>DispatcherQueue.TryEnqueue(async()=>await OpenQuick(true,mouse)),()=>DispatcherQueue.TryEnqueue(ShowMain),()=>DispatcherQueue.TryEnqueue(ExitApp));
             if(!tray.Installed)Notice("托盘图标创建失败；关闭主窗口时将正常退出");
         }catch(Exception ex){Notice("托盘不可用："+ex.Message);}
     }
@@ -31,9 +31,9 @@ public sealed partial class MainWindow {
     public void ShowHidden(){ShowMain();HiddenClicked(this,new RoutedEventArgs());}
     public void ShowSettings(){ShowMain();SettingsClicked(this,new RoutedEventArgs());}
     public void ExitApp(){Exiting=true;Close();}
-    async Task OpenQuick(bool fromTray=false){
+    async Task OpenQuick(bool fromTray=false,bool mouseTrayClick=false){
         if(dialogOpen){ShowMain();return;}if(busy)return;
-        try{quick??=new QuickWindow(this);if(quick.IsPanelVisible)quick.Dismiss();else if(!fromTray||!quick.JustDeactivated)await quick.ShowPanel(fromTray);}
+        try{quick??=new QuickWindow(this);if(mouseTrayClick&&quick.ConsumeTrayDismiss()){quick.Dismiss();return;}if(quick.IsPanelVisible)quick.Dismiss();else await quick.ShowPanel(fromTray);}
         catch(Exception ex){Notice("快捷面板无法打开："+ex.Message);ShowMain();}
     }
     async void QuickClicked(object sender,RoutedEventArgs e)=>await OpenQuick();

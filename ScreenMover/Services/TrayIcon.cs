@@ -30,7 +30,7 @@ public sealed class TrayIcon : IDisposable {
     NotifyData data;
     bool disposed;
     public bool Installed {get;private set;}
-    public TrayIcon(nint window,Action show,Action main,Action quit){
+    public TrayIcon(nint window,Action<bool> show,Action main,Action quit){
         hwnd=window;icon=IconService.Extract(Environment.ProcessPath!);
         data=new(){Size=(uint)Marshal.SizeOf<NotifyData>(),Window=hwnd,Id=1,Flags=1|2|4,Callback=0x8000+27,Icon=icon,Tip="ScreenMover · 点击快捷操作 / 右键菜单",Info="",InfoTitle=""};
         taskbarCreated=RegisterWindowMessageW("TaskbarCreated");
@@ -39,7 +39,7 @@ public sealed class TrayIcon : IDisposable {
             if(msg==data.Callback&&!disposed){
                 int message=l.ToInt32()&0xFFFF;
                 // Version 4 supports keyboard activation and sends one selection event per click.
-                if(message is 0x400 or 0x401)show();
+                if(message is 0x400 or 0x401)show(message==0x400);
                 else if(message==0x7B){
                     GetCursorPos(out var point);var menu=CreatePopupMenu();
                     try{
@@ -47,7 +47,7 @@ public sealed class TrayIcon : IDisposable {
                         SetForegroundWindow(hwnd);
                         uint selected=TrackPopupMenu(menu,0x100|0x2,point.X,point.Y,0,hwnd,0);
                         PostMessageW(hwnd,0,0,0);
-                        if(selected==1)show();else if(selected==2)main();else if(selected==3)quit();
+                        if(selected==1)show(false);else if(selected==2)main();else if(selected==3)quit();
                     }finally{DestroyMenu(menu);}
                 }
                 return 0;

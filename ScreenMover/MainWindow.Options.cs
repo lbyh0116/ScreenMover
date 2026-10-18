@@ -58,6 +58,8 @@ public sealed partial class MainWindow {
         var closeToTray=Toggle("关闭主窗口时保留托盘运行",settings.CloseToTray);
         var hotkeyBox=HotkeyCapture(settings.QuickHotkey);panel.Children.Add(hotkeyBox);
         var clearHotkey=new Button{Content="清除快捷键"};clearHotkey.Click+=(_,_)=>hotkeyBox.Text="";panel.Children.Add(clearHotkey);
+        var hideHotkeyBox=HotkeyCapture(settings.HideHotkey,"全局快捷键：隐藏当前前台窗口");panel.Children.Add(hideHotkeyBox);
+        var clearHide=new Button{Content="清除隐藏快捷键"};clearHide.Click+=(_,_)=>hideHotkeyBox.Text="";panel.Children.Add(clearHide);
         var startupState=StartupService.ReadState(out var startupError);bool startupWasEnabled=startupState==true;
         var startup=Toggle("登录 Windows 后启动到托盘",startupWasEnabled);
         startup.IsEnabled=startupState!=null;
@@ -77,7 +79,7 @@ public sealed partial class MainWindow {
         var duration=Number("操作提示停留时间（秒）",settings.NoticeSeconds,2,30);
         var reset=new Button{Content="恢复默认设置"};
         reset.Click+=(_,_)=>{
-            var d=new AppSettings();theme.SelectedIndex=0;accentMode.SelectedIndex=0;startup.IsOn=false;hotkeyBox.Text="";
+            var d=new AppSettings();theme.SelectedIndex=0;accentMode.SelectedIndex=0;startup.IsOn=false;hotkeyBox.Text="";hideHotkeyBox.Text="";
             trayEnabled.IsOn=d.TrayEnabled;closeToTray.IsOn=d.CloseToTray;fallback.IsOn=d.IconFallback;inactive.IsOn=d.ShowInactive;remember.IsOn=d.RememberSize;activate.IsOn=d.RefreshOnActivate;
             interval.Value=d.RefreshSeconds;screen.IsOn=d.ScreenPreviews;windows.IsOn=d.WindowPreviews;
             margin.Value=d.MoveMargin;shrink.IsOn=d.ShrinkToFit;duration.Value=d.NoticeSeconds;
@@ -102,7 +104,7 @@ public sealed partial class MainWindow {
             var path=await OpenSettingsPath();if(path==null)return "已取消";
             var loaded=await SettingsProfile.Read(path);
             theme.SelectedIndex=Array.IndexOf(themes,loaded.Theme);accentMode.SelectedIndex=loaded.AccentColor==""?0:1;if(loaded.AccentColor!="")accent.Color=Views.Appearance.Parse(loaded.AccentColor);trayEnabled.IsOn=loaded.TrayEnabled;closeToTray.IsOn=loaded.CloseToTray;
-            hotkeyBox.Text=loaded.QuickHotkey;fallback.IsOn=loaded.IconFallback;inactive.IsOn=loaded.ShowInactive;remember.IsOn=loaded.RememberSize;
+            hotkeyBox.Text=loaded.QuickHotkey;hideHotkeyBox.Text=loaded.HideHotkey;fallback.IsOn=loaded.IconFallback;inactive.IsOn=loaded.ShowInactive;remember.IsOn=loaded.RememberSize;
             activate.IsOn=loaded.RefreshOnActivate;interval.Value=loaded.RefreshSeconds;screen.IsOn=loaded.ScreenPreviews;windows.IsOn=loaded.WindowPreviews;
             margin.Value=loaded.MoveMargin;shrink.IsOn=loaded.ShrinkToFit;duration.Value=loaded.NoticeSeconds;
             return "已载入偏好，保存并应用后生效";
@@ -124,13 +126,15 @@ public sealed partial class MainWindow {
                 if(interval.Value>0&&interval.Value<15)throw new InvalidOperationException("定时刷新请设为 0 或至少 15 秒");
                 if(startup.IsOn&&!trayEnabled.IsOn)throw new InvalidOperationException("登录后驻留需要开启托盘图标");
                 var shortcutName=HotkeySpec.Parse(hotkeyBox.Text)?.Name??"";
-                var next=settings with{QuickHotkey=shortcutName,Theme=themes[theme.SelectedIndex],AccentColor=accentMode.SelectedIndex==0?"":$"#{accent.Color.R:X2}{accent.Color.G:X2}{accent.Color.B:X2}",ShowInactive=inactive.IsOn,
+                var hideShortcut=HotkeySpec.Parse(hideHotkeyBox.Text)?.Name??"";
+                if(shortcutName!=""&&shortcutName==hideShortcut)throw new InvalidOperationException("打开面板与隐藏窗口必须使用不同的快捷键");
+                var next=settings with{HideHotkey=hideShortcut,QuickHotkey=shortcutName,Theme=themes[theme.SelectedIndex],AccentColor=accentMode.SelectedIndex==0?"":$"#{accent.Color.R:X2}{accent.Color.G:X2}{accent.Color.B:X2}",ShowInactive=inactive.IsOn,
                     TrayEnabled=trayEnabled.IsOn,CloseToTray=closeToTray.IsOn,IconFallback=fallback.IsOn,RememberSize=remember.IsOn,RefreshOnActivate=activate.IsOn,RefreshSeconds=(int)interval.Value,
                     ScreenPreviews=screen.IsOn,WindowPreviews=windows.IsOn,MoveMargin=(int)margin.Value,ShrinkToFit=shrink.IsOn,NoticeSeconds=(int)duration.Value};
-                next.Normalize();using var shortcut=EnsureGlobalHotkey().Binding.Prepare(next.QuickHotkey);LocalData.Write(AppSettings.FilePath,next);
+                next.Normalize();using var shortcut=EnsureGlobalHotkey().Binding.Prepare(next.QuickHotkey);using var hideShortcutUpdate=EnsureHideHotkey().Binding.Prepare(next.HideHotkey);LocalData.Write(AppSettings.FilePath,next);
                 try{if(startup.IsOn||startup.IsOn!=startupWasEnabled)StartupService.SetEnabled(startup.IsOn);}
                 catch{LocalData.Write(AppSettings.FilePath,settings);throw;}
-                shortcut.Commit();settings=next;completion.TrySetResult(true);
+                shortcut.Commit();hideShortcutUpdate.Commit();settings=next;completion.TrySetResult(true);
             }catch(Exception ex){error.Text="未保存："+ex.Message;SettingsScroll.ChangeView(null,double.MaxValue,null);}
         };
         SettingsSave.Click+=saveHandler;
@@ -142,8 +146,8 @@ public sealed partial class MainWindow {
     }
     void ApplySettings(){
         cursorHost.RequestedTheme=settings.Theme switch{"Light"=>ElementTheme.Light,"Dark"=>ElementTheme.Dark,_=>ElementTheme.Default};
-        Views.Appearance.Apply(settings.AccentColor,appearanceSettings);UpdateCaptionTheme();
-        SetLayout();ConfigureTray();ConfigureHotkey();
+        Views.Appearance.Apply(settings.AccentColor,appearanceSettings,cursorHost.ActualTheme);UpdateCaptionTheme();
+        SetLayout();ConfigureTray();ConfigureHotkey();ConfigureHideHotkey();
 foreach(var w in allWindows.Concat(WindowsList.Items.OfType<WindowInfo>()))w.SetIcon(iconCache.GetValueOrDefault(w.OrderKey),settings.IconFallback);
         previewCancellation?.Cancel();
         if(!settings.WindowPreviews){

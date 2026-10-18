@@ -91,12 +91,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test
 - 重复启动会唤醒已有实例，截图和测试进程仍独立运行。
 - 设置可选“登录 Windows 后启动到托盘”，默认关闭；使用当前用户 Run 启动项，不需要管理员权限。移动/删除程序前应关闭此选项。
 
-当前本地预览位于 `dist\ScreenMover-preview-3\ScreenMover.exe`，最新公开预发布为 v0.2.0-preview.3，v0.1.0-demo 为较早版本。见 [开发清单](docs/ROADMAP.md) 与 [手动验收清单](docs/MANUAL_TEST.md)。
+当前本地预览位于 `dist\ScreenMover-preview-4\ScreenMover.exe`，最新公开预发布为 v0.2.0-preview.4，v0.1.0-demo 为较早版本。见 [开发清单](docs/ROADMAP.md) 与 [手动验收清单](docs/MANUAL_TEST.md)。
 
 
 ## 继续完善：快捷键、偏好备份与诊断
 
-当前构建标记为 `0.2.0-preview.3`，尚待人工界面验收。
+当前构建标记为 `0.2.0-preview.4`，尚待人工界面验收。
 
 - 设置中可录入快捷面板的全局组合键；默认关闭，冲突或保存失败会保留原绑定，退出释放。
 - “设置备份与诊断”可导出已保存偏好、读取偏好文件；导入后保存并应用才生效。设备尺寸、窗口排序、启动项和隐藏记录不随偏好文件迁移。
@@ -106,7 +106,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test
 本轮没有注册实际全局快捷键、修改开机启动或启动图形界面验收；这些入口只在运行软件后由使用者操作。测试使用模拟注册器验证冲突与回退，使用临时文件验证偏好和诊断包。
 
 
-## 0.2.0-preview.3：紧凑快捷面板
+## 0.2.0-preview.4：紧凑快捷面板
 
 快捷面板随窗口数与屏幕数变化，接近 4:3；少量内容约 350 × 258 DIP，较多内容最多约 480 × 360 DIP 并滚动。软件名列保持紧凑，只显示 Word、ChatGPT 等软件名，完整窗口标题放在悬停提示里。拖拽预览不再叠加外层边框。原生白边增加非客户区与样式处理，实际观感仍需要人工确认。
 
@@ -114,7 +114,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test
 # 构建、发布、纯逻辑回归（不启动软件窗口）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest
 # 输出到指定目录，避免覆盖正在运行的文件
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest -OutputPath dist\ScreenMover-preview-3
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest -OutputPath dist\ScreenMover-preview-4
 ```
 
 每次 push 到 main 或提交 PR，GitHub Actions 会执行 Windows 构建、无界面回归并保存便携包产物。它不会代替视觉和实体多屏验收。更新详情见 [CHANGELOG](CHANGELOG.md)。
@@ -123,3 +123,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest -Outpu
 ### Preview 3 界面修复
 
 修复空屏幕旧卡片残留与浅色云母主题不同步；设置变为主窗口内页面，可自定义主题色或跟随系统；标题栏与内容背景融合。拖入屏幕时改为高不透明度遮罩、白字和边框，收起跟随预览以避免叠加。上述视觉表现仍需手动验收，详见 MANUAL_TEST.md。
+
+
+### Preview 4
+
+屏幕卡片按屏幕比例变宽/变窄，软件缩略图改为填充裁切；更细选中框、淡色投放遮罩与滚动虚线。托盘支持连续点击开/关，面板按任务栏方向滑入。设置可配置独立的“隐藏当前前台窗口”快捷键（默认关闭），在主界面「已隐藏」中找回。
+
+[图标候选](https://github.com/lbyh0116/ScreenMover/tree/main/design/icon-options) · [GitHub / Store 双渠道计划](https://github.com/lbyh0116/ScreenMover/blob/main/docs/STORE_PLAN.md)。图标尚待选定，Copilot 键系统注册属于拟议 MSIX 商店版工作，当前便携版尚未提供。

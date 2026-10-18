@@ -14,7 +14,7 @@
             <Style TargetType="HyperlinkButton"><Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}"/></Style>
             <Style x:Key="SurfaceNormal" TargetType="views:SelectionSurface">
                 <Setter Property="IsTabStop" Value="False"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="VerticalContentAlignment" Value="Stretch"/>
-                <Setter Property="CornerRadius" Value="8"/><Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="8"/><Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}"/>
                 <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
                 <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="views:SelectionSurface"><Grid>
@@ -22,9 +22,9 @@
                         <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
                     </Border>
                     <Grid x:Name="DropOverlay" Visibility="Collapsed" IsHitTestVisible="False">
-                        <Border CornerRadius="{TemplateBinding CornerRadius}" Background="{ThemeResource AppDropBrush}" Opacity=".94"/>
-                        <Border CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{ThemeResource AppAccentBrush}" BorderThickness="3"/>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12" Text="{TemplateBinding DropLabel}" Foreground="White" FontSize="20" TextWrapping="Wrap" TextAlignment="Center" FontWeight="SemiBold"/>
+                        <Border CornerRadius="{TemplateBinding CornerRadius}" Background="{ThemeResource AppDropBrush}" Opacity=".42"/>
+                        <Rectangle x:Name="DropOutline" Margin=".75" RadiusX="8" RadiusY="8" Stroke="{ThemeResource AppAccentBrush}" StrokeThickness="1.5" StrokeDashArray="4,3"/>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12" Text="{TemplateBinding DropLabel}" Foreground="White" FontSize="16" TextWrapping="Wrap" TextAlignment="Center" FontWeight="SemiBold"/>
                     </Grid>
                 </Grid></ControlTemplate></Setter.Value></Setter>
             </Style>
@@ -34,6 +34,9 @@
             <Style x:Key="SurfaceSelected" TargetType="views:SelectionSurface" BasedOn="{StaticResource SurfaceNormal}">
                 <Setter Property="BorderBrush" Value="{ThemeResource AppAccentBrush}"/>
                 <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
+            </Style>
+            <Style x:Key="SurfaceDrop" TargetType="views:SelectionSurface" BasedOn="{StaticResource SurfaceNormal}">
+                <Setter Property="BorderBrush" Value="Transparent"/>
             </Style>
             <Style x:Key="WindowItemStyle" TargetType="ListViewItem">
                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="VerticalContentAlignment" Value="Stretch"/>
