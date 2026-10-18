@@ -1,6 +1,12 @@
 using System.Runtime.InteropServices;
 using ScreenMover.Services;
 using static ScreenMover.Interop.Native;
+if(args.Length==2&&args[0]=="--update-helper"){UpdateRegression.HelperSmoke(Path.GetFullPath(args[1]));return;}
+if(args.Length==2&&args[0]=="--update-package"){await UpdateRegression.PackageSmoke(Path.GetFullPath(args[1]));return;}
+if(args.Length==1&&args[0]=="--check-updates"){
+    var release=await new GitHubUpdates().Check(true,CancellationToken.None);
+    Console.WriteLine(release==null?"No release":$"GitHub release={release.Tag}; architecture={GitHubUpdates.Architecture}; bytes={release.Size}; SHA256={release.Sha256}; compatible asset={release.Download!=null}");return;
+}
 if(args.Length==2&&args[0]=="--tray"){
 if(!TrayIcon.TryGetBounds((nint)long.Parse(args[1]),out var trayRect))throw new Exception("Tray icon is not registered");
 Console.WriteLine("PASS tray icon registered: "+trayRect);return;

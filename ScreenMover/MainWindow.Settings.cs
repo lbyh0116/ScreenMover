@@ -33,6 +33,7 @@ public sealed partial class MainWindow {
             editor.Export=async()=>{if(!Save())return "请先修正无效设置";return await ExportSettings()?"已导出设置":"已取消";};
             editor.Diagnose=async()=>await ExportDiagnostics()?"诊断包已生成":"已取消";
             editor.Import=async()=>{var path=await OpenSettingsPath();if(path==null)return "已取消";editor.SetValues(await SettingsProfile.Read(path));return Save()?"已导入并自动保存":"导入值未保存，请检查提示";};
+            editor.InstallUpdate=prepared=>{if(busy||!Save())return false;UpdateInstaller.Start(prepared);ExitApp();return true;};
             var completion=new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             EventHandler changed=(_,_)=>{debounce.Stop();debounce.Start();};editor.Changed+=changed;
             debounce.Tick+=(_,_)=>{if(busy||editor.Working)return;Save();};
@@ -44,7 +45,7 @@ public sealed partial class MainWindow {
             if(!saved&&!closed)Notice("部分设置无效，已保留上次有效值");
         }finally{
             debounce.Stop();stopSettings?.Invoke();settingsReturn=settingsFlush=stopSettings=null;
-            if(editor!=null){editor.StatusChanged-=statusChanged;editor.Export=editor.Import=editor.Diagnose=null;}
+            if(editor!=null){editor.StatusChanged-=statusChanged;editor.Export=editor.Import=editor.Diagnose=null;editor.InstallUpdate=null;}
             if(!closed){SettingsState.Text="";SettingsScroll.Content=null;SettingsPage.Visibility=Visibility.Collapsed;Root.Visibility=Visibility.Visible;dialogOpen=false;SettingsButton.Focus(FocusState.Programmatic);}
         }
     }

@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup><ProjectReference Include="..\CaptureWorker\CaptureWorker.csproj" ReferenceOutputAssembly="false" /></ItemGroup>
+  <ItemGroup><Compile Include="..\UpdateHelper\UpdateEngine.cs" Link="Services\UpdateEngine.cs" /></ItemGroup>
   <ItemGroup>
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
@@ -85,9 +86,11 @@
   <ItemGroup>
     <Content Include="Helpers\VirtualDesktop-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
     <Content Include="Helpers\ScreenMover.DesktopHelper.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
+    <Content Include="Helpers\ScreenMover.UpdateHelper.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
   </ItemGroup>
   <Target Name="BuildDesktopHelper" BeforeTargets="BeforeBuild">
     <Exec Command="&quot;$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\csc.exe&quot; /nologo /target:exe /platform:x64 /out:&quot;$(MSBuildProjectDirectory)\Helpers\ScreenMover.DesktopHelper.exe&quot; &quot;$(MSBuildProjectDirectory)\..\DesktopHelper\Vendor.cs&quot; &quot;$(MSBuildProjectDirectory)\..\DesktopHelper\Program.cs&quot;"/>
+    <Exec Command="&quot;$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\csc.exe&quot; /nologo /target:winexe /platform:x64 /r:System.Xml.Linq.dll /r:System.Windows.Forms.dll /out:&quot;$(MSBuildProjectDirectory)\Helpers\ScreenMover.UpdateHelper.exe&quot; &quot;$(MSBuildProjectDirectory)\..\UpdateHelper\UpdateEngine.cs&quot; &quot;$(MSBuildProjectDirectory)\..\UpdateHelper\Program.cs&quot;"/>
   </Target>
   <Target Name="CopyCaptureWorker" AfterTargets="Build">
     <ItemGroup><CaptureFiles Include="$(MSBuildProjectDirectory)\..\CaptureWorker\bin\$(Configuration)\net10.0\$(RuntimeIdentifier)\ScreenMover.CaptureWorker.exe;$(MSBuildProjectDirectory)\..\CaptureWorker\bin\$(Configuration)\net10.0\$(RuntimeIdentifier)\ScreenMover.CaptureWorker.dll;$(MSBuildProjectDirectory)\..\CaptureWorker\bin\$(Configuration)\net10.0\$(RuntimeIdentifier)\ScreenMover.CaptureWorker.deps.json;$(MSBuildProjectDirectory)\..\CaptureWorker\bin\$(Configuration)\net10.0\$(RuntimeIdentifier)\ScreenMover.CaptureWorker.runtimeconfig.json" /></ItemGroup>

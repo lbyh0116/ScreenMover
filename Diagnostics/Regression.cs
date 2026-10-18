@@ -67,6 +67,7 @@ static partial class Regression {
         Instances();
         Preferences();
         ReleaseChecks();
+        UpdateRegression.Run();
         RECT Box(int x,int y,int w,int h)=>new(){Left=x,Top=y,Right=x+w,Bottom=y+h};
         // Mixed resolutions and relative monitor positions, all in physical pixels.
         var works=new[]{Box(-1920,0,1920,1040),Box(0,-2160,3840,2100),Box(2560,0,1080,1880),Box(-1080,-1920,1080,1880),Box(48,40,1872,1040)};

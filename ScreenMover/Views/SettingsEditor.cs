@@ -13,7 +13,10 @@ public sealed class SettingsEditor : UserControl {
     readonly HotkeyPicker quickKey,hideKey;
     public event Action<string>? StatusChanged;
     bool ready;
-    public bool Working {get;private set;}
+    bool dataWorking;
+    readonly UpdatePanel updater;
+    public bool Working=>dataWorking||updater.Working;
+    public Func<PreparedUpdate,bool>? InstallUpdate {get=>updater.Install;set=>updater.Install=value;}
     public bool StartupWanted=>startup.IsOn;
     public event EventHandler? Changed;
     public Func<Task<string>>? Export,Import,Diagnose;
@@ -44,15 +47,16 @@ public sealed class SettingsEditor : UserControl {
         var dataStatus=new TextBlock{TextWrapping=TextWrapping.Wrap};
         foreach(var (label,run) in new (string,Func<Task<string>>)[]{("导出设置",()=>Export?.Invoke()??Task.FromResult("不可用")),("导入设置",()=>Import?.Invoke()??Task.FromResult("不可用")),("诊断包",()=>Diagnose?.Invoke()??Task.FromResult("不可用"))}){
             var button=new Button{Content=label};button.Click+=async(_,_)=>{
-                if(Working)return;Working=true;IsEnabled=false;
+                if(Working)return;dataWorking=true;IsEnabled=false;
                 try{dataStatus.Text=await run();}catch(Exception ex){dataStatus.Text="未完成："+ex.Message;}
-                finally{Working=false;IsEnabled=true;Signal();}
+                finally{dataWorking=false;IsEnabled=true;Signal();}
             };row.Children.Add(button);
         }
         data.Children.Add(row);data.Children.Add(dataStatus);
         data.Children.Add(new TextBlock{Text="设置变化后自动保存。无效数字或快捷键冲突会保留上次有效设置。导入不迁移启动项、设备尺寸、排序或隐藏记录。诊断包不包含窗口标题、截图或原始日志。",TextWrapping=TextWrapping.Wrap,Opacity=.7});
         Children.Add(new Expander{Header="设置备份与诊断",Content=data,HorizontalAlignment=HorizontalAlignment.Stretch});
         Children.Add(new Expander{Header="操作说明与快捷键",HorizontalAlignment=HorizontalAlignment.Stretch,Content=new TextBlock{TextWrapping=TextWrapping.Wrap,Text="主界面：单击选择，Ctrl / Shift 多选，点击空白取消。拖动卡片排序；拖到屏幕移动；双击激活窗口。\n\n快捷面板：点击托盘图标打开或收起。拖到其他屏幕移动，拖到当前屏幕隐藏（仅已适配系统）；按 Esc 或点击外部收起。已隐藏的窗口可在主界面找回。\n\n快捷键：支持按键录入，也可点输入栏右侧箭头选择预设或组合；通过清除按钮停用。隐藏前台窗口默认为关闭。\n\n截图：静态采样，仅保存在内存中；启动、重新激活、定时或 F5 时刷新。最多保留 64 个窗口缩略图，超额时优先当前屏幕，其余使用图标。\n\n离开设置页前会保存有效变更。右键托盘图标可彻底退出。"}});
+        Section("软件更新");updater=new();Children.Add(updater);
         var about=new StackPanel{Spacing=8};
         about.Children.Add(new TextBlock{Text=$"ScreenMover {BuildInfo.DisplayVersion}\n{PlatformSupport.Current.Description}\n{PlatformSupport.Current.HideStatus}",TextWrapping=TextWrapping.Wrap});
         about.Children.Add(new TextBlock{Text="本地处理窗口与截图，不上传画面，不启用遥测。应用图标采用桌面收纳方案。",TextWrapping=TextWrapping.Wrap,Opacity=.7});

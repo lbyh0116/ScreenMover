@@ -8,6 +8,8 @@ Windows 10 / 11 多屏窗口管理工具，使用 C# / WinUI 3 开发。目前�
 
 发布包包含 .NET 与 Windows App SDK 运行时，不需要 MSIX 注册。当前发行目标为 Windows 11 与 Windows 10 22H2 x64 基础功能。Win11 优先云母，Win10 支持时使用亚克力，不可用时纯色回退；Win10 实机仍待验收。隐藏到独立虚拟桌面仅在 26100/26200 构建启用。
 
+从 Preview 6 起可在设置 → 软件更新中检查 GitHub Releases，选择是否包含预览版，并下载、校验、原地安装后重启。当前不会后台联网；旧版首次升级仍需下载 ZIP。详见 [更新与回退说明](docs/UPDATES.md)。
+
 ## 功能
 
 - 屏幕磁贴横向排列，显示静态截图；未启用屏幕以虚线标记。
@@ -91,12 +93,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test
 - 重复启动会唤醒已有实例，截图和测试进程仍独立运行。
 - 设置可选“登录 Windows 后启动到托盘”，默认关闭；使用当前用户 Run 启动项，不需要管理员权限。移动/删除程序前应关闭此选项。
 
-当前本地预览位于 `dist\ScreenMover-preview-5\ScreenMover.exe`，最新公开预发布为 v0.2.0-preview.5，v0.1.0-demo 为较早版本。见 [开发清单](docs/ROADMAP.md) 与 [手动验收清单](docs/MANUAL_TEST.md)。
+当前本地预览位于 `dist\ScreenMover-preview-6\ScreenMover.exe`，最新公开预发布为 v0.2.0-preview.6，v0.1.0-demo 为较早版本。见 [开发清单](docs/ROADMAP.md) 与 [手动验收清单](docs/MANUAL_TEST.md)。
 
 
 ## 继续完善：快捷键、偏好备份与诊断
 
-当前构建标记为 `0.2.0-preview.5`，尚待人工界面验收。
+当前构建标记为 `0.2.0-preview.6`，尚待人工界面验收。
 
 - 设置中可录入快捷面板的全局组合键；默认关闭，冲突或保存失败会保留原绑定，退出释放。
 - “设置备份与诊断”可导出已保存偏好、读取偏好文件；导入后自动保存生效。设备尺寸、窗口排序、启动项和隐藏记录不随偏好文件迁移。
@@ -114,7 +116,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test
 # 构建、发布、纯逻辑回归（不启动软件窗口）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest
 # 输出到指定目录，避免覆盖正在运行的文件
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest -OutputPath dist\ScreenMover-preview-5
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest -OutputPath dist\ScreenMover-preview-6
 ```
 
 每次 push 到 main 或提交 PR，GitHub Actions 会执行 Windows 构建、无界面回归并保存便携包产物。它不会代替视觉和实体多屏验收。更新详情见 [CHANGELOG](CHANGELOG.md)。
