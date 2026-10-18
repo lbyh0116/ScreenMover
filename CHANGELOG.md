@@ -1,79 +1,35 @@
-# 更新记录
+# v0.2.0 · 2026-10-18
 
-## 0.2.0-preview.6 — 2026-10-18
+[下载正式版 / Download](https://github.com/lbyh0116/ScreenMover/releases/tag/v0.2.0)
 
-- 设置增加 GitHub Releases 检查、稳定/预览渠道选择、更新说明、下载进度及取消操作。
-- 按当前架构选择发布包，以 GitHub API SHA-256 和大小校验下载；限制下载/解压大小及路径，拒绝不匹配的程序架构和版本。
-- 独立更新助手等待原进程退出，备份、原地替换并重启；替换失败尝试回退，保留更新结果与旧文件。用户设置、排序及隐藏恢复数据不随程序覆盖。
-- 不后台联网检查，不自动提权；包身份版本交由 Store 更新。补充网络与更新备份隐私说明。
-- 统一架构构建入口并预留 CI 矩阵，仍只启用 x64；x86/ARM64 未适配构建明确拒绝。
+## 简体中文
 
-验证：无界面更新协议/网络/文件事务回归，现有回归及发布资源检查。未使用 computer use，不对真实用户程序目录执行更新；界面、真实退出/重启与 Win10 实机仍需人工验收。
+首个正式发行版，提供 Windows x64 便携包。
 
-## 0.2.0-preview.5 — 2026-10-18
+- 显示器与软件窗口静态预览、相册网格、搜索、多选、拖拽排序。
+- 窗口跨屏拖放、批量移动、撤销，以及已适配系统上的隐藏与找回。
+- 托盘快捷面板、可配置全局快捷键、主题与设置自动保存。
+- GitHub 更新检查、SHA-256 校验、独立安装与文件替换失败回退；正式渠道在 API 不可用时通过 GitHub 的 latest 入口读取稳定版本。
 
-- 正式采用 C「桌面收纳」图标，更新 EXE、托盘、窗口和图标资源。
-- 快捷键输入栏增加向下箭头与等宽选单，可选择预设或自由搭配 Ctrl / Alt / Shift / Win 与主键；保留按键录入，Delete / Backspace 不再清空，使用清除按钮。
-- 设置变更约 450 ms 防抖后自动保存，返回/关闭前保存有效变更；删除底部应用和取消按钮。快捷键冲突、磁盘或启动项更新失败会显示状态并回退有效设置。
-- 按用户选择增加 Windows 10 22H2 x64 基础兼容路径：Win11 优先云母，支持时 Win10 使用桌面亚克力，材质不可用时纯色回退；Win10 使用系统原生标题栏。预览、移动、托盘和面板快捷键保持可用，独立虚拟桌面隐藏仅在已适配 26100/26200 构建启用。Win10 实机尚待验收。
-- 将截图移到不加载 WinUI 的独立轻量进程，与主程序共享自包含 .NET 运行时；验证二进制帧尺寸/长度、并行排空标准错误，超时取消后结束子进程。
-- 窗口缩略图最多保留 64 个，优先当前屏幕；淘汰时同时清理模型引用。拖拽结束和快捷面板收起释放残留预览，指针游标及原生钩子进行生命周期清理。
-- 操作记录只在内存保留最近 500 条，日志按 4 MiB 归档保留历史；提供数据文件夹入口。
-- 收紧单实例消息长度并增加失败重试退避；加强窗口 PID/进程启动时间身份校验；原生事件监听初始化失败时清理已申请钩子并降级轮询。
-- 拆分设置编辑器、快捷键选择器、保存事务和截图进程，集中版本号；增加关于、隐私说明、问题模板、私密漏洞报告和质量复查记录。
+升级：退出旧版，完整解压后运行 ScreenMover.exe；已有 Preview 6 可从设置的软件更新中安装。数据继续保留。
 
-验证：编译、发布资源、无界面逻辑与截图 GDI/内存重复测试。NuGet 未报告已知漏洞；这不等同于完整安全认证或新版整个界面无泄漏。未使用 computer use；Win10 实机和新界面交互待人工验收。
+兼容：Windows 11 x64；Win10 22H2 提供基础兼容路径，尚待实机验证。独立虚拟桌面隐藏限构建 26100 / 26200。当前不含 x86/ARM64 包、英文界面或 Microsoft Store 版。
 
-## 0.2.0-preview.4 — 2026-10-18
+## English
 
-- 屏幕预览保持相同高度，按实际屏幕比例决定卡片宽度，横屏、竖屏和超宽屏不再强塞到相同比例；快捷面板会为超宽屏预览适当增加宽度，空间不足时整体缩小预览高度以保留比例。
-- 软件窗口缩略图改为填满预览区域并裁切溢出部分；图标回退仍保持小尺寸，不将图标放大填满。
-- 常规选中边框从 2 DIP 减为 1 DIP；拖放目标使用较淡的遮罩、16 DIP 白字和 1.5 DIP 滚动虚线，结束/取消后恢复普通样式，关闭系统动画时不滚动。
-- 跟随系统主题色使用 WinUI 的浅色 AccentDark1 / 深色 AccentLight2 变体；外观或系统主题色变化时同步。自定义色继续按用户选择应用。
-- 修复点击托盘图标收起后松开鼠标又重新打开的问题；区分同次点击的按下关闭与松开激活。
-- 面板出现前预置动画起点，按任务栏方向滑入，避免先闪现完整内容再播放动画。
-- 新增可自定义的“隐藏当前前台窗口”全局快捷键，默认关闭；捕获按键时的前台窗口，不激活主界面，复用隐藏记录与找回。两个快捷键独立注册并共同回退，冲突不覆盖旧设置。
-- 新增四组原创矢量图标候选和小尺寸预览，待用户选定后应用；新增双渠道发行与 Copilot 键注册调研文档，尚未上架或收费。
+First stable release, distributed as a portable Windows x64 package.
 
-验证：源码构建与无界面回归；屏幕比例、托盘点击事件、双快捷键 ID/冲突回退及前台窗口匹配已加入覆盖。真实 UI 动画、系统按键与多显示器效果仍需手动验收。未使用 computer use。
+- Static monitor/window previews, gallery browsing, search, multi-selection, and persistent drag ordering.
+- Cross-monitor drag-and-drop, batch moves, undo, and hiding/recovery on supported Windows builds.
+- Tray quick panel, configurable global hotkeys, appearance options, and automatically saved settings.
+- GitHub release checks, SHA-256 verification, an independent updater, and attempted rollback after file replacement failures. Stable checks can use GitHub's official latest-release redirect when the API is unavailable.
 
-## 0.2.0-preview.3 — 2026-10-18
+Upgrade: exit the old version, extract the entire archive, and run ScreenMover.exe. Preview 6 users can install through the in-app updater. Local settings and recovery records are retained.
 
-- 修复选择空显示器（包括新启用的虚拟屏幕）后计数为零但旧窗口卡片仍留在列表的问题；列表失效状态不再用空字符串表示。
-- 主窗口使用与内容共享云母背景的标题栏，移除独立浅色标题条，保留系统最小化、最大化和关闭按钮。
-- 修复外观切换只作用于内部控件、云母宿主仍使用另一主题的问题；统一浅色/深色背景与文字。
-- 设置改为主窗口内的完整页面，按个性化、托盘与启动、窗口与截图、移动与提示、数据与帮助分组；左上角返回，保存并应用或取消返回。
-- 新增跟随系统/自定义主题色，支持颜色选择和十六进制输入，偏好可保存和导入导出；系统主题色变化自动同步。
-- 投放遮罩提高不透明度，改为无底色的大号白字，并增加边框和入场反馈；浅色主题色会为遮罩自动加深以保证可读性。
-- 拖拽进入屏幕卡片后收起鼠标旁的预览，离开后恢复，避免拖拽行、截图和操作文字透明叠加。
+Compatibility: Windows 11 x64. A basic Windows 10 22H2 path is included but still needs device validation. Separate virtual-desktop hiding is limited to builds 26100 / 26200. No x86/ARM64 packages, English UI, or Store edition are included.
 
-验证：本轮只做源码构建、无界面回归与发布资源检查。真实双屏/虚拟屏幕切换、标题栏和云母观感、设置键盘导航及拖拽动画仍需人工验收；未使用 computer use。
+## 验证 / Validation
 
-## 0.2.0-preview.2 — 2026-10-17
+构建、无界面回归、临时副本更新助手重启及发行包完整性检查；未使用 computer use。更广泛的设备测试仍在进行。
 
-### 本轮修复
-
-- 快捷面板按照窗口和屏幕数量调整为接近 4:3 的尺寸，少量内容从约 350 × 258 DIP 起步，最多约 480 × 360 DIP；内容较多时滚动，软件名列不再随整体窗口无限变宽。
-- 快捷列表只显示软件名（如 Word、Hermes、ChatGPT），不展开文档标题；完整窗口标题保留在悬停提示中，同软件的多个窗口仍分别操作。
-- 拖拽预览直接显示卡片/窗口行渲染结果，移除外层重复边框及重复标题。
-- 快捷面板增加原生窗口边框处理：移除 caption/thick-frame/client-edge 样式，处理 WM_NCCALCSIZE，并在显示、激活、主题变化后重新应用 DWM 无边框与圆角策略。白边实际效果仍需人工确认。
-- 切换来源屏幕或操作后，根据新内容重新计算快捷面板尺寸。
-
-### 自上个公开 Demo 后累计新增
-
-- 固定相册主界面、统一选中边框与圆角、点击空白取消选择。
-- 按压/拖拽反馈，屏幕投放主题色遮罩与移动/隐藏预告。
-- 紧凑云母托盘面板、点击外部收起、精简常驻说明。
-- 全局快捷键（默认关闭），冲突与保存失败回退。
-- 单实例唤醒、可选登录后驻留（默认关闭）。
-- 设置偏好导入导出及白名单诊断 ZIP。
-- DPI 尺寸记忆、移动撤销、隐藏找回和排序持久化。
-- 新增 GitHub Actions Windows 构建、无界面回归及便携包产物；build.ps1 支持 -PureTest 和自定义输出目录。
-
-### 验证范围
-
-本地干净源码构建、发布资源检查与无界面逻辑回归。未使用 computer use；没有把白边观感、材质、真实双屏/DPI/热插拔或管理员窗口的人工验收标为通过。
-
-## 0.1.0-demo — 2026-10-16
-
-首个公开 Demo，包含屏幕与窗口预览、移动与隐藏、设置、拖拽排序和托盘快捷面板。
+Build, headless regressions, updater restart using a temporary fixture, and release-package integrity checks. No computer-use verification. Broader hardware testing remains ongoing.

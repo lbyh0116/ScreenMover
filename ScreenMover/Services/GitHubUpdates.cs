@@ -45,9 +45,26 @@ public sealed class GitHubUpdates {
             using var response=await Send(new Uri($"https://api.github.com/repos/{Repository}/releases?per_page=100"),false,timeout.Token);
             var data=await ReadBounded(response,2*1024*1024,timeout.Token);
             return Select(data,previews,Architecture);
-        }catch(HttpRequestException)when(previews){return await Feed(previews,timeout.Token);}
+        }catch(HttpRequestException){return await PublicRelease(previews,timeout.Token);}
     }
-    async Task<GitHubRelease?> Feed(bool previews,CancellationToken token){
+    async Task<GitHubRelease?> PublicRelease(bool previews,CancellationToken token){
+        string? tag;
+        if(previews)tag=await FeedTag(token);
+        else{
+            using var latest=await Send(new Uri($"https://github.com/{Repository}/releases/latest"),true,token);
+            tag=TagFromPage(latest.RequestMessage?.RequestUri);
+            if(tag!=null&&ReleaseVersion.Parse(tag).Pre.Length!=0)tag=null;
+        }
+        if(tag==null)return null;
+        return await PublicAsset(tag,token);
+    }
+    static string? TagFromPage(Uri? uri){
+        string prefix=$"/{Repository}/releases/tag/";
+        if(uri==null||uri.Scheme!="https"||!uri.IsDefaultPort||uri.UserInfo!=""||uri.Host!="github.com"||!uri.AbsolutePath.StartsWith(prefix,StringComparison.Ordinal))return null;
+        string tag=Uri.UnescapeDataString(uri.AbsolutePath[prefix.Length..]);
+        try{ReleaseVersion.Parse(tag);return tag;}catch(Exception e)when(e is FormatException or OverflowException){return null;}
+    }
+    async Task<string?> FeedTag(CancellationToken token){
         using var response=await Send(new Uri($"https://github.com/{Repository}/releases.atom"),true,token);
         byte[] xml=await ReadBounded(response,2*1024*1024,token);
         using var memory=new MemoryStream(xml);using var reader=XmlReader.Create(memory,new(){DtdProcessing=DtdProcessing.Prohibit,XmlResolver=null,MaxCharactersInDocument=2*1024*1024});
@@ -55,14 +72,16 @@ public sealed class GitHubUpdates {
         var choices=new List<(ReleaseVersion Version,string Tag)>();
         foreach(var entry in doc.Descendants(atom+"entry")){
             var link=entry.Elements(atom+"link").Select(e=>(string?)e.Attribute("href")).FirstOrDefault(s=>s?.Contains("/releases/tag/",StringComparison.Ordinal)==true);
-            if(!Uri.TryCreate(link,UriKind.Absolute,out var uri)||uri.Scheme!="https"||uri.Host!="github.com"||!uri.AbsolutePath.StartsWith($"/{Repository}/releases/tag/",StringComparison.Ordinal))continue;
-            string tag=Uri.UnescapeDataString(uri.AbsolutePath[($"/{Repository}/releases/tag/").Length..]);
-            try{var version=ReleaseVersion.Parse(tag);if(previews||version.Pre.Length==0)choices.Add((version,tag));}catch(Exception e)when(e is FormatException or OverflowException){}
+            if(!Uri.TryCreate(link,UriKind.Absolute,out var uri))continue;
+            string? tag=TagFromPage(uri);if(tag!=null)choices.Add((ReleaseVersion.Parse(tag),tag));
         }
-        var choice=choices.OrderByDescending(c=>c.Version).FirstOrDefault();if(choice.Version==null)return null;
-        string root=$"https://github.com/{Repository}/releases/download/{Uri.EscapeDataString(choice.Tag)}/",file=$"ScreenMover-v{choice.Tag.TrimStart('v')}-win-{Architecture}.zip";
+        return choices.OrderByDescending(c=>c.Version).Select(c=>c.Tag).FirstOrDefault();
+    }
+    async Task<GitHubRelease> PublicAsset(string tag,CancellationToken token){
+        var version=ReleaseVersion.Parse(tag);
+        string root=$"https://github.com/{Repository}/releases/download/{Uri.EscapeDataString(tag)}/",file=$"ScreenMover-v{tag.TrimStart('v')}-win-{Architecture}.zip";
         string? sha=null;var sums=new List<string>{"SHA256SUMS.txt"};
-        if(choice.Version.Pre.Length==2&&choice.Version.Pre[0]=="preview"&&choice.Version.Pre[1].All(char.IsAsciiDigit))sums.Add($"SHA256SUMS-preview{choice.Version.Pre[1]}.txt");
+        if(version.Pre.Length==2&&version.Pre[0]=="preview"&&version.Pre[1].All(char.IsAsciiDigit))sums.Add($"SHA256SUMS-preview{version.Pre[1]}.txt");
         foreach(string name in sums)try{
             using var checksum=await Send(new Uri(root+name),true,token);
             string text=System.Text.Encoding.UTF8.GetString(await ReadBounded(checksum,64*1024,token));
@@ -72,7 +91,7 @@ public sealed class GitHubUpdates {
             }
             if(sha!=null)break;
         }catch(HttpRequestException){}
-        return new(choice.Tag,"GitHub API 暂不可用，已通过公开发布订阅读取版本。完整更新说明请打开发布页。",new Uri($"https://github.com/{Repository}/releases/tag/{Uri.EscapeDataString(choice.Tag)}"),new Uri(root+file),0,sha);
+        return new(tag,"GitHub API 暂不可用，已通过公开发布页读取版本。完整更新说明请打开发布页。",new Uri($"https://github.com/{Repository}/releases/tag/{Uri.EscapeDataString(tag)}"),new Uri(root+file),0,sha);
     }
     public static GitHubRelease? Select(byte[] json,bool previews,string architecture){
         using var doc=JsonDocument.Parse(json,new(){MaxDepth=32});
@@ -111,6 +130,7 @@ public sealed class GitHubUpdates {
             request.Headers.UserAgent.ParseAdd("ScreenMover/"+BuildInfo.DisplayVersion);
             request.Headers.Accept.ParseAdd(download?"application/octet-stream":"application/vnd.github+json");
             var response=await http.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,token);
+            response.RequestMessage??=request;
             if((int)response.StatusCode is 301 or 302 or 303 or 307 or 308){
                 var location=response.Headers.Location;response.Dispose();
                 if(!download||location==null)throw new HttpRequestException("GitHub API 地址发生变化，请手动查看发布页");

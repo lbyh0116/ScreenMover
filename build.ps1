@@ -17,8 +17,12 @@ try {
     foreach ($required in @('ScreenMover.exe','Assets\AppIcon.ico','ScreenMover.CaptureWorker.exe','ScreenMover.CaptureWorker.dll','ScreenMover.CaptureWorker.runtimeconfig.json','ScreenMover.pri','MainWindow.xbf','QuickWindow.xbf','Helpers\ScreenMover.DesktopHelper.exe','Helpers\ScreenMover.UpdateHelper.exe','Helpers\VirtualDesktop-LICENSE.txt')) {
         if (-not (Test-Path (Join-Path $releasePath $required))) { throw "Missing release resource: $required" }
     }
-    foreach ($document in @('README.md','CHANGELOG.md','docs\MANUAL_TEST.md','docs\ROADMAP.md','docs\PRIVACY.md','docs\QUALITY_REVIEW.md','docs\COMPATIBILITY.md','docs\STORE_PLAN.md','docs\UPDATES.md','docs\ARCHITECTURE.md','SECURITY.md')) {
-        if (Test-Path $document) { Copy-Item -LiteralPath $document -Destination $releasePath -Force }
+    foreach ($document in @('README.md','README.en.md','CHANGELOG.md','docs\PRIVACY.md','docs\COMPATIBILITY.md','docs\UPDATES.md','SECURITY.md')) {
+        if (Test-Path $document) {
+            $documentTarget = Join-Path $releasePath $document
+            [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($documentTarget))
+            Copy-Item -LiteralPath $document -Destination $documentTarget -Force
+        }
     }
     if ($PureTest) {
         & (Join-Path $releasePath "ScreenMover.CaptureWorker.exe") --self-test

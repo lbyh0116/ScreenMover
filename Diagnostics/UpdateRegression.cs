@@ -43,8 +43,16 @@ static class UpdateRegression {
                 return new(HttpStatusCode.OK){Content=new StringContent(content)};
             }));
             var feed=await new GitHubUpdates(fallback).Check(true,CancellationToken.None);Check(feed?.Tag=="v1.0.0-preview.2"&&feed.Sha256==hash&&feed.Size==0,"API rate-limit feed fallback failed");
-            bool stableRejected=false;try{await new GitHubUpdates(fallback).Check(false,CancellationToken.None);}catch(HttpRequestException){stableRejected=true;}
-            Check(stableRejected,"Stable channel guessed GitHub prerelease status from feed");
+            Check(await new GitHubUpdates(fallback).Check(false,CancellationToken.None)==null,"Stable channel guessed GitHub prerelease status from feed");
+            using var stableFallback=new HttpClient(new Handler(request=>{
+                if(request.RequestUri!.Host=="api.github.com")return new(HttpStatusCode.Forbidden);
+                if(request.RequestUri.AbsolutePath.EndsWith("/latest",StringComparison.Ordinal)){
+                    var result=new HttpResponseMessage(HttpStatusCode.Redirect);result.Headers.Location=new Uri("https://github.com/lbyh0116/ScreenMover/releases/tag/v1.0.0");return result;
+                }
+                return new(HttpStatusCode.OK){Content=new StringContent(hash+"  ScreenMover-v1.0.0-win-"+GitHubUpdates.Architecture+".zip\n")};
+            }));
+            var stable=await new GitHubUpdates(stableFallback).Check(false,CancellationToken.None);
+            Check(stable?.Tag=="v1.0.0"&&stable.Sha256==hash,"Official latest stable release fallback failed");
             string bad=Path.Combine(folder,"bad.zip");bool rejected=false;
             try{await api.Download(release with{Sha256=new string('0',64)},bad,null,CancellationToken.None);}catch(InvalidDataException){rejected=true;}
             Check(rejected&&!File.Exists(bad),"Corrupt download retained");

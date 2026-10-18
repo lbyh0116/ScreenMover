@@ -1,6 +1,6 @@
 # 兼容范围
 
-本轮按用户选择的 A 档实现：Windows 10 22H2 x64 基础兼容，Win11 保持现有功能。以下区分“代码路径已实现”和“实机已验收”。
+v0.2.0 发行架构为 x64，主要面向 Windows 11；Windows 10 22H2 提供基础兼容路径。以下区分代码支持与设备验收范围。
 
 | 平台 | 材质与标题栏 | 预览 / 移动 / 托盘 / 面板快捷键 | 独立虚拟桌面隐藏 |
 | --- | --- | --- | --- |
@@ -9,7 +9,7 @@
 | Windows 11 26100 / 26200 | 云母或运行时回退 | 保持可用 | 已适配构建，继续回归隐藏/找回 |
 | 后续未知构建 | 运行时探测材质与 API | 不因隐藏接口未知而阻止主界面使用 | 默认禁用，待验证后适配 |
 
-WinUI 3 与 Windows App SDK 具备从 Windows 10 1809 起的向后兼容能力，但此项目本轮选择的 Win10 发行目标是 22H2 x64，不据此承诺所有旧系统、设备或依赖版本都已验收。[微软说明](https://learn.microsoft.com/en-au/windows/apps/get-started/windows-developer-faq)
+WinUI 3 与 Windows App SDK 具备从 Windows 10 1809 起的向后兼容能力；本项目的 Win10 目标是 22H2 x64，不据此承诺所有旧系统、设备或依赖版本都已验收。[微软说明](https://learn.microsoft.com/en-au/windows/apps/get-started/windows-developer-faq)
 
 `MicaController.IsSupported()` / `DesktopAcrylicController.IsSupported()` 决定材质，无法建立材质时保留主题纯色背景。系统透明效果、远程会话、图形能力和节能状态可能使材质降级。[官方材质文档](https://learn.microsoft.com/en-us/windows/apps/develop/ui/materials)
 

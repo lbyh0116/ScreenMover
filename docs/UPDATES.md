@@ -5,9 +5,9 @@
 ## 发布协议
 
 - 源为 https://api.github.com/repos/lbyh0116/ScreenMover/releases?per_page=100 ，从最近 100 个非草稿发布中按语义版本选择最高版本；稳定渠道排除预览标签和 prerelease 发布。
-- tag 使用 vMAJOR.MINOR.PATCH[-preview.N]；安装资产名称必须为 ScreenMover-vVERSION-win-ARCH.zip，例如 ScreenMover-v0.2.0-preview.6-win-x64.zip。
+- tag 使用 vMAJOR.MINOR.PATCH[-preview.N]；安装资产名称必须为 ScreenMover-vVERSION-win-ARCH.zip，例如 ScreenMover-v0.2.0-win-x64.zip。
 - GitHub API 资产必须提供 sha256 digest，且 ZIP 字节数与 size 一致。缺包、缺 hash 或架构不匹配时，仅允许打开发布页，不自动安装。摘要来自 GitHub HTTPS API，不等于独立的发布者数字签名；仓库发布权限仍属于信任边界。
-- 包含预览版时，API 限流/网络错误可回退到同仓库 releases.atom，并读取该发布的 SHA256SUMS.txt（兼容 SHA256SUMS-previewN.txt）。只选择校验和中精确匹配的包名，下载仍限制大小并校验 SHA-256。订阅不完整携带 GitHub 的 prerelease 标记，稳定渠道不使用此回退，以免把预发布当正式版；限流时可稍后重试或手动打开发布页。
+- API 限流/网络错误时，正式渠道通过同仓库 releases/latest 的官方重定向识别正式发布；包含预览版的渠道通过 releases.atom 选择版本。读取该发布的 SHA256SUMS.txt（兼容 SHA256SUMS-previewN.txt），只选择校验和中精确匹配的包名，下载仍限制大小并校验 SHA-256。正式渠道不从订阅猜测 GitHub 的 prerelease 标记。
 - ZIP 可以是根目录文件或单层共同目录；必须包含完整程序、运行时、截图组件、XAML/PRI 及 UpdateHelper。必须使用与发行标签相同的 ProductVersion。
 - 下载上限 512 MiB，展开上限 1.5 GiB、最多 4,000 项；限制路径、重复文件名、符号链接、Windows 设备名/数据流及重解析点。安装前核对三个可执行组件的 PE 架构，独立更新程序再次校验逐文件摘要。
 

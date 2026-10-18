@@ -3,8 +3,8 @@ using ScreenMover.Services;
 using static ScreenMover.Interop.Native;
 if(args.Length==2&&args[0]=="--update-helper"){UpdateRegression.HelperSmoke(Path.GetFullPath(args[1]));return;}
 if(args.Length==2&&args[0]=="--update-package"){await UpdateRegression.PackageSmoke(Path.GetFullPath(args[1]));return;}
-if(args.Length==1&&args[0]=="--check-updates"){
-    var release=await new GitHubUpdates().Check(true,CancellationToken.None);
+if(args.Length==1&&(args[0]=="--check-updates"||args[0]=="--check-stable-updates")){
+    var release=await new GitHubUpdates().Check(args[0]=="--check-updates",CancellationToken.None);
     Console.WriteLine(release==null?"No release":$"GitHub release={release.Tag}; architecture={GitHubUpdates.Architecture}; bytes={release.Size}; SHA256={release.Sha256}; compatible asset={release.Download!=null}");return;
 }
 if(args.Length==2&&args[0]=="--tray"){
