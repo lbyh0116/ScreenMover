@@ -1,7 +1,7 @@
 using ScreenMover.Models;
 using ScreenMover.Services;
 using static ScreenMover.Interop.Native;
-static class Regression {
+static partial class Regression {
     static void Surfaces(){
         RECT Box(int x,int y,int w,int h)=>new(){Left=x,Top=y,Right=x+w,Bottom=y+h};
         var screen=Box(-1920,-1080,1920,1080);
@@ -66,6 +66,7 @@ static class Regression {
         DropTargets();
         Instances();
         Preferences();
+        ReleaseChecks();
         RECT Box(int x,int y,int w,int h)=>new(){Left=x,Top=y,Right=x+w,Bottom=y+h};
         // Mixed resolutions and relative monitor positions, all in physical pixels.
         var works=new[]{Box(-1920,0,1920,1040),Box(0,-2160,3840,2100),Box(2560,0,1080,1880),Box(-1080,-1920,1080,1880),Box(48,40,1872,1040)};

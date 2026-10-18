@@ -37,3 +37,6 @@ Copilot 键能力的技术前提是“已打包、已签名、正确注册”，
 - [Copilot 硬件键 Provider：打包、扩展与签名要求](https://learn.microsoft.com/en-us/windows/apps/develop/windows-integration/microsoft-copilot-key-provider)
 - [Windows 设置 URI：Copilot 硬件键选择页](https://learn.microsoft.com/en-us/windows/apps/develop/launch/launch-settings)
 - [MSIX 应用价格与可用性](https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/msix/price-and-availability)
+
+
+Preview 5 补充：便携原版增加 Win10 22H2 基础兼容路径；Copilot 键系统选择入口依然是后续 MSIX 工作，只在实际提供该设置的 Windows 版本启用，不把它作为 Win10 基础功能承诺。C 图标已定稿应用。

@@ -4,7 +4,6 @@
     <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>ScreenMover</RootNamespace>
-    <Version>0.2.0-preview.4</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon Condition="Exists('Assets\AppIcon.ico')">Assets\AppIcon.ico</ApplicationIcon>
     <Platforms>x86;x64;ARM64</Platforms>
@@ -25,10 +24,12 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\Square44x44Logo.targetsize-48_altform-lightunplated.png" />
     <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\AppIcon.ico" />
+    <Content Include="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="Assets\AppIcon.svg" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
 
+  <ItemGroup><ProjectReference Include="..\CaptureWorker\CaptureWorker.csproj" ReferenceOutputAssembly="false" /></ItemGroup>
   <ItemGroup>
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
@@ -89,4 +90,9 @@
   <Target Name="BuildDesktopHelper" BeforeTargets="BeforeBuild">
     <Exec Command="&quot;$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\csc.exe&quot; /nologo /target:exe /platform:x64 /out:&quot;$(MSBuildProjectDirectory)\Helpers\ScreenMover.DesktopHelper.exe&quot; &quot;$(MSBuildProjectDirectory)\..\DesktopHelper\Vendor.cs&quot; &quot;$(MSBuildProjectDirectory)\..\DesktopHelper\Program.cs&quot;"/>
   </Target>
+  <Target Name="CopyCaptureWorker" AfterTargets="Build">
+    <ItemGroup><CaptureFiles Include="$(MSBuildProjectDirectory)\..\CaptureWorker\bin\$(Configuration)\net10.0\win-x64\ScreenMover.CaptureWorker.exe;$(MSBuildProjectDirectory)\..\CaptureWorker\bin\$(Configuration)\net10.0\win-x64\ScreenMover.CaptureWorker.dll;$(MSBuildProjectDirectory)\..\CaptureWorker\bin\$(Configuration)\net10.0\win-x64\ScreenMover.CaptureWorker.deps.json;$(MSBuildProjectDirectory)\..\CaptureWorker\bin\$(Configuration)\net10.0\win-x64\ScreenMover.CaptureWorker.runtimeconfig.json" /></ItemGroup>
+    <Copy SourceFiles="@(CaptureFiles)" DestinationFolder="$(TargetDir)" />
+  </Target>
+  <Target Name="PublishCaptureWorker" AfterTargets="Publish"><Copy SourceFiles="@(CaptureFiles)" DestinationFolder="$(PublishDir)" /></Target>
 </Project>

@@ -1,0 +1,36 @@
+name: 问题反馈
+description: 报告 ScreenMover 的功能或兼容问题
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: 请勿公开含窗口标题、私人路径或文档画面的原始日志与截图。安全漏洞请使用私密报告入口。
+  - type: input
+    id: version
+    attributes:
+      label: 软件版本
+      placeholder: 例如 0.2.0-preview.5
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows 版本与构建号
+      placeholder: 例如 Windows 10 22H2 19045 / Windows 11 25H2 26200
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 重现步骤、预期与实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: display
+    attributes:
+      label: 显示器数量、分辨率与缩放（如相关）
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充信息
+      description: 可附已脱敏的截图或软件导出的诊断包；不要求提供原始日志。

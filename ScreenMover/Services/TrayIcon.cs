@@ -54,7 +54,7 @@ public sealed class TrayIcon : IDisposable {
             }
             return DefSubclassProc(h,msg,w,l);
         };
-        if(!SetWindowSubclass(hwnd,callback,42,0))throw new InvalidOperationException("无法创建托盘消息监听");
+        if(!SetWindowSubclass(hwnd,callback,42,0)){if(icon!=0)IconService.DestroyIcon(icon);throw new InvalidOperationException("无法创建托盘消息监听");}
         Install();
     }
     void Install(){

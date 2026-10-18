@@ -28,8 +28,11 @@ public sealed class WindowOrder {
 }
 public static class WindowTitle {
     public static string Middle(string text,int max=30){
+        if(max<1)return "";
         var parts=StringInfo.ParseCombiningCharacters(text);
         if(parts.Length<=max)return text;
+        if(max==1)return "…";
+        if(max==2)return text[..parts[1]]+"…";
         int head=(max-1)*2/3,tail=max-1-head;
         return text[..parts[head]]+"…"+text[parts[^tail]..];
     }

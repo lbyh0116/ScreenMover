@@ -34,7 +34,7 @@ public sealed partial class QuickWindow : Window {
         presenter.SetBorderAndTitleBar(false,false);presenter.IsResizable=false;presenter.IsMaximizable=false;presenter.IsMinimizable=false;presenter.IsAlwaysOnTop=true;
         AppWindow.SetPresenter(presenter);AppWindow.IsShownInSwitchers=false;
         frame=new(WinRT.Interop.WindowNative.GetWindowHandle(this));
-        PanelSurface.ActualThemeChanged+=(_,_)=>frame.Apply(PanelSurface.ActualTheme==ElementTheme.Dark);
+        PanelSurface.ActualThemeChanged+=(_,_)=>{if(owner.Exiting)return;frame.Apply(PanelSurface.ActualTheme==ElementTheme.Dark);WindowMaterial.Apply(this,QuickRoot);};
         Activated+=(_,e)=>{panelActive=e.WindowActivationState!=WindowActivationState.Deactivated;if(!panelActive&&!acting&&IsPanelVisible){if(TrayIcon.GetCursorPos(out var point))RememberTrayClick(point);Cancel();Dismiss();}};
         AppWindow.Closing+=(_,e)=>{if(!owner.Exiting){e.Cancel=true;Dismiss();}};
         Closed+=(_,_)=>{frame.Dispose();outside?.Dispose();IsPanelVisible=false;generation++;visibilityVersion++;};
@@ -60,7 +60,7 @@ public sealed partial class QuickWindow : Window {
         if(!hasTray)panelAnchor=new(){Left=display.Bounds.Right-1,Right=display.Bounds.Right,Top=display.Bounds.Bottom-1,Bottom=display.Bounds.Bottom};
         source=display;anchor=display;
         PanelSurface.RequestedTheme=owner.CurrentSettings.Theme switch{"Light"=>ElementTheme.Light,"Dark"=>ElementTheme.Dark,_=>ElementTheme.Default};
-        QuickRoot.RequestedTheme=PanelSurface.RequestedTheme;
+        QuickRoot.RequestedTheme=PanelSurface.RequestedTheme;WindowMaterial.Apply(this,QuickRoot);
         Motion.Reset(PanelSurface);
         pendingDismiss=false;
         PanelSurface.IsHitTestVisible=true;
@@ -90,7 +90,7 @@ public sealed partial class QuickWindow : Window {
         Cancel();var offset=EnterOffset();
         await Motion.Exit(PanelSurface,offset.X/2,offset.Y/2);
         if(version!=visibilityVersion||IsPanelVisible)return;
-        AppWindow.Hide();Motion.Reset(PanelSurface);
+        AppWindow.Hide();QuickList.ItemsSource=null;windows=[];Screens.Children.Clear();targets.Clear();QuickStatus.Text="";Motion.Reset(PanelSurface);
     }
     void PlacePanel(){
         if(anchor==null)return;
@@ -162,7 +162,7 @@ public sealed partial class QuickWindow : Window {
         if(!dragging&&Math.Abs(p.X-start.X)+Math.Abs(p.Y-start.Y)<6)return;
         if(!dragging){dragging=true;dragFeedback.Start(new[]{QuickList.ContainerFromItem(pressed)}.OfType<FrameworkElement>(),1);}
         hover=Hit(p);
-        var intent=DropIntent.For(hover,new[]{pressed},true);
+        var intent=DropIntent.For(hover,new[]{pressed},true,PlatformSupport.Current.CanHide);
         QuickGhostText.Text=hover==null?WindowTitle.Middle(pressed.Title,24):intent.Label;
         dragFeedback.Move(p,hover!=null);
         foreach(var b in targets.Values){b.DropLabel=intent.Label;b.IsDropTarget=(b.Tag as DisplayInfo)?.Key==hover?.Key;}

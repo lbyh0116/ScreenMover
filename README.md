@@ -1,12 +1,12 @@
 # ScreenMover
 
-Windows 11 多屏窗口管理工具，使用 C# / WinUI 3 开发。目前为 **Demo / 预发布版本**。
+Windows 10 / 11 多屏窗口管理工具，使用 C# / WinUI 3 开发。目前为 **Demo / 预发布版本**。
 
 ## 下载运行
 
 在 [Releases](https://github.com/lbyh0116/ScreenMover/releases) 下载最新 Windows x64 预发布压缩包，完整解压后运行 `ScreenMover.exe`。请保留整个文件夹，不能只复制 exe。
 
-发布包包含 .NET 与 Windows App SDK 运行时，不需要 MSIX 注册。当前面向 Windows 11 x64；隐藏到虚拟桌面功能适配系统构建 26100/26200，已在 26200 上测试。
+发布包包含 .NET 与 Windows App SDK 运行时，不需要 MSIX 注册。当前发行目标为 Windows 11 与 Windows 10 22H2 x64 基础功能。Win11 优先云母，Win10 支持时使用亚克力，不可用时纯色回退；Win10 实机仍待验收。隐藏到独立虚拟桌面仅在 26100/26200 构建启用。
 
 ## 功能
 
@@ -91,22 +91,22 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test
 - 重复启动会唤醒已有实例，截图和测试进程仍独立运行。
 - 设置可选“登录 Windows 后启动到托盘”，默认关闭；使用当前用户 Run 启动项，不需要管理员权限。移动/删除程序前应关闭此选项。
 
-当前本地预览位于 `dist\ScreenMover-preview-4\ScreenMover.exe`，最新公开预发布为 v0.2.0-preview.4，v0.1.0-demo 为较早版本。见 [开发清单](docs/ROADMAP.md) 与 [手动验收清单](docs/MANUAL_TEST.md)。
+当前本地预览位于 `dist\ScreenMover-preview-5\ScreenMover.exe`，最新公开预发布为 v0.2.0-preview.5，v0.1.0-demo 为较早版本。见 [开发清单](docs/ROADMAP.md) 与 [手动验收清单](docs/MANUAL_TEST.md)。
 
 
 ## 继续完善：快捷键、偏好备份与诊断
 
-当前构建标记为 `0.2.0-preview.4`，尚待人工界面验收。
+当前构建标记为 `0.2.0-preview.5`，尚待人工界面验收。
 
 - 设置中可录入快捷面板的全局组合键；默认关闭，冲突或保存失败会保留原绑定，退出释放。
-- “设置备份与诊断”可导出已保存偏好、读取偏好文件；导入后保存并应用才生效。设备尺寸、窗口排序、启动项和隐藏记录不随偏好文件迁移。
+- “设置备份与诊断”可导出已保存偏好、读取偏好文件；导入后自动保存生效。设备尺寸、窗口排序、启动项和隐藏记录不随偏好文件迁移。
 - 可生成诊断 ZIP，包含版本/构建编号、系统信息、匿名显示器几何和设置。使用白名单重新生成 JSON，不收集截图、原始日志、窗口标题、显示器名称或用户路径。
 - 同时修复重复释放单实例资源、启动项读取受限导致设置打不开、设置保存后状态阻挡快捷操作的问题。
 
 本轮没有注册实际全局快捷键、修改开机启动或启动图形界面验收；这些入口只在运行软件后由使用者操作。测试使用模拟注册器验证冲突与回退，使用临时文件验证偏好和诊断包。
 
 
-## 0.2.0-preview.4：紧凑快捷面板
+## 0.2.0-preview.5：紧凑快捷面板
 
 快捷面板随窗口数与屏幕数变化，接近 4:3；少量内容约 350 × 258 DIP，较多内容最多约 480 × 360 DIP 并滚动。软件名列保持紧凑，只显示 Word、ChatGPT 等软件名，完整窗口标题放在悬停提示里。拖拽预览不再叠加外层边框。原生白边增加非客户区与样式处理，实际观感仍需要人工确认。
 
@@ -114,7 +114,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Test
 # 构建、发布、纯逻辑回归（不启动软件窗口）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest
 # 输出到指定目录，避免覆盖正在运行的文件
-powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest -OutputPath dist\ScreenMover-preview-4
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest -OutputPath dist\ScreenMover-preview-5
 ```
 
 每次 push 到 main 或提交 PR，GitHub Actions 会执行 Windows 构建、无界面回归并保存便携包产物。它不会代替视觉和实体多屏验收。更新详情见 [CHANGELOG](CHANGELOG.md)。
@@ -129,4 +129,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -PureTest -Outpu
 
 屏幕卡片按屏幕比例变宽/变窄，软件缩略图改为填充裁切；更细选中框、淡色投放遮罩与滚动虚线。托盘支持连续点击开/关，面板按任务栏方向滑入。设置可配置独立的“隐藏当前前台窗口”快捷键（默认关闭），在主界面「已隐藏」中找回。
 
-[图标候选](https://github.com/lbyh0116/ScreenMover/tree/main/design/icon-options) · [GitHub / Store 双渠道计划](https://github.com/lbyh0116/ScreenMover/blob/main/docs/STORE_PLAN.md)。图标尚待选定，Copilot 键系统注册属于拟议 MSIX 商店版工作，当前便携版尚未提供。
+[图标候选](https://github.com/lbyh0116/ScreenMover/tree/main/design/icon-options) · [GitHub / Store 双渠道计划](https://github.com/lbyh0116/ScreenMover/blob/main/docs/STORE_PLAN.md)。图标已选定 C「桌面收纳」。Copilot 键系统注册属于拟议 MSIX 商店版工作，当前便携版尚未提供。
+
+
+### Preview 5
+
+快捷键支持下拉预设与自由搭配；设置自动保存，删除底部应用按钮。采用 C 图标，新增 Win10 基础兼容与材质回退。截图使用轻量独立进程，缩略图缓存和内存日志有明确上限。
+
+版本号集中在 `Directory.Build.props`；`CaptureWorker` 是无 WinUI 的截图组件，发布包内复用主程序 .NET 运行时。请完整保留发布文件夹。
+
+[兼容范围](https://github.com/lbyh0116/ScreenMover/blob/main/docs/COMPATIBILITY.md) · [内存与安全复查](https://github.com/lbyh0116/ScreenMover/blob/main/docs/QUALITY_REVIEW.md) · [隐私说明](https://github.com/lbyh0116/ScreenMover/blob/main/docs/PRIVACY.md)。

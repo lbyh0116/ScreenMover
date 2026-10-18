@@ -65,6 +65,7 @@ return new(){Left=left,Top=top,Right=left+width,Bottom=top+height};
 static void CheckIdentity(WindowInfo w) {
 GetWindowThreadProcessId(w.Handle,out int pid);
 if(!IsWindow(w.Handle)||pid!=w.Pid) throw new InvalidOperationException("窗口已关闭或已被替换");
+if(w.ProcessStartedTicks>0){using var process=Process.GetProcessById(w.Pid);if(process.StartTime.ToUniversalTime().Ticks!=w.ProcessStartedTicks)throw new InvalidOperationException("原进程已重启，未操作替代窗口");}
 }
 static string Error(int e)=>e==5?"权限不足，请以管理员身份重启":e==0?"应用拒绝操作或未确认状态":new Win32Exception(e).Message+$" ({e})";
 public OperationResult Move(WindowInfo w,DisplayInfo requested,int margin=60,bool shrink=true) {

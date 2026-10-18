@@ -37,6 +37,7 @@ public sealed class HiddenWindows {
         lock(gate){var next=records.Where(x=>x.Id!=id).ToList();LocalData.Write(path,next);records=next;}
     }
     public OperationResult Hide(WindowInfo window) {
+        if(!PlatformSupport.Current.CanHide)return new(window.Title,false,PlatformSupport.Current.HideStatus);
         HiddenWindow? entry=null;
         try {
             if(Read().Any(x=>x.Saved.Handle==window.Handle.ToInt64()&&MoveHistory.Alive(x.Saved)))

@@ -49,6 +49,7 @@ public sealed class MoveHistory {
         GetWindowThreadProcessId(w.Handle,out int pid);
         if(!IsWindow(w.Handle)||pid!=w.Pid)throw new InvalidOperationException("窗口已关闭或已被替换");
         using var process=Process.GetProcessById(w.Pid);
+        if(w.ProcessStartedTicks>0&&process.StartTime.ToUniversalTime().Ticks!=w.ProcessStartedTicks)throw new InvalidOperationException("原进程已重启，未操作替代窗口");
         var placement=WindowService.StablePlacement(w.Handle);
         string gdi=WindowService.MonitorNameForWindow(w.Handle);
         var display=new DisplayService().Read().Displays.First(d=>d.Active&&d.Gdi==gdi);

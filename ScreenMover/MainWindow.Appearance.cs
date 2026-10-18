@@ -9,6 +9,7 @@ public sealed partial class MainWindow {
         if(!closed){Views.Appearance.Apply(settings.AccentColor,appearanceSettings,cursorHost.ActualTheme);UpdateCaptionTheme();}
     });
     void UpdateCaptionTheme(){
+        if(Services.PlatformSupport.Current.Build<22000||!Microsoft.UI.Windowing.AppWindowTitleBar.IsCustomizationSupported())return;
         var title=AppWindow.TitleBar;
         var foreground=cursorHost.ActualTheme==ElementTheme.Dark?Colors.White:Colors.Black;
         title.ButtonBackgroundColor=Colors.Transparent;

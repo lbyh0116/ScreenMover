@@ -29,8 +29,11 @@ public sealed class SingleInstance : IDisposable {
                     using var reader=new StreamReader(server,leaveOpen:true);
                     using var writer=new StreamWriter(server,leaveOpen:true){AutoFlush=true};
                     await writer.WriteLineAsync(Environment.ProcessId.ToString());
-                    if(await reader.ReadLineAsync(limit.Token)=="show"){activate();await writer.WriteLineAsync("ok");}
-                }catch(OperationCanceledException){}catch(IOException){}catch(ObjectDisposedException){}
+                    if(await ReadShortLine(reader,limit.Token)=="show"){activate();await writer.WriteLineAsync("ok");}
+                }catch(OperationCanceledException){}catch(ObjectDisposedException){}
+                catch(Exception ex)when(ex is IOException or UnauthorizedAccessException or InvalidDataException){
+                    try{await Task.Delay(200,stop.Token);}catch(OperationCanceledException){}
+                }
             }
         });
     }
@@ -41,10 +44,15 @@ public sealed class SingleInstance : IDisposable {
             await client.ConnectAsync(timeout.Token);
             using var reader=new StreamReader(client,leaveOpen:true);
             using var writer=new StreamWriter(client,leaveOpen:true){AutoFlush=true};
-            if(uint.TryParse(await reader.ReadLineAsync(timeout.Token),out uint process))AllowSetForegroundWindow(process);
+            if(uint.TryParse(await ReadShortLine(reader,timeout.Token),out uint process))AllowSetForegroundWindow(process);
             await writer.WriteLineAsync("show");
-            return await reader.ReadLineAsync(timeout.Token)=="ok";
-        }catch(Exception ex)when(ex is IOException or OperationCanceledException or UnauthorizedAccessException){return false;}
+            return await ReadShortLine(reader,timeout.Token)=="ok";
+        }catch(Exception ex)when(ex is IOException or InvalidDataException or OperationCanceledException or UnauthorizedAccessException){return false;}
     }
-    public void Dispose(){if(Interlocked.Exchange(ref disposed,1)!=0)return;stop.Cancel();try{mutex.ReleaseMutex();}catch(ApplicationException){}mutex.Dispose();}
+    public static async Task<string?> ReadShortLine(StreamReader reader,CancellationToken token){
+        var text=new System.Text.StringBuilder();var one=new char[1];
+        while(await reader.ReadAsync(one,token)!=0){if(one[0]=='\n')return text.ToString().TrimEnd('\r');if(text.Length>=32)throw new InvalidDataException("实例消息过长");text.Append(one[0]);}
+        return text.Length==0?null:text.ToString();
+    }
+    public void Dispose(){if(Interlocked.Exchange(ref disposed,1)!=0)return;stop.Cancel();if(listener==null)stop.Dispose();else _=listener.ContinueWith(_=>stop.Dispose(),TaskScheduler.Default);try{mutex.ReleaseMutex();}catch(ApplicationException){}mutex.Dispose();}
 }

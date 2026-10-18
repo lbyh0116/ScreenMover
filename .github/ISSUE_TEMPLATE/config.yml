@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 下载与更新说明
+    url: https://github.com/lbyh0116/ScreenMover/releases
+    about: 先查看最新版本是否已有修复
+  - name: 私密报告安全漏洞
+    url: https://github.com/lbyh0116/ScreenMover/security/advisories/new
+    about: 请勿把漏洞细节或私人数据发到公开 Issue

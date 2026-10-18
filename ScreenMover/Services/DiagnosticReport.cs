@@ -9,7 +9,7 @@ public static class DiagnosticReport {
         var safe=settings with{};safe.Normalize();
         return JsonSerializer.Serialize(new{
             Format="ScreenMover.Diagnostics",Version=1,CreatedAt=DateTimeOffset.Now,
-            AppVersion=typeof(DiagnosticReport).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute),false).OfType<System.Reflection.AssemblyInformationalVersionAttribute>().FirstOrDefault()?.InformationalVersion,
+            AppVersion=BuildInfo.FullVersion,
             BuildId=typeof(DiagnosticReport).Module.ModuleVersionId,
             OS=RuntimeInformation.OSDescription,Architecture=RuntimeInformation.ProcessArchitecture.ToString(),Runtime=RuntimeInformation.FrameworkDescription,
             Settings=safe,

@@ -12,6 +12,7 @@ public sealed partial class MainWindow {
     void SetupTrayLifecycle(){
         ConfigureTray();
         AppWindow.Closing+=(_,e)=>{
+            settingsFlush?.Invoke();
             if(!Exiting&&settings.CloseToTray&&tray?.Installed==true){
                 e.Cancel=true;AppWindow.Hide();
             }

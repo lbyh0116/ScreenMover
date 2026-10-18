@@ -8,6 +8,7 @@ public sealed record HotkeySpec(uint Modifiers,uint Key,string Name) {
     };
     public static HotkeySpec? Parse(string? text){
         if(string.IsNullOrWhiteSpace(text))return null;
+        if(text.Length>96)throw new FormatException("快捷键内容过长");
         var parts=text.Split('+',StringSplitOptions.TrimEntries);
         uint mods=0;
         foreach(string part in parts[..^1]){

@@ -42,6 +42,6 @@ public sealed class DragFeedback(FrameworkElement root,Canvas layer,Border ghost
         version++;
         if(pressed!=null)Motion.Touch(pressed,false);
         foreach(var element in lifted)Motion.Touch(element,false);
-        lifted.Clear();pressed=null;ghost.Visibility=Visibility.Collapsed;
+        lifted.Clear();pressed=null;ghost.Visibility=Visibility.Collapsed;image.Source=null;
     }
 }
