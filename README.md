@@ -1,8 +1,10 @@
 # ScreenMover
 
-**看见窗口，拖到目标屏幕。** 面向 Windows 的多屏窗口整理工具。
+**看见窗口，拖到目标屏幕或隐藏。** 面向 Windows 的多屏窗口整理工具。
 
-[English](README.en.md) · [下载正式版](https://github.com/lbyh0116/ScreenMover/releases/latest) · [反馈问题](https://github.com/lbyh0116/ScreenMover/issues/new/choose)
+[简体中文](README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md)
+
+[下载正式版](https://github.com/lbyh0116/ScreenMover/releases/latest) · [反馈问题](https://github.com/lbyh0116/ScreenMover/issues/new/choose)
 
 ## 下载与运行
 

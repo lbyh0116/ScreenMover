@@ -1,8 +1,10 @@
 # ScreenMover
 
-**See your windows. Drag them to the right display.** A visual multi-monitor window organizer for Windows.
+**See your windows. Drag them to another display or hide them.** A visual multi-monitor window organizer for Windows.
 
-[简体中文](README.md) · [Latest release](https://github.com/lbyh0116/ScreenMover/releases/latest) · [Report an issue](https://github.com/lbyh0116/ScreenMover/issues/new/choose)
+[简体中文](README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md)
+
+[Latest release](https://github.com/lbyh0116/ScreenMover/releases/latest) · [Report an issue](https://github.com/lbyh0116/ScreenMover/issues/new/choose)
 
 ## Download and run
 
@@ -49,7 +51,7 @@ Protected, minimized, GPU-rendered, or unresponsive windows may not provide a pr
 
 ## Updates and privacy
 
-In settings, open **软件更新** (Software updates), choose **检查更新** (Check for updates), then **下载并安装** (Download and install). Downloads are checked with SHA-256. File replacement failures trigger an attempted rollback; power loss and runtime crashes in a new version are not automatically recovered. Checks are user-initiated; there is no background update polling. See [update details](docs/UPDATES.md) (Chinese).
+In Settings, open **Software updates**, choose **Check for updates**, then **Download and install**. Downloads are checked with SHA-256. File replacement failures trigger an attempted rollback; power loss and runtime crashes in a new version are not automatically recovered. Checks are user-initiated; there is no background update polling. See [update details](docs/UPDATES.md) (Chinese).
 
 Local data is stored in `%LOCALAPPDATA%\ScreenMover`. Screenshots remain in memory and are not uploaded. Operation logs and recovery records may contain window titles. Update backups are stored in the `updates` subfolder. See [privacy details](docs/PRIVACY.md) (Chinese).
 
