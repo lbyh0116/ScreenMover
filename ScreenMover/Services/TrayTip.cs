@@ -17,14 +17,14 @@ public static class TrayTip {
             var name=desktop?.GetValue("Name") as string;
             if(string.IsNullOrWhiteSpace(name)&&root?.GetValue("VirtualDesktopIDs") is byte[] ids){
                 for(int offset=0;offset+16<=ids.Length;offset+=16)
-                    if(new Guid(ids.AsSpan(offset,16))==id){name=$"桌面 {offset/16+1}";break;}
+                    if(new Guid(ids.AsSpan(offset,16))==id){name=L.F("桌面 {0}", offset/16+1);break;}
             }
             return Format(name);
         }catch{return Format(null);}
     }
     public static string Format(string? name){
-        const string prefix="ScreenMover\n当前桌面：";
-        name=string.IsNullOrWhiteSpace(name)?"名称不可用":string.Concat(name.Select(c=>char.IsControl(c)?' ':c)).Trim();
+string prefix=L.T("ScreenMover\n当前桌面：");
+        name=string.IsNullOrWhiteSpace(name)?L.T("名称不可用"):string.Concat(name.Select(c=>char.IsControl(c)?' ':c)).Trim();
         int available=127-prefix.Length;
         if(name.Length>available){int end=available-1;if(char.IsHighSurrogate(name[end-1]))end--;name=name[..end]+"…";}
         return prefix+name;

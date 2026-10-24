@@ -15,12 +15,12 @@ public static class OperationLog {
         while(reader.ReadLine() is {} line){lines.Enqueue(ForDisplay(line));if(lines.Count>MemoryEntries)lines.Dequeue();}
         return lines.ToList();
     }
-    public static string ForDisplay(string value)=>value.Length>4096?value[..4096]+"…（记录已截断）":value;
+    public static string ForDisplay(string value)=>value.Length>4096?value[..4096]+L.T("…（记录已截断）"):value;
     public static void Append(string path,string entry){
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         if(File.Exists(path)&&new FileInfo(path).Length>=4*1024*1024)
             File.Move(path,Path.Combine(Path.GetDirectoryName(path)!,"operations-"+DateTime.UtcNow.ToString("yyyyMMdd-HHmmssfff")+"-"+Guid.NewGuid().ToString("N")[..6]+".log"));
-        if(entry.Length>65536)entry=entry[..65536]+"…（记录已截断）";
+        if(entry.Length>65536)entry=entry[..65536]+L.T("…（记录已截断）");
         File.AppendAllText(path,entry+Environment.NewLine);
     }
 }

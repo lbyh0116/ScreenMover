@@ -25,7 +25,7 @@ public sealed class WindowChrome : IDisposable {
             }
             return result;
         };
-        if(!SetWindowSubclass(window,callback,43,0))throw new InvalidOperationException("无法设置窗口尺寸约束");
+        if(!SetWindowSubclass(window,callback,43,0))throw new InvalidOperationException(L.T("无法设置窗口尺寸约束"));
     }
     public void Dispose()=>RemoveWindowSubclass(window,callback,43);
 }

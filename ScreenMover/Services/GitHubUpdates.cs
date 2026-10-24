@@ -10,11 +10,11 @@ namespace ScreenMover.Services;
 
 public sealed record ReleaseVersion(int Major,int Minor,int Patch,string[] Pre) : IComparable<ReleaseVersion> {
     public static ReleaseVersion Parse(string text){
-        if(text.Length>128)throw new FormatException("版本号过长");
+        if(text.Length>128)throw new FormatException(L.T("版本号过长"));
         var m=Regex.Match(text,@"^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z.-]+)?$",RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(100));
-        if(!m.Success)throw new FormatException("版本号格式无效");
+        if(!m.Success)throw new FormatException(L.T("版本号格式无效"));
         var pre=m.Groups[4].Success?m.Groups[4].Value.Split('.'):[];
-        if(pre.Any(s=>s.All(char.IsAsciiDigit)&&s.Length>1&&s[0]=='0'))throw new FormatException("预览版本号格式无效");
+        if(pre.Any(s=>s.All(char.IsAsciiDigit)&&s.Length>1&&s[0]=='0'))throw new FormatException(L.T("预览版本号格式无效"));
         return new(int.Parse(m.Groups[1].Value),int.Parse(m.Groups[2].Value),int.Parse(m.Groups[3].Value),pre);
     }
     public int CompareTo(ReleaseVersion? other){
@@ -91,7 +91,7 @@ public sealed class GitHubUpdates {
             }
             if(sha!=null)break;
         }catch(HttpRequestException){}
-        return new(tag,"GitHub API 暂不可用，已通过公开发布页读取版本。完整更新说明请打开发布页。",new Uri($"https://github.com/{Repository}/releases/tag/{Uri.EscapeDataString(tag)}"),new Uri(root+file),0,sha);
+        return new(tag,L.T("GitHub API 暂不可用，已通过公开发布页读取版本。完整更新说明请打开发布页。"),new Uri($"https://github.com/{Repository}/releases/tag/{Uri.EscapeDataString(tag)}"),new Uri(root+file),0,sha);
     }
     public static GitHubRelease? Select(byte[] json,bool previews,string architecture){
         using var doc=JsonDocument.Parse(json,new(){MaxDepth=32});
@@ -125,7 +125,7 @@ public sealed class GitHubUpdates {
     static bool DownloadHost(Uri uri)=>uri.Scheme=="https"&&uri.IsDefaultPort&&uri.UserInfo==""&&uri.Host is "github.com" or "release-assets.githubusercontent.com" or "objects.githubusercontent.com";
     async Task<HttpResponseMessage> Send(Uri uri,bool download,CancellationToken token){
         for(int i=0;i<6;i++){
-            if(download&&!DownloadHost(uri))throw new InvalidDataException("下载被重定向到不受信任的地址");
+            if(download&&!DownloadHost(uri))throw new InvalidDataException(L.T("下载被重定向到不受信任的地址"));
             using var request=new HttpRequestMessage(HttpMethod.Get,uri);
             request.Headers.UserAgent.ParseAdd("ScreenMover/"+BuildInfo.DisplayVersion);
             request.Headers.Accept.ParseAdd(download?"application/octet-stream":"application/vnd.github+json");
@@ -133,37 +133,37 @@ public sealed class GitHubUpdates {
             response.RequestMessage??=request;
             if((int)response.StatusCode is 301 or 302 or 303 or 307 or 308){
                 var location=response.Headers.Location;response.Dispose();
-                if(!download||location==null)throw new HttpRequestException("GitHub API 地址发生变化，请手动查看发布页");
+                if(!download||location==null)throw new HttpRequestException(L.T("GitHub API 地址发生变化，请手动查看发布页"));
                 uri=location.IsAbsoluteUri?location:new Uri(uri,location);continue;
             }
-            if(!response.IsSuccessStatusCode){var code=response.StatusCode;response.Dispose();throw new HttpRequestException(code is HttpStatusCode.Forbidden or HttpStatusCode.TooManyRequests?"GitHub 请求受限，请稍后重试":$"GitHub 请求失败（{(int)code}）");}
+            if(!response.IsSuccessStatusCode){var code=response.StatusCode;response.Dispose();throw new HttpRequestException(code is HttpStatusCode.Forbidden or HttpStatusCode.TooManyRequests?L.T("GitHub 请求受限，请稍后重试"):L.F("GitHub 请求失败（{0}）", (int)code));}
             return response;
         }
-        throw new HttpRequestException("下载重定向次数过多");
+        throw new HttpRequestException(L.T("下载重定向次数过多"));
     }
     static async Task<byte[]> ReadBounded(HttpResponseMessage response,int limit,CancellationToken token){
-        if(response.Content.Headers.ContentLength>limit)throw new InvalidDataException("GitHub 响应过大");
+        if(response.Content.Headers.ContentLength>limit)throw new InvalidDataException(L.T("GitHub 响应过大"));
         using var stream=await response.Content.ReadAsStreamAsync(token);using var output=new MemoryStream();var buffer=new byte[32768];int read;
-        while((read=await stream.ReadAsync(buffer,token))>0){if(output.Length+read>limit)throw new InvalidDataException("GitHub 响应过大");await output.WriteAsync(buffer.AsMemory(0,read),token);}
+        while((read=await stream.ReadAsync(buffer,token))>0){if(output.Length+read>limit)throw new InvalidDataException(L.T("GitHub 响应过大"));await output.WriteAsync(buffer.AsMemory(0,read),token);}
         return output.ToArray();
     }
     public async Task Download(GitHubRelease release,string path,IProgress<double>? progress,CancellationToken token){
-        if(release.Download==null||!AssetUrl(release.Download)||release.Sha256==null||release.Size<0||release.Size>MaximumDownload)throw new InvalidDataException("此版本缺少对应架构的下载包或可信 SHA-256，请使用发布页手动更新");
+        if(release.Download==null||!AssetUrl(release.Download)||release.Sha256==null||release.Size<0||release.Size>MaximumDownload)throw new InvalidDataException(L.T("此版本缺少对应架构的下载包或可信 SHA-256，请使用发布页手动更新"));
         using var timeout=CancellationTokenSource.CreateLinkedTokenSource(token);timeout.CancelAfter(TimeSpan.FromMinutes(15));
         bool created=false;
         try{
             using var response=await Send(release.Download,true,timeout.Token);
             long expected=release.Size;
             if(response.Content.Headers.ContentLength is long length){
-                if(length<=0||length>MaximumDownload||expected>0&&length!=expected)throw new InvalidDataException("下载文件大小与发布信息不符");
+                if(length<=0||length>MaximumDownload||expected>0&&length!=expected)throw new InvalidDataException(L.T("下载文件大小与发布信息不符"));
                 expected=length;
             }
             using var input=await response.Content.ReadAsStreamAsync(timeout.Token);
             await using var output=new FileStream(path,FileMode.CreateNew,FileAccess.Write,FileShare.None,65536,true);
             created=true;
             using var hash=IncrementalHash.CreateHash(HashAlgorithmName.SHA256);var buffer=new byte[65536];long total=0;int read;
-            while((read=await input.ReadAsync(buffer,timeout.Token))>0){total+=read;if(total>MaximumDownload||expected>0&&total>expected)throw new InvalidDataException("下载文件超出声明大小");hash.AppendData(buffer,0,read);await output.WriteAsync(buffer.AsMemory(0,read),timeout.Token);if(expected>0)progress?.Report((double)total/expected);}
-            if(total==0||expected>0&&total!=expected||!Convert.ToHexString(hash.GetHashAndReset()).Equals(release.Sha256,StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("SHA-256 校验失败，下载包不会安装");
+            while((read=await input.ReadAsync(buffer,timeout.Token))>0){total+=read;if(total>MaximumDownload||expected>0&&total>expected)throw new InvalidDataException(L.T("下载文件超出声明大小"));hash.AppendData(buffer,0,read);await output.WriteAsync(buffer.AsMemory(0,read),timeout.Token);if(expected>0)progress?.Report((double)total/expected);}
+            if(total==0||expected>0&&total!=expected||!Convert.ToHexString(hash.GetHashAndReset()).Equals(release.Sha256,StringComparison.OrdinalIgnoreCase))throw new InvalidDataException(L.T("SHA-256 校验失败，下载包不会安装"));
         }catch{if(created)try{File.Delete(path);}catch{}throw;}
     }
 }

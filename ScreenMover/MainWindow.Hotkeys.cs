@@ -17,7 +17,7 @@ public sealed partial class MainWindow {
             string wanted=Services.PlatformSupport.Current.CanHide?settings.HideHotkey:"";
             if(binding.Current==wanted)return;
             using var update=binding.Prepare(wanted);update.Commit();
-        }catch(Exception ex){Notice("隐藏快捷键未启用："+ex.Message);}
+        }catch(Exception ex){Notice(L.T("隐藏快捷键未启用：")+ex.Message);}
     }
     async Task HideForeground((nint Handle,nint Owner,int Pid) target){
         if(closed||busy)return;
@@ -25,10 +25,10 @@ public sealed partial class MainWindow {
         try{
             var result=await Task.Run(()=>{
                 var current=Services.WindowQuery.Foreground(windows.Read(),target.Handle,target.Owner,target.Pid);
-                return current==null?new Models.OperationResult("前台窗口",false,"窗口已关闭或不属于可管理的软件窗口"):hidden.Hide(current);
+                return current==null?new Models.OperationResult(L.T("前台窗口"),false,L.T("窗口已关闭或不属于可管理的软件窗口")):hidden.Hide(current);
             });
-            ShowResults("快捷隐藏",new[]{result});
-        }catch(Exception ex){Notice("快捷隐藏失败："+ex.Message);}
+            ShowResults(L.T("快捷隐藏"),new[]{result});
+        }catch(Exception ex){Notice(L.T("快捷隐藏失败：")+ex.Message);}
         finally{busy=false;await Refresh();UpdateStatus();}
     }
     Interop.GlobalHotkey EnsureGlobalHotkey()=>globalHotkey??=new(WinRT.Interop.WindowNative.GetWindowHandle(this),()=>DispatcherQueue.TryEnqueue(async()=>{if(!closed)await OpenQuick();}));
@@ -37,6 +37,6 @@ public sealed partial class MainWindow {
             var binding=EnsureGlobalHotkey().Binding;
             if(binding.Current==settings.QuickHotkey)return;
             using var update=binding.Prepare(settings.QuickHotkey);update.Commit();
-        }catch(Exception ex){Notice("全局快捷键未启用："+ex.Message);}
+        }catch(Exception ex){Notice(L.T("全局快捷键未启用：")+ex.Message);}
     }
 }

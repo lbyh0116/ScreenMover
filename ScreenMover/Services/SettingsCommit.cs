@@ -8,7 +8,7 @@ public static class SettingsCommit {
         write(next);
         try{if(wasStartup!=wantStartup)setStartup(wantStartup);}
         catch(Exception failure){
-            try{write(previous);}catch(Exception rollback){throw new AggregateException("启动项更新失败，设置文件回退也未完成",failure,rollback);}
+            try{write(previous);}catch(Exception rollback){throw new AggregateException(L.T("启动项更新失败，设置文件回退也未完成"),failure,rollback);}
             throw;
         }
         q.Commit();h.Commit();

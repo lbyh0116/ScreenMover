@@ -19,7 +19,7 @@ public sealed class SingleInstance : IDisposable {
     }
     public void Listen(Action activate){
         ObjectDisposedException.ThrowIf(disposed!=0,this);
-        if(listener!=null)throw new InvalidOperationException("实例监听已经启动");
+        if(listener!=null)throw new InvalidOperationException(L.T("实例监听已经启动"));
         listener=Task.Run(async()=>{
             while(!stop.IsCancellationRequested){
                 try{
@@ -51,7 +51,7 @@ public sealed class SingleInstance : IDisposable {
     }
     public static async Task<string?> ReadShortLine(StreamReader reader,CancellationToken token){
         var text=new System.Text.StringBuilder();var one=new char[1];
-        while(await reader.ReadAsync(one,token)!=0){if(one[0]=='\n')return text.ToString().TrimEnd('\r');if(text.Length>=32)throw new InvalidDataException("实例消息过长");text.Append(one[0]);}
+        while(await reader.ReadAsync(one,token)!=0){if(one[0]=='\n')return text.ToString().TrimEnd('\r');if(text.Length>=32)throw new InvalidDataException(L.T("实例消息过长"));text.Append(one[0]);}
         return text.Length==0?null:text.ToString();
     }
     public void Dispose(){if(Interlocked.Exchange(ref disposed,1)!=0)return;stop.Cancel();if(listener==null)stop.Dispose();else _=listener.ContinueWith(_=>stop.Dispose(),TaskScheduler.Default);try{mutex.ReleaseMutex();}catch(ApplicationException){}mutex.Dispose();}

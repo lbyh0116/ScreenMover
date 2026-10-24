@@ -9,6 +9,6 @@ public static class PreviewPolicy {
     public static void Trim<T>(IDictionary<string,T> cache,IEnumerable<WindowInfo> models,IReadOnlyList<WindowInfo> retained){
         var keys=retained.Select(w=>w.OrderKey).ToHashSet();
         foreach(var key in cache.Keys.Where(k=>!keys.Contains(k)).ToList())cache.Remove(key);
-        foreach(var model in models.Where(w=>!keys.Contains(w.OrderKey)))model.SetPreview(null,"内存受控：优先当前屏幕预览");
+        foreach(var model in models.Where(w=>!keys.Contains(w.OrderKey)))model.SetPreview(null,L.T("内存受控：优先当前屏幕预览"));
     }
 }

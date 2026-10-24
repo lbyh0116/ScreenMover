@@ -121,16 +121,16 @@ public sealed partial class QuickWindow : Window {
             var selectedKey=source?.Key;
             targets.Clear();Screens.Children.Clear();SourceScreen.Items.Clear();
             foreach(var d in data.Displays.Where(d=>d.Active)){
-                SourceScreen.Items.Add(new ComboBoxItem{Content=$"屏幕 {d.Number}",Tag=d});
+                SourceScreen.Items.Add(new ComboBoxItem{Content=L.F("屏幕 {0}", d.Number),Tag=d});
                 var image=new Image{Height=64,Stretch=Stretch.Uniform,Source=data.Previews.GetValueOrDefault(d.Key)};
                 var stack=new StackPanel{Spacing=5};
-                stack.Children.Add(image);stack.Children.Add(new TextBlock{Text=$"屏幕 {d.Number} · {d.Name}",TextTrimming=TextTrimming.CharacterEllipsis,FontSize=12});
+                stack.Children.Add(image);stack.Children.Add(new TextBlock{Text=L.F("屏幕 {0} · {1}", d.Number, d.Name),TextTrimming=TextTrimming.CharacterEllipsis,FontSize=12});
                 var border=new SelectionSurface{Child=stack,Padding=new(6),IsSelected=d.Key==selectedKey,Tag=d};
                 ToolTipService.SetToolTip(border,d.Details);targets[d.Key]=border;Screens.Children.Add(border);
             }
             SourceScreen.SelectedItem=SourceScreen.Items.OfType<ComboBoxItem>().FirstOrDefault(x=>(x.Tag as DisplayInfo)?.Key==selectedKey)??SourceScreen.Items.FirstOrDefault();
             SetWindows();if(IsPanelVisible)PlacePanel();
-        }catch(Exception ex){ShowNotice("刷新失败："+ex.Message);}
+        }catch(Exception ex){ShowNotice(L.T("刷新失败：")+ex.Message);}
         finally{loading=false;}
     }
     void SourceChanged(object sender,SelectionChangedEventArgs e){
@@ -182,7 +182,7 @@ public sealed partial class QuickWindow : Window {
         if(target==null)return;
         acting=true;SourceScreen.IsEnabled=false;
         try{var result=await owner.QuickDrop(item,target);if(!result.Success)ShowNotice(result.Message);else{noticeVersion++;QuickNotice.Visibility=Visibility.Collapsed;}}
-        catch(Exception ex){ShowNotice("操作失败："+ex.Message);}
+        catch(Exception ex){ShowNotice(L.T("操作失败：")+ex.Message);}
         finally{acting=false;SourceScreen.IsEnabled=true;await Reload(true);if(!panelActive||pendingDismiss)Dismiss();}
         e.Handled=true;
     }

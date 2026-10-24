@@ -9,7 +9,7 @@ public static class StartupService {
     }
     public static bool? ReadState(out string? error){
         error=null;
-        try{return Enabled;}catch(Exception ex)when(ex is UnauthorizedAccessException or System.Security.SecurityException or IOException){error="无法读取启动项："+ex.Message;return null;}
+        try{return Enabled;}catch(Exception ex)when(ex is UnauthorizedAccessException or System.Security.SecurityException or IOException){error=L.T("无法读取启动项：")+ex.Message;return null;}
     }
     public static void SetEnabled(bool enabled){
         using var key=Registry.CurrentUser.CreateSubKey(RunKey,true);

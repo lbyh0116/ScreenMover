@@ -9,16 +9,16 @@ static void Log(Exception e){try {var folder=System.IO.Path.Combine(Environment.
 protected override async void OnLaunched(LaunchActivatedEventArgs args) {
 var command=Environment.GetCommandLineArgs();
 if(command.Contains("--fixture")) {
-window=new Window {Title="ScreenMover Test Fixture",Content=new TextBlock {Text="ScreenMover 测试窗口\n仅供移动、最小化、最大化验证；无用户文档。",Margin=new Thickness(32),FontSize=22}};
+window=new Window {Title="ScreenMover Test Fixture",Content=new TextBlock {Text=L.T("ScreenMover 测试窗口\n仅供移动、最小化、最大化验证；无用户文档。"),Margin=new Thickness(32),FontSize=22}};
 window.AppWindow.Resize(new Windows.Graphics.SizeInt32(640,420));
 } else {
     var queue=Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();bool pending=false;
     single=Services.SingleInstance.Claim(Services.SingleInstance.Name);
-    if(single==null&&command.Contains("--elevated-restart")){
+    if(single==null&&(command.Contains("--elevated-restart")||command.Contains("--restart"))){
         for(int i=0;i<30&&single==null;i++){await Task.Delay(100);single=Services.SingleInstance.Claim(Services.SingleInstance.Name);}
     }
     if(single==null){
-        if(!await Services.SingleInstance.Activate(Services.SingleInstance.Name))Log(new IOException("已有实例暂未响应，请从托盘打开或退出后重试。"));
+        if(!await Services.SingleInstance.Activate(Services.SingleInstance.Name))Log(new IOException(L.T("已有实例暂未响应，请从托盘打开或退出后重试。")));
         Exit();return;
     }
     single.Listen(()=>queue.TryEnqueue(()=>{if(window is MainWindow main)main.ShowMain();else pending=true;}));

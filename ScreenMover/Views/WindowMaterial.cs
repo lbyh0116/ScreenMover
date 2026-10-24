@@ -11,9 +11,9 @@ public static class WindowMaterial {
         try{
             if(MicaController.IsSupported())window.SystemBackdrop=new MicaBackdrop();
             else if(DesktopAcrylicController.IsSupported())window.SystemBackdrop=new DesktopAcrylicBackdrop();
-            else {window.SystemBackdrop=null;return "纯色";}
+            else {window.SystemBackdrop=null;return L.T("纯色");}
             root.Background=new SolidColorBrush(Microsoft.UI.Colors.Transparent);
-            return window.SystemBackdrop is MicaBackdrop?"云母":"亚克力";
-        }catch(Exception ex)when(ex is System.Runtime.InteropServices.COMException or NotSupportedException){window.SystemBackdrop=null;return "纯色";}
+            return window.SystemBackdrop is MicaBackdrop?L.T("云母"):L.T("亚克力");
+        }catch(Exception ex)when(ex is System.Runtime.InteropServices.COMException or NotSupportedException){window.SystemBackdrop=null;return L.T("纯色");}
     }
 }

@@ -1,0 +1,2102 @@
+{
+  "\n系统编号：未分配": [
+    "\nSystem ID: unassigned",
+    "\nSystem-ID: nicht zugewiesen",
+    "\nIdentifiant système : non attribué",
+    "\nID del sistema: sin asignar"
+  ],
+  " · 主屏": [
+    " · Main",
+    " · Hauptbildschirm",
+    " · Principal",
+    " · Principal"
+  ],
+  " · 主显示器": [
+    " · Main display",
+    " · Hauptbildschirm",
+    " · Écran principal",
+    " · Pantalla principal"
+  ],
+  " · 未启用": [
+    " · Inactive",
+    " · Inaktiv",
+    " · Inactif",
+    " · Inactiva"
+  ],
+  " 此版本缺少对应架构的包或 SHA-256，请打开发布页手动更新。": [
+    " No package or SHA-256 is available for this architecture. Update manually from the release page.",
+    " Für diese Architektur fehlt das Paket oder die SHA-256-Prüfsumme. Bitte über die Release-Seite aktualisieren.",
+    " Le paquet ou sa somme SHA-256 manque pour cette architecture. Installez la mise à jour depuis la page de publication.",
+    " Falta el paquete o la suma SHA-256 para esta arquitectura. Actualiza desde la página de versiones."
+  ],
+  "GitHub API 地址发生变化，请手动查看发布页": [
+    "The GitHub API address changed. Please open the release page.",
+    "Die GitHub-API-Adresse hat sich geändert. Bitte die Release-Seite öffnen.",
+    "L’adresse de l’API GitHub a changé. Ouvrez la page de publication.",
+    "La dirección de la API de GitHub ha cambiado. Abre la página de versiones."
+  ],
+  "GitHub API 暂不可用，已通过公开发布页读取版本。完整更新说明请打开发布页。": [
+    "The GitHub API is unavailable. Version information was read from the public release page; open it for the full notes.",
+    "Die GitHub-API ist nicht erreichbar. Die Version wurde über die öffentliche Release-Seite ermittelt. Dort stehen die vollständigen Versionshinweise.",
+    "L’API GitHub est indisponible. La version a été obtenue depuis la page publique ; consultez-la pour les notes complètes.",
+    "La API de GitHub no está disponible. La versión se obtuvo de la página pública; ábrela para ver las notas completas."
+  ],
+  "GitHub 响应过大": [
+    "GitHub response is too large",
+    "Die GitHub-Antwort ist zu groß",
+    "La réponse de GitHub est trop volumineuse",
+    "La respuesta de GitHub es demasiado grande"
+  ],
+  "GitHub 请求受限，请稍后重试": [
+    "GitHub rate limit reached. Try again later.",
+    "GitHub-Anfragelimit erreicht. Bitte später erneut versuchen.",
+    "Limite de requêtes GitHub atteinte. Réessayez plus tard.",
+    "Se alcanzó el límite de solicitudes de GitHub. Inténtalo más tarde."
+  ],
+  "GitHub 请求失败（{0}）": [
+    "GitHub request failed ({0})",
+    "GitHub-Anfrage fehlgeschlagen ({0})",
+    "Échec de la requête GitHub ({0})",
+    "Error en la solicitud a GitHub ({0})"
+  ],
+  "QueryDisplayConfig 与桌面显示器不一致，请刷新": [
+    "Display information is inconsistent. Refresh to try again.",
+    "Die Bildschirmdaten sind widersprüchlich. Bitte aktualisieren.",
+    "Les informations des écrans sont incohérentes. Actualisez la liste.",
+    "La información de las pantallas no coincide. Actualiza la lista."
+  ],
+  "SHA-256 校验失败，下载包不会安装": [
+    "SHA-256 verification failed. The package will not be installed.",
+    "SHA-256-Prüfung fehlgeschlagen. Das Paket wird nicht installiert.",
+    "La vérification SHA-256 a échoué. Le paquet ne sera pas installé.",
+    "La verificación SHA-256 ha fallado. El paquete no se instalará."
+  ],
+  "ScreenMover\n当前桌面：": [
+    "ScreenMover\nCurrent desktop: ",
+    "ScreenMover\nAktueller Desktop: ",
+    "ScreenMover\nBureau actuel : ",
+    "ScreenMover\nEscritorio actual: "
+  ],
+  "ScreenMover · 多屏窗口调度器": [
+    "ScreenMover · Window manager",
+    "ScreenMover · Fensterverwaltung",
+    "ScreenMover · Gestion des fenêtres",
+    "ScreenMover · Gestor de ventanas"
+  ],
+  "ScreenMover · 快捷操作": [
+    "ScreenMover · Quick panel",
+    "ScreenMover · Schnellzugriff",
+    "ScreenMover · Accès rapide",
+    "ScreenMover · Panel rápido"
+  ],
+  "ScreenMover 更新": [
+    "ScreenMover update",
+    "ScreenMover-Update",
+    "Mise à jour de ScreenMover",
+    "Actualización de ScreenMover"
+  ],
+  "ScreenMover 更新失败": [
+    "ScreenMover update failed",
+    "ScreenMover-Update fehlgeschlagen",
+    "Échec de la mise à jour de ScreenMover",
+    "Error al actualizar ScreenMover"
+  ],
+  "ScreenMover 测试窗口\n仅供移动、最小化、最大化验证；无用户文档。": [
+    "ScreenMover test window\nFor move, minimize and maximize tests only. No user documents.",
+    "ScreenMover-Testfenster\nNur für Verschiebe-, Minimierungs- und Maximierungstests. Keine Benutzerdokumente.",
+    "Fenêtre de test ScreenMover\nRéservée aux tests de déplacement, réduction et agrandissement. Aucun document personnel.",
+    "Ventana de prueba de ScreenMover\nSolo para probar mover, minimizar y maximizar. Sin documentos personales."
+  ],
+  "ScreenMover 设置": [
+    "ScreenMover settings",
+    "ScreenMover-Einstellungen",
+    "Paramètres ScreenMover",
+    "Ajustes de ScreenMover"
+  ],
+  "ScreenMover 诊断包": [
+    "ScreenMover diagnostics",
+    "ScreenMover-Diagnose",
+    "Diagnostic ScreenMover",
+    "Diagnóstico de ScreenMover"
+  ],
+  "ScreenMover 诊断包\n包含：版本、系统信息、匿名屏幕几何和软件设置。\n不包含：截图、窗口标题、用户路径、显示器名称、隐藏窗口记录或原始日志。\n": [
+    "ScreenMover diagnostics\nIncludes version, system information, anonymous display geometry and settings.\nExcludes screenshots, window titles, user paths, monitor names, hidden-window records and raw logs.\n",
+    "ScreenMover-Diagnose\nEnthält Version, Systemdaten, anonyme Bildschirmgeometrie und Einstellungen.\nKeine Screenshots, Fenstertitel, Benutzerpfade, Bildschirmnamen, ausgeblendeten Fenster oder Rohprotokolle.\n",
+    "Diagnostic ScreenMover\nContient la version, les informations système, la géométrie anonyme des écrans et les paramètres.\nExclut les captures, titres de fenêtres, chemins personnels, noms d’écrans, fenêtres masquées et journaux bruts.\n",
+    "Diagnóstico de ScreenMover\nIncluye versión, información del sistema, geometría anónima de pantallas y ajustes.\nNo incluye capturas, títulos de ventanas, rutas personales, nombres de pantallas, registros de ventanas ocultas ni registros sin filtrar.\n"
+  ],
+  "Windows 终端": [
+    "Windows Terminal",
+    "Windows Terminal",
+    "Terminal Windows",
+    "Terminal de Windows"
+  ],
+  "{0}\n{1}\n{2} × {3} · {4:0.##} Hz\n坐标 ({5}, {6})\n{7}": [
+    "{0}\n{1}\n{2} × {3} · {4:0.##} Hz\nPosition ({5}, {6})\n{7}",
+    "{0}\n{1}\n{2} × {3} · {4:0.##} Hz\nPosition ({5}, {6})\n{7}",
+    "{0}\n{1}\n{2} × {3} · {4:0.##} Hz\nPosition ({5}, {6})\n{7}",
+    "{0}\n{1}\n{2} × {3} · {4:0.##} Hz\nPosición ({5}, {6})\n{7}"
+  ],
+  "{0}\n桌面：{1} · {2:MM-dd HH:mm}\n{3}": [
+    "{0}\nDesktop: {1} · {2:MM-dd HH:mm}\n{3}",
+    "{0}\nDesktop: {1} · {2:MM-dd HH:mm}\n{3}",
+    "{0}\nBureau : {1} · {2:MM-dd HH:mm}\n{3}",
+    "{0}\nEscritorio: {1} · {2:MM-dd HH:mm}\n{3}"
+  ],
+  "{0} {1} 个窗口：成功 {2}，失败 {3}": [
+    "{0} — {1} windows: {2} succeeded, {3} failed",
+    "{0} — {1} Fenster: {2} erfolgreich, {3} fehlgeschlagen",
+    "{0} — {1} fenêtres : {2} réussites, {3} échecs",
+    "{0} — {1} ventanas: {2} correctas, {3} fallidas"
+  ],
+  "{0} 无法读取：{1}": [
+    "Could not read {0}: {1}",
+    "{0} konnte nicht gelesen werden: {1}",
+    "Impossible de lire {0} : {1}",
+    "No se pudo leer {0}: {1}"
+  ],
+  "…（记录已截断）": [
+    "… (entry truncated)",
+    "… (Eintrag gekürzt)",
+    "… (entrée tronquée)",
+    "… (entrada recortada)"
+  ],
+  "三角洲行动": [
+    "Delta Force",
+    "Delta Force",
+    "Delta Force",
+    "Delta Force"
+  ],
+  "下载已取消或超时，可重试。": [
+    "Download cancelled or timed out. You can retry.",
+    "Download abgebrochen oder Zeitlimit erreicht. Erneuter Versuch möglich.",
+    "Téléchargement annulé ou délai dépassé. Vous pouvez réessayer.",
+    "Descarga cancelada o tiempo de espera agotado. Puedes volver a intentarlo."
+  ],
+  "下载并安装": [
+    "Download and install",
+    "Herunterladen und installieren",
+    "Télécharger et installer",
+    "Descargar e instalar"
+  ],
+  "下载文件大小与发布信息不符": [
+    "The download size does not match the release information",
+    "Die Downloadgröße stimmt nicht mit den Release-Daten überein",
+    "La taille du téléchargement ne correspond pas à celle annoncée",
+    "El tamaño de la descarga no coincide con el anunciado"
+  ],
+  "下载文件超出声明大小": [
+    "The download exceeds its declared size",
+    "Der Download überschreitet die angegebene Größe",
+    "Le téléchargement dépasse la taille annoncée",
+    "La descarga supera el tamaño anunciado"
+  ],
+  "下载被重定向到不受信任的地址": [
+    "The download was redirected to an untrusted address",
+    "Der Download wurde an eine nicht vertrauenswürdige Adresse umgeleitet",
+    "Le téléchargement a été redirigé vers une adresse non fiable",
+    "La descarga se redirigió a una dirección no fiable"
+  ],
+  "下载重定向次数过多": [
+    "Too many download redirects",
+    "Zu viele Download-Weiterleitungen",
+    "Trop de redirections du téléchargement",
+    "Demasiadas redirecciones de descarga"
+  ],
+  "不可用": [
+    "Unavailable",
+    "Nicht verfügbar",
+    "Indisponible",
+    "No disponible"
+  ],
+  "不能清理当前桌面": [
+    "The current desktop cannot be removed",
+    "Der aktuelle Desktop kann nicht entfernt werden",
+    "Impossible de supprimer le bureau actuel",
+    "No se puede eliminar el escritorio actual"
+  ],
+  "两个操作不能使用相同的快捷键": [
+    "Choose a different shortcut for each action",
+    "Für jede Aktion eine andere Tastenkombination wählen",
+    "Choisissez un raccourci différent pour chaque action",
+    "Elige un atajo distinto para cada acción"
+  ],
+  "两个操作必须使用不同的快捷键": [
+    "The two actions need different shortcuts",
+    "Die beiden Aktionen benötigen unterschiedliche Tastenkombinationen",
+    "Les deux actions doivent avoir des raccourcis distincts",
+    "Las dos acciones necesitan atajos diferentes"
+  ],
+  "个性化": [
+    "Personalization",
+    "Personalisierung",
+    "Personnalisation",
+    "Personalización"
+  ],
+  "主界面：单击选择，Ctrl / Shift 多选，点击空白取消。拖动卡片排序；拖到屏幕移动；双击激活窗口。\n\n快捷面板：点击托盘图标打开或收起。拖到其他屏幕移动，拖到当前屏幕隐藏（仅已适配系统）；按 Esc 或点击外部收起。已隐藏的窗口可在主界面找回。\n\n快捷键：支持按键录入，也可点输入栏右侧箭头选择预设或组合；通过清除按钮停用。隐藏前台窗口默认为关闭。\n\n截图：静态采样，仅保存在内存中；启动、重新激活、定时或 F5 时刷新。最多保留 64 个窗口缩略图，超额时优先当前屏幕，其余使用图标。\n\n离开设置页前会保存有效变更。右键托盘图标可彻底退出。": [
+    "Main window: click to select, Ctrl/Shift to select several, or click empty space to clear. Drag cards to reorder, drop onto a display to move, or double-click to activate.\n\nQuick panel: click the tray icon to open or close. Drop onto another display to move, or the current display to hide on supported systems. Press Esc or click outside to close. Recover hidden windows from the main window.\n\nShortcuts: press a key combination, or use the arrow to choose a preset or build your own. Use Clear to disable one. The hide shortcut is off by default.\n\nPreviews: snapshots stay in memory. They refresh at startup, on activation, on a timer or with F5. Up to 64 window thumbnails are kept, prioritizing the current display; other windows use icons.\n\nValid changes are saved before leaving settings. Right-click the tray icon to quit.",
+    "Hauptfenster: Klicken zum Auswählen, Strg/Umschalt für mehrere Fenster, freie Fläche zum Abwählen. Karten zum Sortieren ziehen, auf einen Bildschirm zum Verschieben, doppelklicken zum Aktivieren.\n\nSchnellzugriff: Über das Taskleistensymbol öffnen oder schließen. Auf einen anderen Bildschirm ziehen zum Verschieben, auf den aktuellen zum Ausblenden, sofern unterstützt. Esc oder ein Klick außerhalb schließt das Fenster. Ausgeblendete Fenster lassen sich im Hauptfenster zurückholen.\n\nTastenkombinationen: Direkt eingeben oder über den Pfeil eine Vorlage wählen bzw. selbst zusammenstellen. Mit Löschen deaktivieren. Die Tastenkombination zum Ausblenden ist standardmäßig aus.\n\nVorschaubilder bleiben im Arbeitsspeicher. Sie werden beim Start, beim Aktivieren, regelmäßig oder mit F5 erneuert. Maximal 64 Fenstervorschauen, bevorzugt vom aktuellen Bildschirm; sonst erscheinen Symbole.\n\nGültige Änderungen werden vor dem Verlassen der Einstellungen gespeichert. Zum Beenden mit der rechten Maustaste auf das Taskleistensymbol klicken.",
+    "Fenêtre principale : cliquez pour sélectionner, utilisez Ctrl/Maj pour en sélectionner plusieurs, ou cliquez dans le vide pour tout désélectionner. Faites glisser les cartes pour les réorganiser, déposez-les sur un écran pour les déplacer, ou double-cliquez pour activer une fenêtre.\n\nAccès rapide : cliquez sur l’icône de notification pour ouvrir ou fermer le panneau. Déposez une fenêtre sur un autre écran pour la déplacer, ou sur l’écran actuel pour la masquer si le système le permet. Échap ou un clic à l’extérieur ferme le panneau. Les fenêtres masquées se récupèrent dans la fenêtre principale.\n\nRaccourcis : saisissez une combinaison ou utilisez la flèche pour choisir un préréglage ou composer le vôtre. Effacer permet de le désactiver. Le raccourci de masquage est désactivé par défaut.\n\nAperçus : les captures restent en mémoire. Elles s’actualisent au démarrage, à l’activation, périodiquement ou avec F5. Jusqu’à 64 miniatures sont conservées, en priorité celles de l’écran actuel ; les autres fenêtres affichent leur icône.\n\nLes modifications valides sont enregistrées avant de quitter les paramètres. Faites un clic droit sur l’icône de notification pour quitter.",
+    "Ventana principal: haz clic para seleccionar, usa Ctrl/Mayús para seleccionar varias o haz clic en un espacio vacío para deseleccionar. Arrastra las tarjetas para ordenarlas, suéltalas sobre una pantalla para moverlas o haz doble clic para activar una ventana.\n\nPanel rápido: pulsa el icono de la bandeja para abrirlo o cerrarlo. Suelta una ventana sobre otra pantalla para moverla o sobre la actual para ocultarla, si el sistema lo permite. Esc o un clic fuera cierra el panel. Recupera las ventanas ocultas desde la ventana principal.\n\nAtajos: pulsa una combinación o usa la flecha para elegir una opción o crear la tuya. Usa Borrar para desactivarla. El atajo para ocultar está desactivado por defecto.\n\nVistas previas: las capturas se guardan solo en memoria. Se actualizan al iniciar, al activar la aplicación, periódicamente o con F5. Se conservan hasta 64 miniaturas, dando prioridad a la pantalla actual; las demás ventanas usan iconos.\n\nLos cambios válidos se guardan antes de salir de los ajustes. Haz clic derecho en el icono de la bandeja para salir."
+  ],
+  "主程序版本与发布标签不符": [
+    "The application version does not match the release tag",
+    "Die Programmversion stimmt nicht mit dem Release-Tag überein",
+    "La version de l’application ne correspond pas au tag de publication",
+    "La versión de la aplicación no coincide con la etiqueta de la versión"
+  ],
+  "主键": [
+    "Key",
+    "Taste",
+    "Touche",
+    "Tecla"
+  ],
+  "主题色": [
+    "Accent color",
+    "Akzentfarbe",
+    "Couleur d’accentuation",
+    "Color de énfasis"
+  ],
+  "之前": [
+    "before",
+    "vor",
+    "avant",
+    "antes"
+  ],
+  "之后": [
+    "after",
+    "nach",
+    "après",
+    "después"
+  ],
+  "事件监听不可用，已改为定时刷新：": [
+    "Event monitoring is unavailable; using periodic refresh: ",
+    "Ereignisüberwachung nicht verfügbar; regelmäßige Aktualisierung aktiv: ",
+    "Surveillance des événements indisponible ; actualisation périodique activée : ",
+    "La supervisión de eventos no está disponible; se usará la actualización periódica: "
+  ],
+  "云母": [
+    "Mica",
+    "Mica",
+    "Mica",
+    "Mica"
+  ],
+  "亚克力": [
+    "Acrylic",
+    "Acryl",
+    "Acrylique",
+    "Acrílico"
+  ],
+  "以管理员身份重启": [
+    "Restart as administrator",
+    "Als Administrator neu starten",
+    "Redémarrer en tant qu’administrateur",
+    "Reiniciar como administrador"
+  ],
+  "保存未能完整回退：": [
+    "Settings rollback was incomplete: ",
+    "Einstellungen konnten nicht vollständig zurückgesetzt werden: ",
+    "Restauration des paramètres incomplète : ",
+    "No se pudieron restaurar todos los ajustes: "
+  ],
+  "修改状态": [
+    "Change state",
+    "Zustand ändern",
+    "Modifier l’état",
+    "Cambiar estado"
+  ],
+  "全局快捷键未启用：": [
+    "Global shortcut is disabled: ",
+    "Globale Tastenkombination deaktiviert: ",
+    "Raccourci global désactivé : ",
+    "Atajo global desactivado: "
+  ],
+  "全局快捷键需要包含 Ctrl、Alt 或 Win": [
+    "Global shortcuts must include Ctrl, Alt or Win",
+    "Globale Tastenkombinationen müssen Strg, Alt oder Win enthalten",
+    "Les raccourcis globaux doivent inclure Ctrl, Alt ou Win",
+    "Los atajos globales deben incluir Ctrl, Alt o Win"
+  ],
+  "全局快捷键：打开 / 收起快捷面板": [
+    "Shortcut: open or close the quick panel",
+    "Tastenkombination: Schnellzugriff öffnen/schließen",
+    "Raccourci : ouvrir ou fermer l’accès rapide",
+    "Atajo: abrir o cerrar el panel rápido"
+  ],
+  "全局快捷键：隐藏当前前台窗口": [
+    "Shortcut: hide the active window",
+    "Tastenkombination: aktives Fenster ausblenden",
+    "Raccourci : masquer la fenêtre active",
+    "Atajo: ocultar la ventana activa"
+  ],
+  "关于与隐私": [
+    "About and privacy",
+    "Info und Datenschutz",
+    "À propos et confidentialité",
+    "Acerca de y privacidad"
+  ],
+  "关闭": [
+    "Close",
+    "Schließen",
+    "Fermer",
+    "Cerrar"
+  ],
+  "关闭主窗口时保留托盘运行": [
+    "Keep running in the tray when the main window closes",
+    "Beim Schließen des Hauptfensters im Infobereich weiterlaufen",
+    "Continuer en arrière-plan à la fermeture de la fenêtre principale",
+    "Seguir en la bandeja al cerrar la ventana principal"
+  ],
+  "内存受控：优先当前屏幕预览": [
+    "Memory limit: prioritizing previews on the current display",
+    "Speicherlimit: Vorschauen des aktuellen Bildschirms haben Vorrang",
+    "Limite mémoire : priorité aux aperçus de l’écran actuel",
+    "Límite de memoria: prioridad a las vistas previas de la pantalla actual"
+  ],
+  "创建桌面": [
+    "Create desktop",
+    "Desktop erstellen",
+    "Créer un bureau",
+    "Crear escritorio"
+  ],
+  "初始化": [
+    "Initialize",
+    "Initialisierung",
+    "Initialisation",
+    "Inicialización"
+  ],
+  "刷新 · F5": [
+    "Refresh · F5",
+    "Aktualisieren · F5",
+    "Actualiser · F5",
+    "Actualizar · F5"
+  ],
+  "刷新失败：": [
+    "Refresh failed: ",
+    "Aktualisierung fehlgeschlagen: ",
+    "Échec de l’actualisation : ",
+    "Error al actualizar: "
+  ],
+  "前台窗口": [
+    "Active window",
+    "Aktives Fenster",
+    "Fenêtre active",
+    "Ventana activa"
+  ],
+  "包含预览版": [
+    "Include preview builds",
+    "Vorabversionen einbeziehen",
+    "Inclure les préversions",
+    "Incluir versiones preliminares"
+  ],
+  "历史 · ": [
+    "Previous · ",
+    "Zuletzt · ",
+    "Précédent · ",
+    "Anterior · "
+  ],
+  "原屏幕已断开，已恢复到当前可用屏幕": [
+    "The original display disconnected. Restored to an available display.",
+    "Ursprünglicher Bildschirm getrennt. Auf einem verfügbaren Bildschirm wiederhergestellt.",
+    "L’écran d’origine est déconnecté. Fenêtre restaurée sur un écran disponible.",
+    "La pantalla original se desconectó. Se restauró en una pantalla disponible."
+  ],
+  "原窗口已关闭 / 进程已重启": [
+    "Window closed or application restarted",
+    "Fenster geschlossen oder Anwendung neu gestartet",
+    "Fenêtre fermée ou application redémarrée",
+    "Ventana cerrada o aplicación reiniciada"
+  ],
+  "原窗口已关闭或进程已重启，未操作其他窗口": [
+    "The original window closed or its process restarted. No other window was changed.",
+    "Das ursprüngliche Fenster wurde geschlossen oder der Prozess neu gestartet. Andere Fenster blieben unverändert.",
+    "La fenêtre d’origine a été fermée ou son processus a redémarré. Aucune autre fenêtre n’a été modifiée.",
+    "La ventana original se cerró o su proceso se reinició. No se modificó ninguna otra ventana."
+  ],
+  "原窗口已关闭或进程已重启；可移除此失效记录": [
+    "The original window closed or its process restarted. This record can be removed.",
+    "Das ursprüngliche Fenster ist geschlossen oder der Prozess wurde neu gestartet. Der Eintrag kann entfernt werden.",
+    "La fenêtre d’origine est fermée ou son processus a redémarré. Cette entrée peut être supprimée.",
+    "La ventana original se cerró o su proceso se reinició. Puedes eliminar este registro."
+  ],
+  "原进程已重启，未操作替代窗口": [
+    "The process restarted. Its replacement window was left untouched.",
+    "Der Prozess wurde neu gestartet. Das Ersatzfenster blieb unverändert.",
+    "Le processus a redémarré. La nouvelle fenêtre n’a pas été modifiée.",
+    "El proceso se reinició. No se modificó la nueva ventana."
+  ],
+  "反馈问题": [
+    "Report an issue",
+    "Problem melden",
+    "Signaler un problème",
+    "Informar de un problema"
+  ],
+  "发现新版本 {0}": [
+    "Version {0} is available",
+    "Version {0} ist verfügbar",
+    "La version {0} est disponible",
+    "La versión {0} está disponible"
+  ],
+  "取消": [
+    "Cancel",
+    "Abbrechen",
+    "Annuler",
+    "Cancelar"
+  ],
+  "名称不可用": [
+    "Name unavailable",
+    "Name nicht verfügbar",
+    "Nom indisponible",
+    "Nombre no disponible"
+  ],
+  "启动项更新失败，设置文件回退也未完成": [
+    "The startup setting could not be updated, and the settings file could not be fully restored",
+    "Die Autostart-Einstellung konnte nicht geändert und die Einstellungsdatei nicht vollständig wiederhergestellt werden",
+    "Le démarrage automatique n’a pas pu être modifié et le fichier de paramètres n’a pas été entièrement restauré",
+    "No se pudo cambiar el inicio automático ni restaurar por completo el archivo de ajustes"
+  ],
+  "商店版本请通过 Microsoft Store 更新": [
+    "Update the Store edition through Microsoft Store",
+    "Die Store-Version über den Microsoft Store aktualisieren",
+    "Mettez à jour la version Store via le Microsoft Store",
+    "Actualiza la edición de la tienda desde Microsoft Store"
+  ],
+  "在任务栏通知区域显示快捷操作图标": [
+    "Show the quick-panel icon in the system tray",
+    "Schnellzugriff-Symbol im Infobereich anzeigen",
+    "Afficher l’icône d’accès rapide dans la zone de notification",
+    "Mostrar el icono del panel rápido en la bandeja del sistema"
+  ],
+  "外观": [
+    "Appearance",
+    "Darstellung",
+    "Apparence",
+    "Apariencia"
+  ],
+  "存在，但系统未启用\n请在系统显示设置中启用": [
+    "Detected, but disabled in Windows\nEnable it in Display settings",
+    "Erkannt, aber in Windows deaktiviert\nIn den Anzeigeeinstellungen aktivieren",
+    "Détecté, mais désactivé dans Windows\nActivez-le dans les paramètres d’affichage",
+    "Detectada, pero desactivada en Windows\nActívala en la configuración de pantalla"
+  ],
+  "安装目标已变化": [
+    "The installation target changed",
+    "Das Installationsziel hat sich geändert",
+    "L’emplacement d’installation a changé",
+    "La ubicación de instalación ha cambiado"
+  ],
+  "定时刷新请设为 0 或至少 15 秒": [
+    "Set the refresh interval to 0 or at least 15 seconds",
+    "Aktualisierungsintervall auf 0 oder mindestens 15 Sekunden setzen",
+    "Choisissez 0 ou un intervalle d’au moins 15 secondes",
+    "Elige 0 o un intervalo de al menos 15 segundos"
+  ],
+  "定时刷新间隔（秒；0 关闭，最短 15 秒）": [
+    "Refresh interval (seconds; 0 to disable, minimum 15)",
+    "Aktualisierungsintervall (Sekunden; 0 = aus, mindestens 15)",
+    "Intervalle d’actualisation (secondes ; 0 pour désactiver, minimum 15)",
+    "Intervalo de actualización (segundos; 0 para desactivar, mínimo 15)"
+  ],
+  "实例消息过长": [
+    "Instance message is too long",
+    "Instanznachricht ist zu lang",
+    "Le message d’instance est trop long",
+    "El mensaje de instancia es demasiado largo"
+  ],
+  "实例监听已经启动": [
+    "Instance listener is already running",
+    "Instanzüberwachung läuft bereits",
+    "L’écoute des instances est déjà active",
+    "La escucha de instancias ya está activa"
+  ],
+  "导入值未保存，请检查提示": [
+    "Imported settings were not saved. Check the message.",
+    "Importierte Einstellungen wurden nicht gespeichert. Bitte die Meldung prüfen.",
+    "Les paramètres importés n’ont pas été enregistrés. Consultez le message.",
+    "Los ajustes importados no se guardaron. Consulta el mensaje."
+  ],
+  "导入设置": [
+    "Import settings",
+    "Einstellungen importieren",
+    "Importer les paramètres",
+    "Importar ajustes"
+  ],
+  "导出设置": [
+    "Export settings",
+    "Einstellungen exportieren",
+    "Exporter les paramètres",
+    "Exportar ajustes"
+  ],
+  "尚未截图": [
+    "No snapshot yet",
+    "Noch kein Vorschaubild",
+    "Aucune capture pour le moment",
+    "Aún no hay captura"
+  ],
+  "屏幕 {0}": [
+    "Display {0}",
+    "Bildschirm {0}",
+    "Écran {0}",
+    "Pantalla {0}"
+  ],
+  "屏幕 {0} · {1}": [
+    "Display {0} · {1}",
+    "Bildschirm {0} · {1}",
+    "Écran {0} · {1}",
+    "Pantalla {0} · {1}"
+  ],
+  "屏幕 {0} 上的窗口": [
+    "Windows on display {0}",
+    "Fenster auf Bildschirm {0}",
+    "Fenêtres sur l’écran {0}",
+    "Ventanas en la pantalla {0}"
+  ],
+  "屏幕未启用": [
+    "Display is inactive",
+    "Bildschirm ist inaktiv",
+    "Écran inactif",
+    "La pantalla está inactiva"
+  ],
+  "屏幕预览已关闭": [
+    "Display previews are off",
+    "Bildschirmvorschauen sind aus",
+    "Aperçus des écrans désactivés",
+    "Vistas previas de pantallas desactivadas"
+  ],
+  "已取消": [
+    "Cancelled",
+    "Abgebrochen",
+    "Annulé",
+    "Cancelado"
+  ],
+  "已在此屏幕": [
+    "Already on this display",
+    "Bereits auf diesem Bildschirm",
+    "Déjà sur cet écran",
+    "Ya está en esta pantalla"
+  ],
+  "已导入并自动保存": [
+    "Settings imported and saved",
+    "Einstellungen importiert und gespeichert",
+    "Paramètres importés et enregistrés",
+    "Ajustes importados y guardados"
+  ],
+  "已导出设置": [
+    "Settings exported",
+    "Einstellungen exportiert",
+    "Paramètres exportés",
+    "Ajustes exportados"
+  ],
+  "已恢复原位置、大小和状态": [
+    "Original position, size and state restored",
+    "Ursprüngliche Position, Größe und Zustand wiederhergestellt",
+    "Position, taille et état d’origine restaurés",
+    "Posición, tamaño y estado originales restaurados"
+  ],
+  "已找回当前虚拟桌面并还原；原虚拟桌面保留": [
+    "Restored to the current desktop. The previous desktop was kept.",
+    "Auf dem aktuellen Desktop wiederhergestellt. Der bisherige Desktop bleibt erhalten.",
+    "Fenêtre restaurée sur le bureau actuel. Le bureau précédent est conservé.",
+    "Restaurada en el escritorio actual. Se ha conservado el escritorio anterior."
+  ],
+  "已是最新版": [
+    "You're up to date",
+    "Du bist auf dem neuesten Stand",
+    "Vous êtes à jour",
+    "Ya tienes la última versión"
+  ],
+  "已最小化至「{0}」，可从「已隐藏」一键找回": [
+    "Minimized on “{0}”. Use Hidden windows to bring it back.",
+    "Auf „{0}“ minimiert. Unter „Ausgeblendete Fenster“ zurückholen.",
+    "Réduite sur « {0} ». Récupérez-la dans « Fenêtres masquées ».",
+    "Minimizada en «{0}». Recupérala desde «Ventanas ocultas»."
+  ],
+  "已有实例暂未响应，请从托盘打开或退出后重试。": [
+    "ScreenMover is already running but not responding. Open it from the tray, or quit and try again.",
+    "ScreenMover läuft bereits, reagiert aber nicht. Über das Taskleistensymbol öffnen oder beenden und erneut versuchen.",
+    "ScreenMover est déjà lancé, mais ne répond pas. Ouvrez-le depuis la zone de notification ou quittez-le et réessayez.",
+    "ScreenMover ya está abierto, pero no responde. Ábrelo desde la bandeja o sal y vuelve a intentarlo."
+  ],
+  "已检测到 {0} 个窗口不再位于隐藏桌面，已更新记录": [
+    "{0} windows have left their hidden desktop. Records updated.",
+    "{0} Fenster befinden sich nicht mehr auf ihrem ausgeblendeten Desktop. Einträge aktualisiert.",
+    "{0} fenêtres ont quitté leur bureau de masquage. La liste a été mise à jour.",
+    "{0} ventanas ya no están en su escritorio oculto. Se han actualizado los registros."
+  ],
+  "已激活": [
+    "Activated",
+    "Aktiviert",
+    "Activée",
+    "Activada"
+  ],
+  "已移至屏幕 {0}": [
+    "Moved to display {0}",
+    "Auf Bildschirm {0} verschoben",
+    "Déplacée vers l’écran {0}",
+    "Movida a la pantalla {0}"
+  ],
+  "已移至独立桌面「{0}」；应用未接受最小化，保留隐藏位置，可一键找回": [
+    "Moved to “{0}”. The app refused minimization but stays on its separate desktop. You can still bring it back.",
+    "Auf „{0}“ verschoben. Die App lässt sich nicht minimieren, bleibt aber auf ihrem separaten Desktop und kann zurückgeholt werden.",
+    "Déplacée sur « {0} ». L’application refuse de se réduire, mais reste sur son bureau séparé. Vous pouvez la récupérer.",
+    "Movida a «{0}». La aplicación no acepta minimizarse, pero permanece en su escritorio independiente y puedes recuperarla."
+  ],
+  "已移除失效记录：": [
+    "Removed stale record: ",
+    "Veralteten Eintrag entfernt: ",
+    "Entrée obsolète supprimée : ",
+    "Registro obsoleto eliminado: "
+  ],
+  "已退出 / 不可访问": [
+    "Exited / unavailable",
+    "Beendet / nicht verfügbar",
+    "Fermée / inaccessible",
+    "Cerrada / no disponible"
+  ],
+  "已选 {0} 个窗口": [
+    "{0} windows selected",
+    "{0} Fenster ausgewählt",
+    "{0} fenêtres sélectionnées",
+    "{0} ventanas seleccionadas"
+  ],
+  "已隐藏": [
+    "Hidden",
+    "Ausgeblendet",
+    "Masquées",
+    "Ocultas"
+  ],
+  "已隐藏 · {0}": [
+    "Hidden · {0}",
+    "Ausgeblendet · {0}",
+    "Masquées · {0}",
+    "Ocultas · {0}"
+  ],
+  "已隐藏 · 已最小化": [
+    "Hidden · Minimized",
+    "Ausgeblendet · Minimiert",
+    "Masquée · Réduite",
+    "Oculta · Minimizada"
+  ],
+  "已隐藏在独立桌面 · 应用未接受最小化": [
+    "On a separate desktop · Minimization refused",
+    "Auf separatem Desktop · Minimieren abgelehnt",
+    "Sur un bureau séparé · Réduction refusée",
+    "En un escritorio independiente · No se pudo minimizar"
+  ],
+  "已隐藏窗口": [
+    "Hidden windows",
+    "Ausgeblendete Fenster",
+    "Fenêtres masquées",
+    "Ventanas ocultas"
+  ],
+  "常用组合": [
+    "Presets",
+    "Vorlagen",
+    "Préréglages",
+    "Combinaciones habituales"
+  ],
+  "应用": [
+    "Application",
+    "Anwendung",
+    "Application",
+    "Aplicación"
+  ],
+  "应用关闭或替换了原窗口；桌面与恢复记录已保留": [
+    "The app closed or replaced its window. The desktop and recovery record were kept.",
+    "Die App hat ihr Fenster geschlossen oder ersetzt. Desktop und Wiederherstellungseintrag bleiben erhalten.",
+    "L’application a fermé ou remplacé sa fenêtre. Le bureau et l’entrée de récupération sont conservés.",
+    "La aplicación cerró o sustituyó su ventana. Se han conservado el escritorio y el registro de recuperación."
+  ],
+  "应用拒绝操作或未确认状态": [
+    "The app refused the action or did not confirm its state",
+    "Die App hat die Aktion abgelehnt oder ihren Zustand nicht bestätigt",
+    "L’application a refusé l’action ou n’a pas confirmé son état",
+    "La aplicación rechazó la acción o no confirmó su estado"
+  ],
+  "应用改变了最小化状态": [
+    "The app changed its minimized state",
+    "Die App hat ihren Minimierungszustand geändert",
+    "L’application a modifié son état de réduction",
+    "La aplicación cambió su estado de minimización"
+  ],
+  "应用未提供画面 / 截图超时": [
+    "No image from the app / capture timed out",
+    "Kein Bild von der App / Aufnahmezeit überschritten",
+    "Aucune image fournie / délai de capture dépassé",
+    "La aplicación no ofrece imagen / captura agotada"
+  ],
+  "应用未确认恢复位置或状态，可重试撤销": [
+    "The app did not confirm its restored position or state. You can retry Undo.",
+    "Die App hat die wiederhergestellte Position oder den Zustand nicht bestätigt. Rückgängig kann erneut versucht werden.",
+    "L’application n’a pas confirmé sa position ou son état restauré. Vous pouvez réessayer d’annuler le déplacement.",
+    "La aplicación no confirmó su posición o estado restaurados. Puedes volver a deshacer el movimiento."
+  ],
+  "应用返回了可见桌面或桌面已切换，未确认隐藏；桌面与恢复记录已保留。全屏游戏可尝试无边框窗口模式": [
+    "The app returned to a visible desktop, or the desktop changed. Hiding could not be confirmed; the desktop and recovery record were kept. For full-screen games, try borderless windowed mode.",
+    "Die App ist auf einen sichtbaren Desktop zurückgekehrt oder der Desktop wurde gewechselt. Ausblenden konnte nicht bestätigt werden; Desktop und Eintrag bleiben erhalten. Bei Vollbildspielen den randlosen Fenstermodus versuchen.",
+    "L’application est revenue sur un bureau visible ou le bureau a changé. Le masquage n’a pas pu être confirmé ; le bureau et l’entrée sont conservés. Pour les jeux en plein écran, essayez le mode fenêtré sans bordure.",
+    "La aplicación volvió a un escritorio visible o se cambió de escritorio. No se pudo confirmar la ocultación; se conservan el escritorio y el registro. En juegos a pantalla completa, prueba el modo ventana sin bordes."
+  ],
+  "开发版": [
+    "Development build",
+    "Entwicklungsversion",
+    "Version de développement",
+    "Versión de desarrollo"
+  ],
+  "开启": [
+    "On",
+    "Ein",
+    "Activé",
+    "Activado"
+  ],
+  "当前屏幕：": [
+    "Current display: ",
+    "Aktueller Bildschirm: ",
+    "Écran actuel : ",
+    "Pantalla actual: "
+  ],
+  "当前已是此渠道的最新版本。": [
+    "You're on the latest version for this channel.",
+    "Die neueste Version dieses Kanals ist installiert.",
+    "Vous utilisez la dernière version de ce canal.",
+    "Ya tienes la última versión de este canal."
+  ],
+  "当前版本：": [
+    "Current version: ",
+    "Aktuelle Version: ",
+    "Version actuelle : ",
+    "Versión actual: "
+  ],
+  "当前程序目录不可写，请将便携版移到可写目录后更新，或使用发布页手动安装": [
+    "The application folder is read-only. Move the portable app to a writable folder or install manually from the release page.",
+    "Der Programmordner ist schreibgeschützt. Die portable App in einen beschreibbaren Ordner verschieben oder über die Release-Seite installieren.",
+    "Le dossier de l’application est en lecture seule. Déplacez la version portable dans un dossier accessible en écriture ou installez-la depuis la page de publication.",
+    "La carpeta de la aplicación es de solo lectura. Mueve la versión portátil a una carpeta con permisos de escritura o instala desde la página de versiones."
+  ],
+  "微信": [
+    "WeChat",
+    "WeChat",
+    "WeChat",
+    "WeChat"
+  ],
+  "快捷操作": [
+    "Quick actions",
+    "Schnellzugriff",
+    "Actions rapides",
+    "Acciones rápidas"
+  ],
+  "快捷操作：{0} · {1}": [
+    "Quick action: {0} · {1}",
+    "Schnellaktion: {0} · {1}",
+    "Action rapide : {0} · {1}",
+    "Acción rápida: {0} · {1}"
+  ],
+  "快捷键修饰键无效或重复": [
+    "Invalid or duplicate shortcut modifiers",
+    "Ungültige oder doppelte Zusatztasten",
+    "Touches de modification invalides ou en double",
+    "Modificadores del atajo no válidos o repetidos"
+  ],
+  "快捷键内容过长": [
+    "The shortcut is too long",
+    "Die Tastenkombination ist zu lang",
+    "Le raccourci est trop long",
+    "El atajo es demasiado largo"
+  ],
+  "快捷键正在修改": [
+    "Shortcut is being edited",
+    "Tastenkombination wird gerade geändert",
+    "Raccourci en cours de modification",
+    "Se está modificando el atajo"
+  ],
+  "快捷隐藏": [
+    "Quick hide",
+    "Schnell ausblenden",
+    "Masquage rapide",
+    "Ocultación rápida"
+  ],
+  "快捷隐藏失败：": [
+    "Could not hide the window: ",
+    "Fenster konnte nicht ausgeblendet werden: ",
+    "Impossible de masquer la fenêtre : ",
+    "No se pudo ocultar la ventana: "
+  ],
+  "快捷面板": [
+    "Quick panel",
+    "Schnellzugriff",
+    "Accès rapide",
+    "Panel rápido"
+  ],
+  "快捷面板无法打开：": [
+    "Could not open the quick panel: ",
+    "Schnellzugriff konnte nicht geöffnet werden: ",
+    "Impossible d’ouvrir l’accès rapide : ",
+    "No se pudo abrir el panel rápido: "
+  ],
+  "恢复默认设置": [
+    "Restore defaults",
+    "Standard wiederherstellen",
+    "Rétablir les valeurs par défaut",
+    "Restablecer valores predeterminados"
+  ],
+  "截图 ": [
+    "Snapshot ",
+    "Aufnahme ",
+    "Capture ",
+    "Captura "
+  ],
+  "截图不可用": [
+    "Preview unavailable",
+    "Vorschau nicht verfügbar",
+    "Aperçu indisponible",
+    "Vista previa no disponible"
+  ],
+  "截图失败：": [
+    "Capture failed: ",
+    "Aufnahme fehlgeschlagen: ",
+    "Échec de la capture : ",
+    "Error de captura: "
+  ],
+  "所有屏幕": [
+    "All displays",
+    "Alle Bildschirme",
+    "Tous les écrans",
+    "Todas las pantallas"
+  ],
+  "手动移回的窗口会自动更新；找回后保留原桌面。": [
+    "Manually moved windows are detected automatically. Recovering a window keeps its previous desktop.",
+    "Manuell verschobene Fenster werden automatisch erkannt. Beim Zurückholen bleibt der bisherige Desktop erhalten.",
+    "Les déplacements manuels sont détectés automatiquement. Récupérer une fenêtre conserve son bureau précédent.",
+    "Los movimientos manuales se detectan automáticamente. Al recuperar una ventana se conserva su escritorio anterior."
+  ],
+  "打开 GitHub 发布页": [
+    "View releases on GitHub",
+    "Releases auf GitHub öffnen",
+    "Voir les versions sur GitHub",
+    "Ver versiones en GitHub"
+  ],
+  "打开主界面": [
+    "Open main window",
+    "Hauptfenster öffnen",
+    "Ouvrir la fenêtre principale",
+    "Abrir ventana principal"
+  ],
+  "打开数据与完整操作记录": [
+    "Open data folder and full activity log",
+    "Datenordner und vollständiges Protokoll öffnen",
+    "Ouvrir le dossier de données et le journal complet",
+    "Abrir la carpeta de datos y el historial completo"
+  ],
+  "托盘不可用：": [
+    "System tray unavailable: ",
+    "Infobereich nicht verfügbar: ",
+    "Zone de notification indisponible : ",
+    "Bandeja del sistema no disponible: "
+  ],
+  "托盘与启动": [
+    "System tray and startup",
+    "Infobereich und Autostart",
+    "Zone de notification et démarrage",
+    "Bandeja e inicio"
+  ],
+  "托盘图标创建失败；关闭主窗口时将正常退出": [
+    "Could not create the tray icon. Closing the main window will quit ScreenMover.",
+    "Taskleistensymbol konnte nicht erstellt werden. Beim Schließen des Hauptfensters wird ScreenMover beendet.",
+    "Impossible de créer l’icône de notification. Fermer la fenêtre principale quittera ScreenMover.",
+    "No se pudo crear el icono de la bandeja. Al cerrar la ventana principal se cerrará ScreenMover."
+  ],
+  "找回窗口": [
+    "Recover window",
+    "Fenster zurückholen",
+    "Récupérer la fenêtre",
+    "Recuperar ventana"
+  ],
+  "找回窗口：{0} · {1}": [
+    "Recover window: {0} · {1}",
+    "Fenster zurückholen: {0} · {1}",
+    "Récupérer la fenêtre : {0} · {1}",
+    "Recuperar ventana: {0} · {1}"
+  ],
+  "找回选中窗口": [
+    "Recover selected window",
+    "Ausgewähltes Fenster zurückholen",
+    "Récupérer la fenêtre sélectionnée",
+    "Recuperar ventana seleccionada"
+  ],
+  "拓扑变化：{0} 尚无桌面几何，请刷新": [
+    "Display layout changed: {0} has no desktop bounds yet. Refresh to try again.",
+    "Bildschirmanordnung geändert: Für {0} fehlen noch Desktop-Koordinaten. Bitte aktualisieren.",
+    "La disposition a changé : les coordonnées de {0} ne sont pas encore disponibles. Actualisez la liste.",
+    "La disposición cambió: aún no hay coordenadas para {0}. Actualiza la lista."
+  ],
+  "按组合键，或从右侧选择": [
+    "Press a shortcut or choose one on the right",
+    "Tastenkombination drücken oder rechts auswählen",
+    "Saisissez un raccourci ou choisissez-en un à droite",
+    "Pulsa una combinación o elige una a la derecha"
+  ],
+  "排序未保存：": [
+    "Order was not saved: ",
+    "Reihenfolge nicht gespeichert: ",
+    "Ordre non enregistré : ",
+    "No se guardó el orden: "
+  ],
+  "排序：放到「{0}」{1}": [
+    "Place {1} “{0}”",
+    "{1} „{0}“ einfügen",
+    "Placer {1} « {0} »",
+    "Colocar {1} de «{0}»"
+  ],
+  "搜索窗口": [
+    "Search windows",
+    "Fenster suchen",
+    "Rechercher une fenêtre",
+    "Buscar ventanas"
+  ],
+  "撤销失败：": [
+    "Undo failed: ",
+    "Rückgängig fehlgeschlagen: ",
+    "Échec de l’annulation : ",
+    "No se pudo deshacer: "
+  ],
+  "撤销移动": [
+    "Undo move",
+    "Verschieben rückgängig",
+    "Annuler le déplacement",
+    "Deshacer movimiento"
+  ],
+  "撤销移动 · {0}": [
+    "Undo move · {0}",
+    "Verschieben rückgängig · {0}",
+    "Annuler le déplacement · {0}",
+    "Deshacer movimiento · {0}"
+  ],
+  "操作失败：": [
+    "Action failed: ",
+    "Aktion fehlgeschlagen: ",
+    "Échec de l’action : ",
+    "Error en la acción: "
+  ],
+  "操作提示停留时间（秒）": [
+    "Status message duration (seconds)",
+    "Anzeigedauer von Meldungen (Sekunden)",
+    "Durée des messages (secondes)",
+    "Duración de los mensajes (segundos)"
+  ],
+  "操作记录": [
+    "Activity log",
+    "Aktivitätsprotokoll",
+    "Historique des actions",
+    "Historial de acciones"
+  ],
+  "操作记录 · 最近 500 条": [
+    "Activity log · Last 500 entries",
+    "Aktivitätsprotokoll · Letzte 500 Einträge",
+    "Historique · 500 dernières entrées",
+    "Historial · Últimas 500 entradas"
+  ],
+  "操作说明与快捷键": [
+    "Help and shortcuts",
+    "Hilfe und Tastenkombinationen",
+    "Aide et raccourcis",
+    "Ayuda y atajos"
+  ],
+  "操作超时，记录已保留，请在任务视图确认状态或重试找回": [
+    "The action timed out. The recovery record was kept. Check Task View or try recovering the window again.",
+    "Zeitlimit überschritten. Der Eintrag bleibt erhalten. Bitte die Taskansicht prüfen oder das Fenster erneut zurückholen.",
+    "Le délai a été dépassé. L’entrée de récupération est conservée. Vérifiez la vue des tâches ou réessayez de récupérer la fenêtre.",
+    "Se agotó el tiempo de espera. Se conserva el registro. Comprueba la Vista de tareas o intenta recuperar la ventana de nuevo."
+  ],
+  "收起": [
+    "Dismiss",
+    "Schließen",
+    "Fermer",
+    "Cerrar"
+  ],
+  "收起快捷面板": [
+    "Close quick panel",
+    "Schnellzugriff schließen",
+    "Fermer l’accès rapide",
+    "Cerrar panel rápido"
+  ],
+  "数据与帮助": [
+    "Data and help",
+    "Daten und Hilfe",
+    "Données et aide",
+    "Datos y ayuda"
+  ],
+  "文件不包含 ScreenMover 设置": [
+    "The file contains no ScreenMover settings",
+    "Die Datei enthält keine ScreenMover-Einstellungen",
+    "Le fichier ne contient aucun paramètre ScreenMover",
+    "El archivo no contiene ajustes de ScreenMover"
+  ],
+  "文件内容为空": [
+    "The file is empty",
+    "Die Datei ist leer",
+    "Le fichier est vide",
+    "El archivo está vacío"
+  ],
+  "文件资源管理器": [
+    "File Explorer",
+    "Datei-Explorer",
+    "Explorateur de fichiers",
+    "Explorador de archivos"
+  ],
+  "无效数字或快捷键冲突会保留上次有效设置。导入不迁移启动项、设备尺寸、排序或隐藏记录。诊断包不包含窗口标题、截图或原始日志。": [
+    "Invalid values or shortcut conflicts leave the previous settings unchanged. Import does not transfer startup entries, device sizes, ordering or hidden-window records. Diagnostic packages exclude window titles, screenshots and raw logs.",
+    "Ungültige Werte oder Tastenkonflikte ändern die bisherigen Einstellungen nicht. Autostart, Gerätegrößen, Reihenfolge und ausgeblendete Fenster werden nicht importiert. Diagnosepakete enthalten keine Fenstertitel, Screenshots oder Rohprotokolle.",
+    "Les valeurs invalides ou les conflits de raccourcis laissent les anciens paramètres inchangés. L’import ne transfère pas le démarrage automatique, les dimensions des appareils, l’ordre ou les fenêtres masquées. Les diagnostics excluent les titres de fenêtres, captures et journaux bruts.",
+    "Los valores no válidos o los conflictos de atajos mantienen los ajustes anteriores. La importación no transfiere el inicio automático, tamaños de dispositivos, orden ni ventanas ocultas. Los diagnósticos no incluyen títulos, capturas ni registros sin filtrar."
+  ],
+  "无效的 PE 文件": [
+    "Invalid PE file",
+    "Ungültige PE-Datei",
+    "Fichier PE invalide",
+    "Archivo PE no válido"
+  ],
+  "无效的更新暂存目录": [
+    "Invalid update staging folder",
+    "Ungültiger Update-Zwischenordner",
+    "Dossier temporaire de mise à jour invalide",
+    "Carpeta temporal de actualización no válida"
+  ],
+  "无效的更新程序文件": [
+    "Invalid update executable",
+    "Ungültiges Update-Programm",
+    "Exécutable de mise à jour invalide",
+    "Ejecutable de actualización no válido"
+  ],
+  "无法创建截图": [
+    "Could not create the capture",
+    "Aufnahme konnte nicht erstellt werden",
+    "Impossible de créer la capture",
+    "No se pudo crear la captura"
+  ],
+  "无法创建托盘消息监听": [
+    "Could not register tray messages",
+    "Taskleistennachrichten konnten nicht registriert werden",
+    "Impossible d’enregistrer les messages de notification",
+    "No se pudieron registrar los mensajes de la bandeja"
+  ],
+  "无法启动独立更新程序": [
+    "Could not start the update helper",
+    "Update-Hilfsprogramm konnte nicht gestartet werden",
+    "Impossible de démarrer l’assistant de mise à jour",
+    "No se pudo iniciar el asistente de actualización"
+  ],
+  "无法开始安装：": [
+    "Could not start installation: ",
+    "Installation konnte nicht gestartet werden: ",
+    "Impossible de lancer l’installation : ",
+    "No se pudo iniciar la instalación: "
+  ],
+  "无法打开：": [
+    "Could not open: ",
+    "Konnte nicht geöffnet werden: ",
+    "Impossible d’ouvrir : ",
+    "No se pudo abrir: "
+  ],
+  "无法注册窗口事件": [
+    "Could not register window events",
+    "Fensterereignisse konnten nicht registriert werden",
+    "Impossible d’enregistrer les événements des fenêtres",
+    "No se pudieron registrar los eventos de ventanas"
+  ],
+  "无法监听全局快捷键": [
+    "Could not listen for global shortcuts",
+    "Globale Tastenkombinationen konnten nicht überwacht werden",
+    "Impossible d’écouter les raccourcis globaux",
+    "No se pudieron detectar los atajos globales"
+  ],
+  "无法监听显示器变化": [
+    "Could not monitor display changes",
+    "Bildschirmänderungen konnten nicht überwacht werden",
+    "Impossible de surveiller les changements d’écran",
+    "No se pudieron supervisar los cambios de pantalla"
+  ],
+  "无法设置快捷面板边框": [
+    "Could not configure the quick-panel frame",
+    "Rahmen des Schnellzugriffs konnte nicht eingerichtet werden",
+    "Impossible de configurer le cadre de l’accès rapide",
+    "No se pudo configurar el marco del panel rápido"
+  ],
+  "无法设置窗口尺寸约束": [
+    "Could not set window size limits",
+    "Fenstergrößenbegrenzung konnte nicht festgelegt werden",
+    "Impossible de définir les limites de taille de la fenêtre",
+    "No se pudieron establecer los límites de tamaño de la ventana"
+  ],
+  "无法读取启动项：": [
+    "Could not read startup settings: ",
+    "Autostart-Einstellungen konnten nicht gelesen werden: ",
+    "Impossible de lire les paramètres de démarrage : ",
+    "No se pudieron leer los ajustes de inicio: "
+  ],
+  "无法读取桌面": [
+    "Could not read desktop information",
+    "Desktop-Daten konnten nicht gelesen werden",
+    "Impossible de lire les informations du bureau",
+    "No se pudo leer la información del escritorio"
+  ],
+  "无法读取窗口状态": [
+    "Could not read window state",
+    "Fensterzustand konnte nicht gelesen werden",
+    "Impossible de lire l’état de la fenêtre",
+    "No se pudo leer el estado de la ventana"
+  ],
+  "无法选择截图位图": [
+    "Could not select the capture bitmap",
+    "Aufnahme-Bitmap konnte nicht ausgewählt werden",
+    "Impossible de sélectionner l’image de capture",
+    "No se pudo seleccionar el mapa de bits de captura"
+  ],
+  "无法重启：": [
+    "Could not restart: ",
+    "Neustart fehlgeschlagen: ",
+    "Impossible de redémarrer : ",
+    "No se pudo reiniciar: "
+  ],
+  "显示器未启用": [
+    "Display is disabled",
+    "Bildschirm ist deaktiviert",
+    "Écran désactivé",
+    "Pantalla desactivada"
+  ],
+  "显示屏幕截图": [
+    "Show display previews",
+    "Bildschirmvorschauen anzeigen",
+    "Afficher les aperçus des écrans",
+    "Mostrar vistas previas de pantallas"
+  ],
+  "显示未启用的屏幕": [
+    "Show inactive displays",
+    "Inaktive Bildschirme anzeigen",
+    "Afficher les écrans inactifs",
+    "Mostrar pantallas inactivas"
+  ],
+  "显示窗口截图": [
+    "Show window previews",
+    "Fenstervorschauen anzeigen",
+    "Afficher les aperçus des fenêtres",
+    "Mostrar vistas previas de ventanas"
+  ],
+  "显示配置变化过快，请重试": [
+    "The display configuration is changing. Try again.",
+    "Die Bildschirmkonfiguration ändert sich gerade. Bitte erneut versuchen.",
+    "La configuration des écrans change. Réessayez.",
+    "La configuración de pantallas está cambiando. Inténtalo de nuevo."
+  ],
+  "普通": [
+    "Normal",
+    "Normal",
+    "Normale",
+    "Normal"
+  ],
+  "暂无操作记录": [
+    "No activity yet",
+    "Noch keine Aktivitäten",
+    "Aucune action pour le moment",
+    "Aún no hay acciones"
+  ],
+  "暂无窗口": [
+    "No windows",
+    "Keine Fenster",
+    "Aucune fenêtre",
+    "No hay ventanas"
+  ],
+  "暂无隐藏记录": [
+    "No hidden windows",
+    "Keine ausgeblendeten Fenster",
+    "Aucune fenêtre masquée",
+    "No hay ventanas ocultas"
+  ],
+  "更新包不得包含符号链接": [
+    "Update packages must not contain symbolic links",
+    "Update-Pakete dürfen keine symbolischen Links enthalten",
+    "Les mises à jour ne doivent pas contenir de liens symboliques",
+    "Los paquetes de actualización no deben contener enlaces simbólicos"
+  ],
+  "更新包包含重复路径": [
+    "The update contains duplicate paths",
+    "Das Update enthält doppelte Pfade",
+    "La mise à jour contient des chemins en double",
+    "La actualización contiene rutas duplicadas"
+  ],
+  "更新包展开大小超限": [
+    "The extracted update exceeds the size limit",
+    "Das entpackte Update überschreitet das Größenlimit",
+    "La mise à jour décompressée dépasse la taille autorisée",
+    "La actualización descomprimida supera el límite de tamaño"
+  ],
+  "更新包文件过多": [
+    "Too many files in the update",
+    "Zu viele Dateien im Update",
+    "Trop de fichiers dans la mise à jour",
+    "Demasiados archivos en la actualización"
+  ],
+  "更新包目录结构无效": [
+    "Invalid update folder structure",
+    "Ungültige Update-Ordnerstruktur",
+    "Structure des dossiers de mise à jour invalide",
+    "Estructura de carpetas de actualización no válida"
+  ],
+  "更新包缺少唯一主程序": [
+    "The update must contain exactly one main executable",
+    "Das Update muss genau ein Hauptprogramm enthalten",
+    "La mise à jour doit contenir un seul exécutable principal",
+    "La actualización debe contener un único ejecutable principal"
+  ],
+  "更新包缺少组件：": [
+    "Missing update component: ",
+    "Fehlende Update-Komponente: ",
+    "Composant manquant : ",
+    "Falta un componente de la actualización: "
+  ],
+  "更新完成，但未能重新启动。请手动打开 ScreenMover。\n": [
+    "Update installed, but ScreenMover could not restart. Please open it manually.\n",
+    "Update installiert, aber ScreenMover konnte nicht neu gestartet werden. Bitte manuell öffnen.\n",
+    "Mise à jour installée, mais ScreenMover n’a pas pu redémarrer. Ouvrez-le manuellement.\n",
+    "La actualización se instaló, pero ScreenMover no pudo reiniciarse. Ábrelo manualmente.\n"
+  ],
+  "更新已准备好。": [
+    "The update is ready.",
+    "Das Update ist bereit.",
+    "La mise à jour est prête.",
+    "La actualización está lista."
+  ],
+  "更新已准备好，请修正未保存的设置或等待当前操作结束，再点击安装。": [
+    "The update is ready. Fix any unsaved settings or wait for the current action to finish, then click Install.",
+    "Das Update ist bereit. Ungespeicherte Einstellungen korrigieren oder die laufende Aktion abwarten, dann installieren.",
+    "La mise à jour est prête. Corrigez les paramètres non enregistrés ou attendez la fin de l’action en cours, puis cliquez sur Installer.",
+    "La actualización está lista. Corrige los ajustes pendientes o espera a que termine la acción actual y pulsa Instalar."
+  ],
+  "更新文件不完整": [
+    "The update files are incomplete",
+    "Die Update-Dateien sind unvollständig",
+    "Les fichiers de mise à jour sont incomplets",
+    "Los archivos de actualización están incompletos"
+  ],
+  "更新文件长度无效": [
+    "Invalid update file size",
+    "Ungültige Größe einer Update-Datei",
+    "Taille de fichier de mise à jour invalide",
+    "Tamaño de archivo de actualización no válido"
+  ],
+  "更新未完成。请查看更新结果与备份：\n": [
+    "The update did not complete. Check the result and backup here:\n",
+    "Das Update wurde nicht abgeschlossen. Ergebnis und Sicherung befinden sich hier:\n",
+    "La mise à jour n’a pas abouti. Consultez le résultat et la sauvegarde ici :\n",
+    "La actualización no se completó. Consulta el resultado y la copia de seguridad aquí:\n"
+  ],
+  "更新未完成：": [
+    "Update not completed: ",
+    "Update nicht abgeschlossen: ",
+    "Mise à jour non terminée : ",
+    "Actualización incompleta: "
+  ],
+  "更新渠道已变化，请重新检查。": [
+    "Update channel changed. Check again.",
+    "Update-Kanal geändert. Bitte erneut prüfen.",
+    "Canal de mise à jour modifié. Relancez la recherche.",
+    "Canal de actualización cambiado. Vuelve a comprobarlo."
+  ],
+  "更新组件架构不匹配": [
+    "Update component architecture does not match",
+    "Architektur der Update-Komponente stimmt nicht überein",
+    "L’architecture du composant ne correspond pas",
+    "La arquitectura del componente no coincide"
+  ],
+  "更新说明": [
+    "Release notes",
+    "Versionshinweise",
+    "Notes de version",
+    "Notas de la versión"
+  ],
+  "最大化": [
+    "Maximize",
+    "Maximieren",
+    "Agrandir",
+    "Maximizar"
+  ],
+  "最小化": [
+    "Minimize",
+    "Minimieren",
+    "Réduire",
+    "Minimizar"
+  ],
+  "最小化 · ": [
+    "Minimized · ",
+    "Minimiert · ",
+    "Réduite · ",
+    "Minimizada · "
+  ],
+  "最小化 · 暂无截图": [
+    "Minimized · No preview",
+    "Minimiert · Keine Vorschau",
+    "Réduite · Aucun aperçu",
+    "Minimizada · Sin vista previa"
+  ],
+  "有操作正在进行，请稍后重试": [
+    "An action is in progress. Please wait.",
+    "Eine Aktion läuft. Bitte warten.",
+    "Une action est en cours. Veuillez patienter.",
+    "Hay una acción en curso. Espera un momento."
+  ],
+  "未保存：": [
+    "Not saved: ",
+    "Nicht gespeichert: ",
+    "Non enregistré : ",
+    "No guardado: "
+  ],
+  "未启用": [
+    "Inactive",
+    "Inaktiv",
+    "Inactif",
+    "Inactiva"
+  ],
+  "未完成：": [
+    "Not completed: ",
+    "Nicht abgeschlossen: ",
+    "Non terminé : ",
+    "Sin completar: "
+  ],
+  "未重启：": [
+    "Not restarted: ",
+    "Nicht neu gestartet: ",
+    "Non redémarré : ",
+    "No se reinició: "
+  ],
+  "本地处理窗口与截图，不上传画面，不启用遥测。应用图标采用桌面收纳方案。": [
+    "Windows and previews are handled locally. No image uploads or telemetry.",
+    "Fenster und Vorschauen werden lokal verarbeitet. Keine Bildübertragung oder Telemetrie.",
+    "Les fenêtres et aperçus sont traités localement. Aucune image envoyée, aucune télémétrie.",
+    "Las ventanas y vistas previas se procesan localmente. Sin envío de imágenes ni telemetría."
+  ],
+  "权限不足，请以管理员身份重启": [
+    "Access denied. Restart as administrator.",
+    "Zugriff verweigert. Als Administrator neu starten.",
+    "Accès refusé. Redémarrez en tant qu’administrateur.",
+    "Acceso denegado. Reinicia como administrador."
+  ],
+  "校验通过，正在准备安装文件…": [
+    "Verified. Preparing installation files…",
+    "Geprüft. Installationsdateien werden vorbereitet…",
+    "Vérification réussie. Préparation de l’installation…",
+    "Verificación correcta. Preparando la instalación…"
+  ],
+  "桌面 {0}": [
+    "Desktop {0}",
+    "Desktop {0}",
+    "Bureau {0}",
+    "Escritorio {0}"
+  ],
+  "桌面仍有窗口，已保留": [
+    "The desktop still has windows and was kept",
+    "Der Desktop enthält noch Fenster und bleibt erhalten",
+    "Le bureau contient encore des fenêtres et a été conservé",
+    "El escritorio aún tiene ventanas y se ha conservado"
+  ],
+  "桌面命名未生效": [
+    "The desktop name did not change",
+    "Der Desktopname wurde nicht übernommen",
+    "Le nom du bureau n’a pas été modifié",
+    "El nombre del escritorio no cambió"
+  ],
+  "桌面：{0}": [
+    "Desktop: {0}",
+    "Desktop: {0}",
+    "Bureau : {0}",
+    "Escritorio: {0}"
+  ],
+  "检查失败：": [
+    "Could not check for updates: ",
+    "Updates konnten nicht geprüft werden: ",
+    "Impossible de rechercher les mises à jour : ",
+    "No se pudieron buscar actualizaciones: "
+  ],
+  "检查已取消或请求超时，可重试。": [
+    "Update check cancelled or timed out. You can retry.",
+    "Update-Prüfung abgebrochen oder Zeitlimit erreicht. Erneuter Versuch möglich.",
+    "Recherche annulée ou délai dépassé. Vous pouvez réessayer.",
+    "La búsqueda se canceló o agotó el tiempo de espera. Puedes volver a intentarlo."
+  ],
+  "检查更新": [
+    "Check for updates",
+    "Nach Updates suchen",
+    "Rechercher des mises à jour",
+    "Buscar actualizaciones"
+  ],
+  "检查更新会连接 GitHub，不上传窗口信息。安装时会退出并重启；替换失败会尝试还原旧文件，更新记录与备份保存在数据目录的 updates 文件夹。": [
+    "Checking connects to GitHub without sending window information. Installation closes and restarts ScreenMover. If file replacement fails, it attempts to restore the old files. Update logs and backups are in the data folder under updates.",
+    "Die Suche verbindet sich mit GitHub, ohne Fensterdaten zu übertragen. Die Installation beendet ScreenMover und startet es neu. Bei einem Dateiaustauschfehler wird versucht, die alten Dateien wiederherzustellen. Protokolle und Sicherungen liegen im Datenordner unter updates.",
+    "La recherche contacte GitHub sans envoyer d’informations sur vos fenêtres. L’installation ferme puis relance ScreenMover. En cas d’échec du remplacement, les anciens fichiers sont restaurés si possible. Les journaux et sauvegardes se trouvent dans le sous-dossier updates du dossier de données.",
+    "La búsqueda conecta con GitHub sin enviar información de las ventanas. La instalación cierra y reinicia ScreenMover. Si falla la sustitución de archivos, se intenta restaurar los anteriores. Los registros y copias se guardan en la subcarpeta updates de la carpeta de datos."
+  ],
+  "正在下载并校验更新…": [
+    "Downloading and verifying the update…",
+    "Update wird heruntergeladen und geprüft…",
+    "Téléchargement et vérification de la mise à jour…",
+    "Descargando y verificando la actualización…"
+  ],
+  "正在截图…": [
+    "Capturing…",
+    "Aufnahme läuft…",
+    "Capture en cours…",
+    "Capturando…"
+  ],
+  "正在找回…": [
+    "Recovering window…",
+    "Fenster wird zurückgeholt…",
+    "Récupération de la fenêtre…",
+    "Recuperando ventana…"
+  ],
+  "正在读取 GitHub Releases…": [
+    "Checking GitHub Releases…",
+    "GitHub Releases werden geprüft…",
+    "Recherche sur GitHub Releases…",
+    "Consultando GitHub Releases…"
+  ],
+  "正在隐藏": [
+    "Hiding",
+    "Wird ausgeblendet",
+    "Masquage en cours",
+    "Ocultando"
+  ],
+  "正在隐藏 / 若操作中断可尝试找回": [
+    "Hiding / If interrupted, try recovering the window",
+    "Wird ausgeblendet / Bei Unterbrechung das Fenster zurückholen",
+    "Masquage en cours / En cas d’interruption, essayez de récupérer la fenêtre",
+    "Ocultando / Si se interrumpe, intenta recuperar la ventana"
+  ],
+  "此安装由 Microsoft Store 管理，请通过商店更新。": [
+    "Microsoft Store manages this installation. Update it through the Store.",
+    "Diese Installation wird vom Microsoft Store verwaltet. Bitte dort aktualisieren.",
+    "Cette installation est gérée par le Microsoft Store. Mettez-la à jour depuis le Store.",
+    "Microsoft Store gestiona esta instalación. Actualízala desde la tienda."
+  ],
+  "此屏幕上暂无可管理的窗口": [
+    "No manageable windows on this display",
+    "Keine verwaltbaren Fenster auf diesem Bildschirm",
+    "Aucune fenêtre disponible sur cet écran",
+    "No hay ventanas disponibles en esta pantalla"
+  ],
+  "此显示器未启用，窗口无法移过去。请在系统显示设置中启用。": [
+    "This display is disabled, so windows cannot be moved there. Enable it in Windows Display settings.",
+    "Dieser Bildschirm ist deaktiviert. Fenster können nicht dorthin verschoben werden. In den Windows-Anzeigeeinstellungen aktivieren.",
+    "Cet écran est désactivé ; aucune fenêtre ne peut y être déplacée. Activez-le dans les paramètres d’affichage Windows.",
+    "Esta pantalla está desactivada y no se pueden mover ventanas a ella. Actívala en la configuración de pantalla de Windows."
+  ],
+  "此显示器未启用，请在系统显示设置中启用。": [
+    "This display is disabled. Enable it in Windows Display settings.",
+    "Dieser Bildschirm ist deaktiviert. In den Windows-Anzeigeeinstellungen aktivieren.",
+    "Cet écran est désactivé. Activez-le dans les paramètres d’affichage Windows.",
+    "Esta pantalla está desactivada. Actívala en la configuración de pantalla de Windows."
+  ],
+  "此渠道暂未发布版本。": [
+    "No releases on this channel yet.",
+    "Für diesen Kanal gibt es noch keine Versionen.",
+    "Aucune version n’est encore disponible sur ce canal.",
+    "Aún no hay versiones en este canal."
+  ],
+  "此版本暂无更新说明，请查看发布页。": [
+    "No release notes are available. Please open the release page.",
+    "Keine Versionshinweise verfügbar. Bitte die Release-Seite öffnen.",
+    "Aucune note de version disponible. Consultez la page de publication.",
+    "No hay notas disponibles. Abre la página de versiones."
+  ],
+  "此版本缺少对应架构的下载包或可信 SHA-256，请使用发布页手动更新": [
+    "This release has no matching package or trusted SHA-256. Update manually from the release page.",
+    "Für dieses Release fehlt ein passendes Paket oder eine vertrauenswürdige SHA-256-Prüfsumme. Bitte über die Release-Seite aktualisieren.",
+    "Cette version ne fournit pas de paquet adapté ou de somme SHA-256 fiable. Installez-la depuis la page de publication.",
+    "Esta versión no tiene un paquete compatible o una suma SHA-256 fiable. Instálala desde la página de versiones."
+  ],
+  "此窗口不允许跨虚拟桌面移动": [
+    "This window cannot be moved between virtual desktops",
+    "Dieses Fenster lässt sich nicht zwischen virtuellen Desktops verschieben",
+    "Cette fenêtre ne peut pas être déplacée entre les bureaux virtuels",
+    "Esta ventana no se puede mover entre escritorios virtuales"
+  ],
+  "此窗口已有隐藏记录，请先从「已隐藏」找回": [
+    "This window already has a recovery record. Bring it back from Hidden windows first.",
+    "Für dieses Fenster besteht bereits ein Eintrag. Zuerst unter „Ausgeblendete Fenster“ zurückholen.",
+    "Cette fenêtre a déjà une entrée de récupération. Récupérez-la d’abord dans « Fenêtres masquées ».",
+    "Esta ventana ya tiene un registro de recuperación. Recupérala primero desde «Ventanas ocultas»."
+  ],
+  "此系统尚未适配独立虚拟桌面隐藏；预览、移动、最小化和快捷面板可用": [
+    "Separate-desktop hiding is not supported on this Windows build. Previews, moving, minimizing and the quick panel are available.",
+    "Ausblenden auf einem separaten Desktop wird auf diesem Windows-Build nicht unterstützt. Vorschauen, Verschieben, Minimieren und Schnellzugriff sind verfügbar.",
+    "Le masquage sur un bureau séparé n’est pas pris en charge sur cette version de Windows. Les aperçus, déplacements, réductions et l’accès rapide restent disponibles.",
+    "Esta versión de Windows no admite ocultar en un escritorio independiente. Las vistas previas, los movimientos, la minimización y el panel rápido siguen disponibles."
+  ],
+  "此系统暂不支持隐藏": [
+    "Hiding is not supported on this system",
+    "Ausblenden wird auf diesem System nicht unterstützt",
+    "Le masquage n’est pas pris en charge sur ce système",
+    "Este sistema no admite la ocultación"
+  ],
+  "没有匹配的窗口，试试更短的关键词或「所有屏幕」": [
+    "No matching windows. Try a shorter search or All displays.",
+    "Keine passenden Fenster. Kürzer suchen oder „Alle Bildschirme“ wählen.",
+    "Aucune fenêtre correspondante. Essayez une recherche plus courte ou « Tous les écrans ».",
+    "No hay coincidencias. Prueba una búsqueda más corta o «Todas las pantallas»."
+  ],
+  "没有截图时用软件图标代替": [
+    "Use app icons when previews are unavailable",
+    "App-Symbole bei fehlender Vorschau verwenden",
+    "Utiliser les icônes si les aperçus sont indisponibles",
+    "Usar iconos cuando no haya vista previa"
+  ],
+  "浅色": [
+    "Light",
+    "Hell",
+    "Clair",
+    "Claro"
+  ],
+  "测试窗口还原失败": [
+    "Could not restore the test window",
+    "Testfenster konnte nicht wiederhergestellt werden",
+    "Impossible de restaurer la fenêtre de test",
+    "No se pudo restaurar la ventana de prueba"
+  ],
+  "深色": [
+    "Dark",
+    "Dunkel",
+    "Sombre",
+    "Oscuro"
+  ],
+  "清除快捷键": [
+    "Clear shortcut",
+    "Tastenkombination löschen",
+    "Effacer le raccourci",
+    "Borrar atajo"
+  ],
+  "清除隐藏快捷键": [
+    "Clear hide shortcut",
+    "Ausblenden-Tastenkombination löschen",
+    "Effacer le raccourci de masquage",
+    "Borrar atajo de ocultación"
+  ],
+  "激活": [
+    "Activate",
+    "Aktivieren",
+    "Activer",
+    "Activar"
+  ],
+  "版本与下载": [
+    "Releases and downloads",
+    "Versionen und Downloads",
+    "Versions et téléchargements",
+    "Versiones y descargas"
+  ],
+  "版本号格式无效": [
+    "Invalid version format",
+    "Ungültiges Versionsformat",
+    "Format de version invalide",
+    "Formato de versión no válido"
+  ],
+  "版本号过长": [
+    "Version string is too long",
+    "Versionsangabe ist zu lang",
+    "Le numéro de version est trop long",
+    "El número de versión es demasiado largo"
+  ],
+  "状态已更新": [
+    "State updated",
+    "Zustand aktualisiert",
+    "État mis à jour",
+    "Estado actualizado"
+  ],
+  "状态未改变（权限不足或应用拒绝）": [
+    "State unchanged: access denied or app refused the action",
+    "Zustand unverändert: Zugriff verweigert oder Aktion von der App abgelehnt",
+    "État inchangé : accès refusé ou action rejetée par l’application",
+    "Estado sin cambios: acceso denegado o acción rechazada por la aplicación"
+  ],
+  "独立虚拟桌面隐藏可用": [
+    "Separate-desktop hiding is available",
+    "Ausblenden auf separatem Desktop verfügbar",
+    "Masquage sur un bureau séparé disponible",
+    "Ocultación en escritorio independiente disponible"
+  ],
+  "登录 Windows 后启动到托盘": [
+    "Start in the tray when I sign in to Windows",
+    "Bei der Windows-Anmeldung im Infobereich starten",
+    "Démarrer dans la zone de notification à l’ouverture de session Windows",
+    "Iniciar en la bandeja al iniciar sesión en Windows"
+  ],
+  "登录后驻留需要开启托盘图标": [
+    "Enable the tray icon to start in the tray at sign-in",
+    "Für den Start bei der Anmeldung zuerst das Taskleistensymbol aktivieren",
+    "Activez l’icône de notification pour démarrer en arrière-plan à l’ouverture de session",
+    "Activa el icono de la bandeja para iniciar en segundo plano al iniciar sesión"
+  ],
+  "目标屏幕已断开": [
+    "The target display disconnected",
+    "Zielbildschirm wurde getrennt",
+    "L’écran cible est déconnecté",
+    "La pantalla de destino se desconectó"
+  ],
+  "目标屏幕已断开或未启用": [
+    "The target display is disconnected or disabled",
+    "Zielbildschirm ist getrennt oder deaktiviert",
+    "L’écran cible est déconnecté ou désactivé",
+    "La pantalla de destino está desconectada o desactivada"
+  ],
+  "确认隐藏": [
+    "Verify hiding",
+    "Ausblenden prüfen",
+    "Vérifier le masquage",
+    "Verificar ocultación"
+  ],
+  "移到屏幕 {0}": [
+    "Move to display {0}",
+    "Auf Bildschirm {0} verschieben",
+    "Déplacer vers l’écran {0}",
+    "Mover a la pantalla {0}"
+  ],
+  "移动": [
+    "Move",
+    "Verschieben",
+    "Déplacer",
+    "Mover"
+  ],
+  "移动与提示": [
+    "Moving and notifications",
+    "Verschieben und Meldungen",
+    "Déplacements et notifications",
+    "Movimientos y avisos"
+  ],
+  "移动后的屏幕边缘留白（物理像素）": [
+    "Margin after moving (physical pixels)",
+    "Randabstand nach dem Verschieben (physische Pixel)",
+    "Marge après déplacement (pixels physiques)",
+    "Margen tras mover (píxeles físicos)"
+  ],
+  "移动失败：": [
+    "Move failed: ",
+    "Verschieben fehlgeschlagen: ",
+    "Échec du déplacement : ",
+    "Error al mover: "
+  ],
+  "移动窗口": [
+    "Move window",
+    "Fenster verschieben",
+    "Déplacer la fenêtre",
+    "Mover ventana"
+  ],
+  "移除失效记录": [
+    "Remove stale record",
+    "Veralteten Eintrag entfernen",
+    "Supprimer l’entrée obsolète",
+    "Eliminar registro obsoleto"
+  ],
+  "窗口": [
+    "Windows",
+    "Fenster",
+    "Fenêtres",
+    "Ventanas"
+  ],
+  "窗口与截图": [
+    "Windows and previews",
+    "Fenster und Vorschauen",
+    "Fenêtres et aperçus",
+    "Ventanas y vistas previas"
+  ],
+  "窗口固定在所有桌面上，请先取消固定": [
+    "This window is pinned to all desktops. Unpin it first.",
+    "Dieses Fenster ist auf allen Desktops angeheftet. Zuerst lösen.",
+    "Cette fenêtre est épinglée sur tous les bureaux. Détachez-la d’abord.",
+    "Esta ventana está fijada en todos los escritorios. Desfíjala primero."
+  ],
+  "窗口已关闭或不属于可管理的软件窗口": [
+    "The window is closed or cannot be managed",
+    "Das Fenster ist geschlossen oder lässt sich nicht verwalten",
+    "La fenêtre est fermée ou ne peut pas être gérée",
+    "La ventana está cerrada o no se puede gestionar"
+  ],
+  "窗口已关闭或已不在当前虚拟桌面": [
+    "The window closed or is no longer on the current desktop",
+    "Das Fenster wurde geschlossen oder befindet sich nicht mehr auf dem aktuellen Desktop",
+    "La fenêtre est fermée ou n’est plus sur le bureau actuel",
+    "La ventana se cerró o ya no está en el escritorio actual"
+  ],
+  "窗口已关闭或已被替换": [
+    "The window was closed or replaced",
+    "Das Fenster wurde geschlossen oder ersetzt",
+    "La fenêtre a été fermée ou remplacée",
+    "La ventana se cerró o fue sustituida"
+  ],
+  "窗口已移回当前桌面，但应用未确认还原状态，请重试": [
+    "The window is back on the current desktop, but the app did not confirm restoration. Try again.",
+    "Das Fenster ist wieder auf dem aktuellen Desktop, aber die App hat die Wiederherstellung nicht bestätigt. Bitte erneut versuchen.",
+    "La fenêtre est revenue sur le bureau actuel, mais l’application n’a pas confirmé sa restauration. Réessayez.",
+    "La ventana volvió al escritorio actual, pero la aplicación no confirmó su restauración. Inténtalo de nuevo."
+  ],
+  "窗口所在屏幕": [
+    "Source display",
+    "Quellbildschirm",
+    "Écran d’origine",
+    "Pantalla de origen"
+  ],
+  "窗口未回到当前桌面": [
+    "The window did not return to the current desktop",
+    "Das Fenster ist nicht zum aktuellen Desktop zurückgekehrt",
+    "La fenêtre n’est pas revenue sur le bureau actuel",
+    "La ventana no volvió al escritorio actual"
+  ],
+  "窗口未落到目标屏幕（应用拒绝或权限不足）": [
+    "The window did not reach the target display: app refusal or insufficient permissions",
+    "Das Fenster erreichte den Zielbildschirm nicht: App hat abgelehnt oder Berechtigungen fehlen",
+    "La fenêtre n’a pas atteint l’écran cible : refus de l’application ou droits insuffisants",
+    "La ventana no llegó a la pantalla de destino: la aplicación lo rechazó o faltan permisos"
+  ],
+  "窗口未进入新桌面": [
+    "The window did not move to the new desktop",
+    "Das Fenster wurde nicht auf den neuen Desktop verschoben",
+    "La fenêtre n’a pas été déplacée sur le nouveau bureau",
+    "La ventana no se movió al nuevo escritorio"
+  ],
+  "窗口过大时按比例缩小至目标工作区": [
+    "Scale oversized windows to fit the target work area",
+    "Zu große Fenster proportional an den Zielarbeitsbereich anpassen",
+    "Redimensionner les fenêtres trop grandes pour l’espace disponible",
+    "Reducir proporcionalmente las ventanas que no quepan en el área de destino"
+  ],
+  "窗口顺序已保存，刷新和重新打开 ScreenMover 后保持顺序": [
+    "Window order saved. It will be kept after refresh and restart.",
+    "Fensterreihenfolge gespeichert. Sie bleibt nach Aktualisierung und Neustart erhalten.",
+    "Ordre des fenêtres enregistré. Il sera conservé après actualisation et redémarrage.",
+    "Orden guardado. Se mantendrá al actualizar y reiniciar."
+  ],
+  "窗口预览已关闭": [
+    "Window previews are off",
+    "Fenstervorschauen sind aus",
+    "Aperçus des fenêtres désactivés",
+    "Vistas previas de ventanas desactivadas"
+  ],
+  "立即安装并重启": [
+    "Install and restart now",
+    "Jetzt installieren und neu starten",
+    "Installer et redémarrer",
+    "Instalar y reiniciar ahora"
+  ],
+  "立即重启": [
+    "Restart now",
+    "Jetzt neu starten",
+    "Redémarrer maintenant",
+    "Reiniciar ahora"
+  ],
+  "等待自动截图": [
+    "Waiting for a snapshot",
+    "Warten auf Vorschaubild",
+    "En attente d’une capture",
+    "Esperando captura"
+  ],
+  "简体中文": [
+    "简体中文",
+    "简体中文",
+    "简体中文",
+    "简体中文"
+  ],
+  "系统正在使用的显示器": [
+    "Active displays",
+    "Aktive Bildschirme",
+    "Écrans actifs",
+    "Pantallas activas"
+  ],
+  "系统正在使用的显示器 · {0}": [
+    "Active displays · {0}",
+    "Aktive Bildschirme · {0}",
+    "Écrans actifs · {0}",
+    "Pantallas activas · {0}"
+  ],
+  "系统限制了前台切换，请点击任务栏窗口": [
+    "Windows blocked the focus change. Click the window on the taskbar.",
+    "Windows hat den Fokuswechsel blockiert. Das Fenster in der Taskleiste anklicken.",
+    "Windows a bloqué le changement de fenêtre active. Cliquez sur la fenêtre dans la barre des tâches.",
+    "Windows bloqueó el cambio de ventana activa. Haz clic en ella en la barra de tareas."
+  ],
+  "纯色": [
+    "Solid color",
+    "Einfarbig",
+    "Couleur unie",
+    "Color sólido"
+  ],
+  "缺少有效设置内容": [
+    "No valid settings found",
+    "Keine gültigen Einstellungen gefunden",
+    "Aucun paramètre valide trouvé",
+    "No se encontraron ajustes válidos"
+  ],
+  "自定义颜色": [
+    "Custom color",
+    "Eigene Farbe",
+    "Couleur personnalisée",
+    "Color personalizado"
+  ],
+  "自由搭配": [
+    "Build your own",
+    "Selbst zusammenstellen",
+    "Combinaison personnalisée",
+    "Crea tu combinación"
+  ],
+  "虚拟 / 间接显示器": [
+    "Virtual / indirect display",
+    "Virtueller / indirekter Bildschirm",
+    "Écran virtuel / indirect",
+    "Pantalla virtual / indirecta"
+  ],
+  "记事本": [
+    "Notepad",
+    "Editor",
+    "Bloc-notes",
+    "Bloc de notas"
+  ],
+  "记住软件窗口尺寸": [
+    "Remember the window size",
+    "Fenstergröße merken",
+    "Mémoriser la taille de la fenêtre",
+    "Recordar el tamaño de la ventana"
+  ],
+  "设置": [
+    "Settings",
+    "Einstellungen",
+    "Paramètres",
+    "Ajustes"
+  ],
+  "设置为空": [
+    "Settings are empty",
+    "Einstellungen sind leer",
+    "Les paramètres sont vides",
+    "Los ajustes están vacíos"
+  ],
+  "设置备份与诊断": [
+    "Settings backup and diagnostics",
+    "Einstellungssicherung und Diagnose",
+    "Sauvegarde des paramètres et diagnostic",
+    "Copia de ajustes y diagnóstico"
+  ],
+  "设置文件必须是 JSON 对象": [
+    "The settings file must be a JSON object",
+    "Die Einstellungsdatei muss ein JSON-Objekt enthalten",
+    "Le fichier de paramètres doit être un objet JSON",
+    "El archivo de ajustes debe ser un objeto JSON"
+  ],
+  "设置文件超过 256 KB": [
+    "The settings file exceeds 256 KB",
+    "Die Einstellungsdatei ist größer als 256 KB",
+    "Le fichier de paramètres dépasse 256 Ko",
+    "El archivo de ajustes supera los 256 KB"
+  ],
+  "设置格式或版本不受支持": [
+    "Unsupported settings format or version",
+    "Einstellungsformat oder Version nicht unterstützt",
+    "Format ou version des paramètres non pris en charge",
+    "Formato o versión de ajustes no compatible"
+  ],
+  "诊断包": [
+    "Diagnostics",
+    "Diagnose",
+    "Diagnostic",
+    "Diagnóstico"
+  ],
+  "诊断包已生成": [
+    "Diagnostic package created",
+    "Diagnosepaket erstellt",
+    "Archive de diagnostic créée",
+    "Paquete de diagnóstico creado"
+  ],
+  "该快捷键已被占用或被系统保留，请换一个组合": [
+    "This shortcut is already in use or reserved by Windows. Choose another combination.",
+    "Diese Tastenkombination ist belegt oder von Windows reserviert. Bitte eine andere wählen.",
+    "Ce raccourci est déjà utilisé ou réservé par Windows. Choisissez une autre combinaison.",
+    "Este atajo ya está en uso o está reservado por Windows. Elige otra combinación."
+  ],
+  "该组合为 Windows 保留快捷键": [
+    "This shortcut is reserved by Windows",
+    "Diese Tastenkombination ist für Windows reserviert",
+    "Ce raccourci est réservé par Windows",
+    "Este atajo está reservado por Windows"
+  ],
+  "语言": [
+    "Language",
+    "Sprache",
+    "Langue",
+    "Idioma"
+  ],
+  "请先修正无效设置": [
+    "Fix invalid settings first",
+    "Zuerst ungültige Einstellungen korrigieren",
+    "Corrigez d’abord les paramètres invalides",
+    "Corrige primero los ajustes no válidos"
+  ],
+  "请输入有效数字": [
+    "Enter a valid number",
+    "Eine gültige Zahl eingeben",
+    "Saisissez un nombre valide",
+    "Introduce un número válido"
+  ],
+  "请选择字母、数字、功能键或方向键；F12 为系统保留键": [
+    "Choose a letter, number, function key or arrow key. F12 is reserved by Windows.",
+    "Buchstaben, Zahl, Funktions- oder Pfeiltaste wählen. F12 ist für Windows reserviert.",
+    "Choisissez une lettre, un chiffre, une touche de fonction ou une flèche. F12 est réservée par Windows.",
+    "Elige una letra, número, tecla de función o flecha. F12 está reservada por Windows."
+  ],
+  "读取隐藏记录失败：": [
+    "Could not read recovery records: ",
+    "Wiederherstellungseinträge konnten nicht gelesen werden: ",
+    "Impossible de lire les entrées de récupération : ",
+    "No se pudieron leer los registros de recuperación: "
+  ],
+  "跟随系统": [
+    "Use system setting",
+    "Systemeinstellung",
+    "Selon le système",
+    "Usar ajuste del sistema"
+  ],
+  "跟随系统语言": [
+    "Use system language",
+    "Systemsprache",
+    "Langue du système",
+    "Idioma del sistema"
+  ],
+  "软件更新": [
+    "Software updates",
+    "Softwareupdates",
+    "Mises à jour",
+    "Actualizaciones"
+  ],
+  "返回": [
+    "Back",
+    "Zurück",
+    "Retour",
+    "Volver"
+  ],
+  "返回主界面": [
+    "Back to main window",
+    "Zurück zum Hauptfenster",
+    "Retour à la fenêtre principale",
+    "Volver a la ventana principal"
+  ],
+  "还原": [
+    "Restore",
+    "Wiederherstellen",
+    "Restaurer",
+    "Restaurar"
+  ],
+  "还原超时或权限不足": [
+    "Restore timed out or access was denied",
+    "Zeitüberschreitung oder fehlende Berechtigung beim Wiederherstellen",
+    "Délai dépassé ou accès refusé lors de la restauration",
+    "La restauración agotó el tiempo de espera o se denegó el acceso"
+  ],
+  "进程已重启，未操作窗口": [
+    "The process restarted. The window was left untouched.",
+    "Der Prozess wurde neu gestartet. Das Fenster blieb unverändert.",
+    "Le processus a redémarré. La fenêtre n’a pas été modifiée.",
+    "El proceso se reinició. No se modificó la ventana."
+  ],
+  "退出 ScreenMover": [
+    "Quit ScreenMover",
+    "ScreenMover beenden",
+    "Quitter ScreenMover",
+    "Salir de ScreenMover"
+  ],
+  "选择快捷键": [
+    "Choose shortcut",
+    "Tastenkombination auswählen",
+    "Choisir un raccourci",
+    "Elegir atajo"
+  ],
+  "选择预设或自由组合": [
+    "Choose a preset or create a shortcut",
+    "Vorlage wählen oder Tastenkombination erstellen",
+    "Choisir un préréglage ou créer un raccourci",
+    "Elegir una combinación o crear un atajo"
+  ],
+  "部分设置无效，已保留上次有效值": [
+    "Some settings were invalid. Previous valid values were kept.",
+    "Einige Einstellungen waren ungültig. Die letzten gültigen Werte bleiben erhalten.",
+    "Certains paramètres étaient invalides. Les anciennes valeurs valides ont été conservées.",
+    "Algunos ajustes no eran válidos. Se conservaron los valores anteriores."
+  ],
+  "重启 ScreenMover 后应用新语言": [
+    "Restart ScreenMover to apply the new language",
+    "ScreenMover neu starten, um die Sprache zu ändern",
+    "Redémarrez ScreenMover pour appliquer la langue",
+    "Reinicia ScreenMover para aplicar el idioma"
+  ],
+  "重新激活 ScreenMover 时自动刷新": [
+    "Refresh when ScreenMover becomes active",
+    "Beim Aktivieren von ScreenMover aktualisieren",
+    "Actualiser à l’activation de ScreenMover",
+    "Actualizar al activar ScreenMover"
+  ],
+  "隐藏到新桌面": [
+    "Hide on a new desktop",
+    "Auf neuem Desktop ausblenden",
+    "Masquer sur un nouveau bureau",
+    "Ocultar en un escritorio nuevo"
+  ],
+  "隐藏快捷键未启用：": [
+    "Hide shortcut is disabled: ",
+    "Ausblenden-Tastenkombination deaktiviert: ",
+    "Raccourci de masquage désactivé : ",
+    "Atajo de ocultación desactivado: "
+  ],
+  "隐藏模式当前支持 Windows 11 24H2/25H2；此系统版本尚未适配": [
+    "Hiding currently supports Windows 11 24H2/25H2. This Windows build is not supported yet.",
+    "Ausblenden unterstützt derzeit Windows 11 24H2/25H2. Dieser Windows-Build wird noch nicht unterstützt.",
+    "Le masquage prend actuellement en charge Windows 11 24H2/25H2. Cette version de Windows n’est pas encore compatible.",
+    "La ocultación admite Windows 11 24H2/25H2. Esta versión de Windows aún no es compatible."
+  ],
+  "预览已关闭": [
+    "Previews are off",
+    "Vorschauen sind aus",
+    "Aperçus désactivés",
+    "Vistas previas desactivadas"
+  ],
+  "预览版本号格式无效": [
+    "Invalid preview version format",
+    "Ungültiges Vorabversionsformat",
+    "Format de préversion invalide",
+    "Formato de versión preliminar no válido"
+  ],
+  "；已保留上次有效设置": [
+    "; previous valid settings kept",
+    "; letzte gültige Einstellungen beibehalten",
+    " ; anciens paramètres valides conservés",
+    "; se conservan los ajustes anteriores"
+  ],
+  "；已备份至 ": [
+    "; backed up to ",
+    "; gesichert unter ",
+    " ; sauvegardé dans ",
+    "; copia guardada en "
+  ],
+  "；恢复失败：": [
+    "; recovery failed: ",
+    "; Wiederherstellung fehlgeschlagen: ",
+    " ; échec de la récupération : ",
+    "; error de recuperación: "
+  ],
+  "；恢复记录已保留": [
+    "; recovery record kept",
+    "; Wiederherstellungseintrag beibehalten",
+    " ; entrée de récupération conservée",
+    "; registro de recuperación conservado"
+  ],
+  "；记录保留，可重试": [
+    "; record kept, you can retry",
+    "; Eintrag bleibt erhalten, erneuter Versuch möglich",
+    " ; entrée conservée, vous pouvez réessayer",
+    "; registro conservado, puedes volver a intentarlo"
+  ],
+  "；请查看已隐藏记录或任务视图": [
+    "; check Hidden windows or Task View",
+    "; ausgeblendete Fenster oder Taskansicht prüfen",
+    " ; consultez les fenêtres masquées ou la vue des tâches",
+    "; comprueba las ventanas ocultas o la Vista de tareas"
+  ]
+}

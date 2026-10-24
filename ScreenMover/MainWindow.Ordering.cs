@@ -34,7 +34,7 @@ public sealed partial class MainWindow {
         var p=Root.TransformToVisual(DragLayer).TransformPoint(new(slot.After?r.Right:r.Left,r.Top));
         Canvas.SetLeft(InsertionMark,p.X);Canvas.SetTop(InsertionMark,p.Y);
         InsertionMark.Width=3;InsertionMark.Height=r.Height;InsertionMark.Visibility=Visibility.Visible;
-        GhostText.Text=$"排序：放到「{WindowTitle.Middle(slot.Window.Title,20)}」{(slot.After?"之后":"之前")}";
+        GhostText.Text=L.F("排序：放到「{0}」{1}", WindowTitle.Middle(slot.Window.Title,20), (slot.After?L.T("之后"):L.T("之前")));
         cursorHost.SetDragCursor(true,true);
     }
     void AutoScrollWindows(Point point){
@@ -51,8 +51,8 @@ public sealed partial class MainWindow {
                 windowRevision.Invalidate();UpdateWindows();
                 var keys=items.Select(w=>w.OrderKey).ToHashSet();
                 foreach(var w in WindowsList.Items.OfType<WindowInfo>().Where(w=>keys.Contains(w.OrderKey)))if(!WindowsList.SelectedItems.Contains(w))WindowsList.SelectedItems.Add(w);
-                MarkSelection();Notice("窗口顺序已保存，刷新和重新打开 ScreenMover 后保持顺序");
+                MarkSelection();Notice(L.T("窗口顺序已保存，刷新和重新打开 ScreenMover 后保持顺序"));
             }
-        }catch(Exception ex){Notice("排序未保存："+ex.Message);}
+        }catch(Exception ex){Notice(L.T("排序未保存：")+ex.Message);}
     }
 }

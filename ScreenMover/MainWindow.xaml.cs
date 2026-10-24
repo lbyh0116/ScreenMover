@@ -38,6 +38,8 @@ readonly bool admin=new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(
 public MainWindow() {
 string? settingsWarning=null;
 try{settings=LocalData.Read(AppSettings.FilePath,()=>new AppSettings(),out settingsWarning);settings.Normalize();}catch(Exception ex){settingsWarning=ex.Message;}
+Localization.Initialize(settings.Language);
+try{Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride=Localization.Code;}catch{}
 Views.Appearance.InitializeResources();
 InitializeComponent();dragFeedback=new(Root,DragLayer,Ghost,GhostImage,GhostCount);Content=null;cursorHost.Children.Add(Shell);Content=cursorHost;
 var hwnd=WinRT.Interop.WindowNative.GetWindowHandle(this);
@@ -53,7 +55,7 @@ var appIcon=Path.Combine(AppContext.BaseDirectory,"Assets","AppIcon.ico");if(Fil
 cursorHost.ActualThemeChanged+=(_,_)=>{if(closed)return;Views.Appearance.Apply(settings.AccentColor,appearanceSettings,cursorHost.ActualTheme);UpdateCaptionTheme();Views.WindowMaterial.Apply(this,cursorHost);};
 appearanceSettings.ColorValuesChanged+=SystemColorsChanged;
 initialized=true;ApplySettings();Views.WindowMaterial.Apply(this,cursorHost);
-try{events=new(WinRT.Interop.WindowNative.GetWindowHandle(this));}catch(Exception ex){settingsWarning=(settingsWarning==null?"":settingsWarning+"\n")+"事件监听不可用，已改为定时刷新："+ex.Message;}
+try{events=new(WinRT.Interop.WindowNative.GetWindowHandle(this));}catch(Exception ex){settingsWarning=(settingsWarning==null?"":settingsWarning+"\n")+L.T("事件监听不可用，已改为定时刷新：")+ex.Message;}
 try {history.AddRange(OperationLog.ReadTail(historyPath));}catch{}
 Root.Loaded+=async(_,_)=>{SetLayout();Views.Motion.Enter(Root,0,8);await RefreshWithPreviews();if(settingsWarning!=null)Notice(settingsWarning);if(hidden.LoadWarning!=null)Notice(hidden.LoadWarning);};
 Root.SizeChanged+=(_,_)=>SetLayout();
@@ -93,7 +95,7 @@ return (ds,ws,icons,returned);
 foreach(var pair in data.Item3)iconCache[pair.Key]=Bitmap(pair.Value);
 foreach(var old in iconCache.Keys.Where(k=>!data.Item2.Any(w=>w.OrderKey==k)).ToList())iconCache.Remove(old);
 foreach(var w in data.Item2)w.SetIcon(iconCache.GetValueOrDefault(w.OrderKey),settings.IconFallback);
-if(data.returned.Count>0)Notice($"已检测到 {data.returned.Count} 个窗口不再位于隐藏桌面，已更新记录");
+if(data.returned.Count>0)Notice(L.F("已检测到 {0} 个窗口不再位于隐藏桌面，已更新记录", data.returned.Count));
 hiddenRecordsChanged?.Invoke();tray?.RefreshTip();
 snapshot=data.Item1;allWindows=data.Item2;
 string signature=string.Join("|",snapshot.Displays.Select(d=>$"{d.Key},{d.Gdi},{d.Details},{d.Primary}"));
@@ -111,7 +113,7 @@ stack.Children.Add(new Border{Child=preview,Background=new SolidColorBrush(Color
 stack.Children.Add(new TextBlock{Text=$"{d.Name}\n{d.Bounds.Width} × {d.Bounds.Height} · {d.Hertz:0.##} Hz",FontSize=11,TextTrimming=TextTrimming.CharacterEllipsis,Opacity=.8});
 stack.Children.Add(label);monitorPreviews[d.Key]=(preview,label);
 ToolTipService.SetToolTip(stack,d.Details);
-}else {stack.Children.Add(new Border{Height=90,Child=new TextBlock{Text="未启用",HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center,Opacity=.5}});stack.Children.Add(new TextBlock{Text=d.Name+"\n系统编号：未分配",TextWrapping=TextWrapping.Wrap,TextTrimming=TextTrimming.CharacterEllipsis,MaxLines=2,FontSize=11});}
+}else {stack.Children.Add(new Border{Height=90,Child=new TextBlock{Text=L.T("未启用"),HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center,Opacity=.5}});stack.Children.Add(new TextBlock{Text=d.Name+L.T("\n系统编号：未分配"),TextWrapping=TextWrapping.Wrap,TextTrimming=TextTrimming.CharacterEllipsis,MaxLines=2,FontSize=11});}
 var border=new Border{Child=stack,Padding=new Thickness(10),CornerRadius=new CornerRadius(8),BorderThickness=new Thickness(0),Tag=d,Opacity=d.Active?1:.65};
 if(!d.Active) {
 var dash=new Microsoft.UI.Xaml.Shapes.Rectangle{Stroke=new SolidColorBrush(Colors.Gray),StrokeDashArray=new DoubleCollection{4,3},StrokeThickness=1,RadiusX=8,RadiusY=8,IsHitTestVisible=false};
@@ -119,19 +121,19 @@ var grid=new Grid();border.BorderThickness=new Thickness(0);grid.Children.Add(bo
 }else MonitorTiles.Items.Add(border);
 }
 MonitorTiles.SelectedItem=MonitorTiles.Items.OfType<FrameworkElement>().FirstOrDefault(b=>(b.Tag as DisplayInfo)?.Key==selected?.Key);
-MonitorHeading.Text=$"系统正在使用的显示器 · {snapshot.DesktopCount}";
+MonitorHeading.Text=L.F("系统正在使用的显示器 · {0}", snapshot.DesktopCount);
 RebuildButtons();UpdateMonitorDensity();
 }
 UpdateWindows();
-} catch(Exception ex) {Notice("刷新失败："+ex.Message);}
+} catch(Exception ex) {Notice(L.T("刷新失败：")+ex.Message);}
 finally {refreshing=false;if(pendingPreview&&!closed){pendingPreview=false;_ = UpdatePreviews();}}
 }
 void UpdateWindows() {
 var items=order.Sort(WindowQuery.Filter(allWindows,selected?.Gdi,SearchBox.Text,AllScreens.IsChecked==true));
 foreach(var w in items){
-if(!settings.WindowPreviews)w.SetPreview(null,"窗口预览已关闭");
-else if(windowPreviews.TryGetValue(w.OrderKey,out var cached))w.SetPreview(cached.image,w.ShowCommand is 2 or 7?"最小化 · "+cached.caption:cached.caption);
-else w.SetPreview(null,w.ShowCommand is 2 or 7?"最小化 · 暂无截图":"等待自动截图");
+if(!settings.WindowPreviews)w.SetPreview(null,L.T("窗口预览已关闭"));
+else if(windowPreviews.TryGetValue(w.OrderKey,out var cached))w.SetPreview(cached.image,w.ShowCommand is 2 or 7?L.T("最小化 · ")+cached.caption:cached.caption);
+else w.SetPreview(null,w.ShowCommand is 2 or 7?L.T("最小化 · 暂无截图"):L.T("等待自动截图"));
 }
 var currentKeys=allWindows.Select(w=>w.OrderKey).ToHashSet();
 foreach(var key in windowPreviews.Keys.Where(k=>!currentKeys.Contains(k)).ToList())windowPreviews.Remove(key);
@@ -142,15 +144,15 @@ WindowsList.ItemsSource=items;
 DispatcherQueue.TryEnqueue(UpdateGalleryWidth);
 foreach(var w in items.Where(w=>chosen.Contains(w.OrderKey)))WindowsList.SelectedItems.Add(w);
 }
-EmptyState.Text=SearchBox.Text.Length>0?"没有匹配的窗口，试试更短的关键词或「所有屏幕」":"此屏幕上暂无可管理的窗口";
+EmptyState.Text=SearchBox.Text.Length>0?L.T("没有匹配的窗口，试试更短的关键词或「所有屏幕」"):L.T("此屏幕上暂无可管理的窗口");
 EmptyState.Visibility=items.Count==0?Visibility.Visible:Visibility.Collapsed;
-WindowHeading.Text=(AllScreens.IsChecked==true?"所有屏幕":selected==null?"窗口":$"屏幕 {selected.Number} 上的窗口")+$" · {items.Count}";
+WindowHeading.Text=(AllScreens.IsChecked==true?L.T("所有屏幕"):selected==null?L.T("窗口"):L.F("屏幕 {0} 上的窗口", selected.Number))+$" · {items.Count}";
 UpdateStatus();
 }
 void RebuildButtons() {
 MoveButtons.Children.Clear();
 foreach(var d in snapshot?.Displays.Where(d=>d.Active)??[]) {
-var b=new Button{Content=(d.Key==selected?.Key&&AllScreens.IsChecked!=true?"当前屏幕：":"→ ")+$"屏幕 {d.Number}"+(d.Primary?" · 主屏":""),Tag=d};
+var b=new Button{Content=(d.Key==selected?.Key&&AllScreens.IsChecked!=true?L.T("当前屏幕："):"→ ")+L.F("屏幕 {0}", d.Number)+(d.Primary?L.T(" · 主屏"):""),Tag=d};
 b.Click+=async(_,_)=>await MoveSelected(d);MoveButtons.Children.Add(b);
 }
 UpdateStatus();
@@ -158,14 +160,14 @@ UpdateStatus();
 void UpdateStatus() {
 if(!initialized||closed)return;
 int count=WindowsList.SelectedItems.Count;
-UndoButton.IsEnabled=moves.Count>0&&!busy;UndoButton.Content=moves.Count>0?$"撤销移动 · {moves.Count}":"撤销移动";HiddenButton.Content=$"已隐藏 · {hidden.ActiveCount}";SettingsButton.IsEnabled=HiddenButton.IsEnabled=!busy;
-SelectionStatus.Text=count>0?$"已选 {count} 个窗口":"";
+UndoButton.IsEnabled=moves.Count>0&&!busy;UndoButton.Content=moves.Count>0?L.F("撤销移动 · {0}", moves.Count):L.T("撤销移动");HiddenButton.Content=L.F("已隐藏 · {0}", hidden.ActiveCount);SettingsButton.IsEnabled=HiddenButton.IsEnabled=!busy;
+SelectionStatus.Text=count>0?L.F("已选 {0} 个窗口", count):"";
 MinButton.IsEnabled=RestoreButton.IsEnabled=MaxButton.IsEnabled=count>0&&!busy;HideButton.IsEnabled=count>0&&!busy&&PlatformSupport.Current.CanHide;ToolTipService.SetToolTip(HideButton,PlatformSupport.Current.HideStatus);
 foreach(var b in MoveButtons.Children.OfType<Button>())b.IsEnabled=count>0&&!busy&&(AllScreens.IsChecked==true||(b.Tag as DisplayInfo)?.Key!=selected?.Key);
 }
 async void MonitorSelectionChanged(object sender,SelectionChangedEventArgs e) {
 if((MonitorTiles.SelectedItem as FrameworkElement)?.Tag is DisplayInfo d){
-if(!d.Active){MonitorTiles.SelectedItem=MonitorTiles.Items.OfType<FrameworkElement>().FirstOrDefault(x=>(x.Tag as DisplayInfo)?.Key==selected?.Key);Notice("此显示器未启用，请在系统显示设置中启用。");return;}
+if(!d.Active){MonitorTiles.SelectedItem=MonitorTiles.Items.OfType<FrameworkElement>().FirstOrDefault(x=>(x.Tag as DisplayInfo)?.Key==selected?.Key);Notice(L.T("此显示器未启用，请在系统显示设置中启用。"));return;}
 selected=d;if(allWindows.Count>PreviewPolicy.MaximumWindows)refreshRequested=true;windowRevision.Invalidate();UpdateWindows();Views.Motion.Enter(WindowsList,0,8);RebuildButtons();UpdateMonitorDensity();
 }
 await Task.CompletedTask;
@@ -175,20 +177,20 @@ async void RefreshClicked(object sender,RoutedEventArgs e){await RefreshWithPrev
 async void MinClicked(object sender,RoutedEventArgs e)=>await Change(2);
 async void RestoreClicked(object sender,RoutedEventArgs e)=>await Change(9);
 async void MaxClicked(object sender,RoutedEventArgs e)=>await Change(3);
-async Task Change(int cmd)=>await Operate(WindowsList.SelectedItems.Cast<WindowInfo>().ToList(),w=>windows.ChangeState(w,cmd),"修改状态");
+async Task Change(int cmd)=>await Operate(WindowsList.SelectedItems.Cast<WindowInfo>().ToList(),w=>windows.ChangeState(w,cmd),L.T("修改状态"));
 async Task MoveSelected(DisplayInfo d)=>await MoveBatch(WindowsList.SelectedItems.Cast<WindowInfo>().ToList(),d);
 async Task Operate(List<WindowInfo> list,Func<WindowInfo,OperationResult> action,string verb) {
 if(busy||list.Count==0)return;
 busy=true;UpdateStatus();
 try {
 var result=await Task.Run(()=>list.Select(action).ToList());
-Notice($"{verb} {list.Count} 个窗口：成功 {result.Count(r=>r.Success)}，失败 {result.Count(r=>!r.Success)}"+
+Notice(L.F("{0} {1} 个窗口：成功 {2}，失败 {3}", verb, list.Count, result.Count(r=>r.Success), result.Count(r=>!r.Success))+
 string.Concat(result.Select(r=>$"\n{r.Title}：{r.Message}")));
-} catch(Exception ex){Notice("操作失败："+ex.Message);}
+} catch(Exception ex){Notice(L.T("操作失败：")+ex.Message);}
 finally{busy=false;await Refresh();UpdateStatus();}
 }
 async void WindowDoubleTapped(object sender,DoubleTappedRoutedEventArgs e) {
-var item=FindWindow(e.OriginalSource as DependencyObject);if(item!=null)await Operate([item],windows.Activate,"激活");
+var item=FindWindow(e.OriginalSource as DependencyObject);if(item!=null)await Operate([item],windows.Activate,L.T("激活"));
 }
 static WindowInfo? FindWindow(DependencyObject? source) {
 while(source!=null){if(source is FrameworkElement f&&f.DataContext is WindowInfo w)return w;source=VisualTreeHelper.GetParent(source);}return null;
@@ -236,7 +238,7 @@ if(wasDrag) {
 e.Handled=true;
 if(target!=null&&DropIntent.For(target,list,false).Action==DropAction.Move)await MoveBatch(list,target);
 else if(insertion.Window!=null)Reorder(list,insertion.Window,insertion.After);
-else {RestoreSelection(previousSelection);if(target is {Active:false})Notice("此显示器未启用，窗口无法移过去。请在系统显示设置中启用。");}
+else {RestoreSelection(previousSelection);if(target is {Active:false})Notice(L.T("此显示器未启用，窗口无法移过去。请在系统显示设置中启用。"));}
 } else {
 bool ctrl=(InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control)&CoreVirtualKeyStates.Down)!=0;
 bool shift=(InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift)&CoreVirtualKeyStates.Down)!=0;
@@ -244,7 +246,7 @@ if(shift&&previousSelection.Count>0) {
 int a=WindowsList.Items.IndexOf(previousSelection.Last()),b=WindowsList.Items.IndexOf(item);
 if(a>=0&&b>=0) for(int i=Math.Min(a,b);i<=Math.Max(a,b);i++)if(!WindowsList.SelectedItems.Contains(WindowsList.Items[i]))WindowsList.SelectedItems.Add(WindowsList.Items[i]);
 }else if(ctrl){if(previousSelection.Contains(item))WindowsList.SelectedItems.Remove(item);else if(!WindowsList.SelectedItems.Contains(item))WindowsList.SelectedItems.Add(item);}
-else {WindowsList.SelectedItems.Clear();WindowsList.SelectedItems.Add(item); if(lastClickHandle==item.Handle&&Environment.TickCount64-lastClickTime<500){lastClickHandle=0;await Operate([item],windows.Activate,"激活");}else{lastClickHandle=item.Handle;lastClickTime=Environment.TickCount64;}}
+else {WindowsList.SelectedItems.Clear();WindowsList.SelectedItems.Add(item); if(lastClickHandle==item.Handle&&Environment.TickCount64-lastClickTime<500){lastClickHandle=0;await Operate([item],windows.Activate,L.T("激活"));}else{lastClickHandle=item.Handle;lastClickTime=Environment.TickCount64;}}
 }
 }
 void RestoreSelection(IEnumerable<WindowInfo>? selection=null){WindowsList.SelectedItems.Clear();foreach(var w in selection??initialSelection)if(WindowsList.Items.Contains(w))WindowsList.SelectedItems.Add(w);}
@@ -257,10 +259,10 @@ using var stream=image.PixelBuffer.AsStream();stream.Write(frame.Pixels);image.I
 }
 async Task UpdatePreviews() {
 if(closed||snapshot==null)return;
-if(!settings.ScreenPreviews&&!settings.WindowPreviews){lastSnapshot=DateTime.Now;RefreshTime.Text="预览已关闭";return;}
+if(!settings.ScreenPreviews&&!settings.WindowPreviews){lastSnapshot=DateTime.Now;RefreshTime.Text=L.T("预览已关闭");return;}
 if(previewing){previewCancellation?.Cancel();pendingPreview=true;return;}
 previewing=true;previewCancellation=new();var token=previewCancellation.Token;
-lastSnapshot=DateTime.Now;RefreshTime.Text="正在截图…";
+lastSnapshot=DateTime.Now;RefreshTime.Text=L.T("正在截图…");
 var screenList=snapshot.Displays.Where(d=>d.Active&&settings.ScreenPreviews).ToList();
 var windowList=settings.WindowPreviews?PreviewPolicy.Select(allWindows,selected?.Gdi):[];
 PreviewPolicy.Trim(windowPreviews,allWindows.Concat(WindowsList.Items.OfType<WindowInfo>()),windowList);
@@ -269,9 +271,9 @@ foreach(var d in screenList) {
 token.ThrowIfCancellationRequested();
 try {
 var frame=await Task.Run(()=>SnapshotService.Screen(d.Bounds),token);
-if(!closed&&monitorPreviews.TryGetValue(d.Key,out var view)){view.image.Source=Bitmap(frame);view.label.Text="截图 "+DateTime.Now.ToString("HH:mm:ss");}
+if(!closed&&monitorPreviews.TryGetValue(d.Key,out var view)){view.image.Source=Bitmap(frame);view.label.Text=L.T("截图 ")+DateTime.Now.ToString("HH:mm:ss");}
 }catch(OperationCanceledException){throw;}
-catch {if(monitorPreviews.TryGetValue(d.Key,out var view))view.label.Text="截图不可用";}
+catch {if(monitorPreviews.TryGetValue(d.Key,out var view))view.label.Text=L.T("截图不可用");}
 }
 foreach(var w in windowList) {
 token.ThrowIfCancellationRequested();
@@ -279,17 +281,17 @@ if(w.ShowCommand is 2 or 7)continue;
 var frame=await SnapshotService.WindowAsync(w.Handle,w.Pid,token,w.ProcessStartedTicks);token.ThrowIfCancellationRequested();
 if(closed)return;
 object? image=frame==null?null:Bitmap(frame);
-string caption=frame==null?"应用未提供画面 / 截图超时":"截图 "+DateTime.Now.ToString("HH:mm:ss");
-if(frame==null&&windowPreviews.TryGetValue(w.OrderKey,out var old)&&old.image!=null){image=old.image;caption="历史 · "+old.caption.Replace("历史 · ","");}
+string caption=frame==null?L.T("应用未提供画面 / 截图超时"):L.T("截图 ")+DateTime.Now.ToString("HH:mm:ss");
+if(frame==null&&windowPreviews.TryGetValue(w.OrderKey,out var old)&&old.image!=null){image=old.image;caption=L.T("历史 · ")+old.caption.Replace(L.T("历史 · "),"");}
 windowPreviews[w.OrderKey]=(image,caption);
 foreach(var current in allWindows.Where(x=>x.OrderKey==w.OrderKey))current.SetPreview(image,caption);
 foreach(var current in WindowsList.Items.OfType<WindowInfo>().Where(x=>x.OrderKey==w.OrderKey))current.SetPreview(image,caption);
 }
 }catch(OperationCanceledException){}
-catch(Exception e){if(!closed)Notice("截图失败："+e.Message);}
+catch(Exception e){if(!closed)Notice(L.T("截图失败：")+e.Message);}
 finally {
 previewing=false;previewCancellation.Dispose();previewCancellation=null;
-if(!closed){RefreshTime.Text="截图 "+lastSnapshot.ToString("HH:mm:ss");if(pendingPreview&&!refreshing){pendingPreview=false;_ = UpdatePreviews();}}
+if(!closed){RefreshTime.Text=L.T("截图 ")+lastSnapshot.ToString("HH:mm:ss");if(pendingPreview&&!refreshing){pendingPreview=false;_ = UpdatePreviews();}}
 }
 }
 static T? Descendant<T>(DependencyObject node) where T:DependencyObject {
@@ -337,7 +339,7 @@ if(busy||pressed!=null){refreshRequested=true;return;}
 refreshRequested=false;pendingPreview=false;await Refresh();
 if(!previewing)await UpdatePreviews();
 }
-async void HideClicked(object sender,RoutedEventArgs e)=>await Operate(WindowsList.SelectedItems.Cast<WindowInfo>().ToList(),hidden.Hide,"隐藏到新桌面");
+async void HideClicked(object sender,RoutedEventArgs e)=>await Operate(WindowsList.SelectedItems.Cast<WindowInfo>().ToList(),hidden.Hide,L.T("隐藏到新桌面"));
 async void Notice(string message){
 string entry=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+"  "+message.Replace("\r","").Replace("\n","  |  ");
 history.Add(OperationLog.ForDisplay(entry));if(history.Count>OperationLog.MemoryEntries)history.RemoveRange(0,history.Count-OperationLog.MemoryEntries);
@@ -352,11 +354,11 @@ if(version==noticeVersion){ResultStatus.Text="";NoticePanel.Visibility=Visibilit
 }
 async void HistoryClicked(object sender,RoutedEventArgs e){
 if(dialogOpen)return;dialogOpen=true;
-var text=new TextBlock{Text=history.Count==0?"暂无操作记录":string.Join("\n\n",history.AsEnumerable().Reverse()),TextWrapping=TextWrapping.Wrap,IsTextSelectionEnabled=true,Margin=new Thickness(0,0,24,0),LineHeight=22};
-var dialog=new ContentDialog{XamlRoot=Root.XamlRoot,Title="操作记录 · 最近 500 条",CloseButtonText="关闭",Content=new ScrollViewer{Content=text,MaxHeight=520}};
+var text=new TextBlock{Text=history.Count==0?L.T("暂无操作记录"):string.Join("\n\n",history.AsEnumerable().Reverse()),TextWrapping=TextWrapping.Wrap,IsTextSelectionEnabled=true,Margin=new Thickness(0,0,24,0),LineHeight=22};
+var dialog=new ContentDialog{XamlRoot=Root.XamlRoot,Title=L.T("操作记录 · 最近 500 条"),CloseButtonText=L.T("关闭"),Content=new ScrollViewer{Content=text,MaxHeight=520}};
 try{await dialog.ShowAsync();}finally{dialogOpen=false;}
 }void AdminClicked(object sender,RoutedEventArgs e) {
 try {var p=Process.Start(new ProcessStartInfo(Environment.ProcessPath!,"--elevated-restart"){UseShellExecute=true,Verb="runas"});if(p!=null)ExitApp();}
-catch(Exception ex){Notice("未重启："+ex.Message);}
+catch(Exception ex){Notice(L.T("未重启：")+ex.Message);}
 }
 }

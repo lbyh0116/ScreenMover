@@ -21,7 +21,7 @@ public sealed class FlyoutChrome : IDisposable {
             if(msg is 0x6 or 0x86 or 0x7D or 0x31A or 0x31E or 0x320)Apply(dark);
             return result;
         };
-        if(!SetWindowSubclass(window,callback,45,0))throw new InvalidOperationException("无法设置快捷面板边框");
+        if(!SetWindowSubclass(window,callback,45,0))throw new InvalidOperationException(L.T("无法设置快捷面板边框"));
         Apply(false);
     }
     public void Apply(bool isDark){

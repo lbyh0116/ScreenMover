@@ -6,13 +6,13 @@
 
 ## 下载与运行
 
-最新正式版：**v0.2.1 · Windows x64 便携版**。
+最新正式版：**v0.2.2 · Windows x64 便携版**。
 
-1. 下载 [ScreenMover-v0.2.1-win-x64.zip](https://github.com/lbyh0116/ScreenMover/releases/download/v0.2.1/ScreenMover-v0.2.1-win-x64.zip)。
+1. 下载 [ScreenMover-v0.2.2-win-x64.zip](https://github.com/lbyh0116/ScreenMover/releases/download/v0.2.2/ScreenMover-v0.2.2-win-x64.zip)。
 2. 完整解压，运行 `ScreenMover.exe`；请保留同目录的所有文件。
 3. 升级时先从托盘退出旧版。设置、排序和隐藏恢复记录会继续保留。
 
-包含所需运行时，无需另装 .NET。当前包未进行商业代码签名；Microsoft Store 版尚未发布。界面语言目前为简体中文。
+包含所需运行时，无需另装 .NET。当前包未进行商业代码签名；Microsoft Store 版尚未发布。支持简体中文、英语、德语、法语和西班牙语，默认跟随 Windows 界面语言；可在设置中切换，重启后生效。其他系统语言回退到英语。
 
 ## 主要功能
 

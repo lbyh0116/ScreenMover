@@ -7,11 +7,11 @@ public sealed class HotkeyBinding(Func<int,HotkeySpec,bool> register,Action<int>
     bool disposed,preparing;int pendingId;
     public Change Prepare(string? value){
         ObjectDisposedException.ThrowIf(disposed,this);
-        if(preparing)throw new InvalidOperationException("快捷键正在修改");
+        if(preparing)throw new InvalidOperationException(L.T("快捷键正在修改"));
         var spec=HotkeySpec.Parse(value);string name=spec?.Name??"";
         int id=name==Current?CurrentId:spec==null?0:CurrentId==firstId?firstId+1:firstId;
         bool reserved=id!=0&&id!=CurrentId;
-        if(reserved&&!register(id,spec!))throw new InvalidOperationException("该快捷键已被占用或被系统保留，请换一个组合");
+        if(reserved&&!register(id,spec!))throw new InvalidOperationException(L.T("该快捷键已被占用或被系统保留，请换一个组合"));
         preparing=true;pendingId=reserved?id:0;return new(this,id,name,reserved);
     }
     public sealed class Change(HotkeyBinding owner,int id,string name,bool reserved) : IDisposable {

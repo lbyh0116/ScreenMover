@@ -66,6 +66,7 @@ static partial class Regression {
     }
     static void Check(bool condition,string message){if(!condition)throw new Exception(message);}
     public static void Pure(){
+        Languages();
         Surfaces();
         HiddenRecoveryChecks();
         DropTargets();

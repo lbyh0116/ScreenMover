@@ -47,7 +47,7 @@ public sealed class TrayIcon : IDisposable {
                 else if(message==0x7B){
                     GetCursorPos(out var point);var menu=CreatePopupMenu();
                     try{
-                        AppendMenuW(menu,0,1,"快捷操作");AppendMenuW(menu,0,2,"打开主界面");AppendMenuW(menu,0x800,0,"");AppendMenuW(menu,0,3,"退出 ScreenMover");
+                        AppendMenuW(menu,0,1,L.T("快捷操作"));AppendMenuW(menu,0,2,L.T("打开主界面"));AppendMenuW(menu,0x800,0,"");AppendMenuW(menu,0,3,L.T("退出 ScreenMover"));
                         SetForegroundWindow(hwnd);
                         uint selected=TrackPopupMenu(menu,0x100|0x2,point.X,point.Y,0,hwnd,0);
                         PostMessageW(hwnd,0,0,0);
@@ -58,7 +58,7 @@ public sealed class TrayIcon : IDisposable {
             }
             return DefSubclassProc(h,msg,w,l);
         };
-        if(!SetWindowSubclass(hwnd,callback,42,0)){if(icon!=0)IconService.DestroyIcon(icon);throw new InvalidOperationException("无法创建托盘消息监听");}
+        if(!SetWindowSubclass(hwnd,callback,42,0)){if(icon!=0)IconService.DestroyIcon(icon);throw new InvalidOperationException(L.T("无法创建托盘消息监听"));}
         Install();
     }
     void Install(){

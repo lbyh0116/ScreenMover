@@ -6,13 +6,13 @@
 
 ## Download and run
 
-Latest stable release: **v0.2.1 · Windows x64 portable**.
+Latest stable release: **v0.2.2 · Windows x64 portable**.
 
-1. Download [ScreenMover-v0.2.1-win-x64.zip](https://github.com/lbyh0116/ScreenMover/releases/download/v0.2.1/ScreenMover-v0.2.1-win-x64.zip).
+1. Download [ScreenMover-v0.2.2-win-x64.zip](https://github.com/lbyh0116/ScreenMover/releases/download/v0.2.2/ScreenMover-v0.2.2-win-x64.zip).
 2. Extract the entire archive and run `ScreenMover.exe`. Keep all bundled files together.
 3. When upgrading, exit the old version from its tray menu first. Settings, window order, and hidden-window recovery records are retained.
 
-The required runtimes are included; no separate .NET installation is needed. This package is not commercially code-signed. The Microsoft Store edition is not available yet. **The application UI is currently Simplified Chinese; this document provides English instructions.**
+The required runtimes are included; no separate .NET installation is needed. This package is not commercially code-signed. The Microsoft Store edition is not available yet. The app supports Simplified Chinese, English, German, French and Spanish. It follows your Windows display language by default, with English as the fallback. Change the language in Settings and restart to apply it.
 
 ## Features
 

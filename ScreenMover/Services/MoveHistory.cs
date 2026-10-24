@@ -47,9 +47,9 @@ public sealed class MoveHistory {
     }
     public static SavedWindow Capture(WindowInfo w) {
         GetWindowThreadProcessId(w.Handle,out int pid);
-        if(!IsWindow(w.Handle)||pid!=w.Pid)throw new InvalidOperationException("窗口已关闭或已被替换");
+        if(!IsWindow(w.Handle)||pid!=w.Pid)throw new InvalidOperationException(L.T("窗口已关闭或已被替换"));
         using var process=Process.GetProcessById(w.Pid);
-        if(w.ProcessStartedTicks>0&&process.StartTime.ToUniversalTime().Ticks!=w.ProcessStartedTicks)throw new InvalidOperationException("原进程已重启，未操作替代窗口");
+        if(w.ProcessStartedTicks>0&&process.StartTime.ToUniversalTime().Ticks!=w.ProcessStartedTicks)throw new InvalidOperationException(L.T("原进程已重启，未操作替代窗口"));
         var placement=WindowService.StablePlacement(w.Handle);
         string gdi=WindowService.MonitorNameForWindow(w.Handle);
         var display=new DisplayService().Read().Displays.First(d=>d.Active&&d.Gdi==gdi);
@@ -58,7 +58,7 @@ public sealed class MoveHistory {
     }
     public static OperationResult Restore(SavedWindow saved) {
         try {
-            if(!Alive(saved))return new(saved.Title,false,"原窗口已关闭或进程已重启，未操作其他窗口");
+            if(!Alive(saved))return new(saved.Title,false,L.T("原窗口已关闭或进程已重启，未操作其他窗口"));
             var displays=new DisplayService().Read().Displays.Where(d=>d.Active).ToList();
             var original=displays.FirstOrDefault(d=>d.Key==saved.DisplayKey);
             var target=original??displays.FirstOrDefault(d=>d.Primary)??displays.First();
@@ -77,7 +77,7 @@ public sealed class MoveHistory {
                 if(actual.showCmd==saved.Placement.showCmd&&Math.Abs(actual.rcNormalPosition.Left-placement.rcNormalPosition.Left)<=4&&Math.Abs(actual.rcNormalPosition.Top-placement.rcNormalPosition.Top)<=4&&Math.Abs(actual.rcNormalPosition.Width-placement.rcNormalPosition.Width)<=4&&Math.Abs(actual.rcNormalPosition.Height-placement.rcNormalPosition.Height)<=4){confirmed=true;break;}
                 Thread.Sleep(25);
             }
-            return new(saved.Title,confirmed,confirmed?(original==null?"原屏幕已断开，已恢复到当前可用屏幕":"已恢复原位置、大小和状态"):"应用未确认恢复位置或状态，可重试撤销");
+            return new(saved.Title,confirmed,confirmed?(original==null?L.T("原屏幕已断开，已恢复到当前可用屏幕"):L.T("已恢复原位置、大小和状态")):L.T("应用未确认恢复位置或状态，可重试撤销"));
         }catch(Exception ex){return new(saved.Title,false,ex.Message);}
     }
 }

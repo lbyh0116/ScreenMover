@@ -9,15 +9,15 @@ public static class VirtualDesktopService {
         foreach(var arg in args)info.ArgumentList.Add(arg);
         using var process=Process.Start(info)!;
         var output=process.StandardOutput.ReadToEndAsync();var error=process.StandardError.ReadToEndAsync();
-        if(!process.WaitForExit(15000)){process.Kill();return (false,"操作超时，记录已保留，请在任务视图确认状态或重试找回");}
+        if(!process.WaitForExit(15000)){process.Kill();return (false,L.T("操作超时，记录已保留，请在任务视图确认状态或重试找回"));}
         string result=output.GetAwaiter().GetResult().Trim();
         return (process.ExitCode==0&&result.StartsWith("OK|",StringComparison.Ordinal),string.IsNullOrEmpty(result)?error.GetAwaiter().GetResult():result);
     }
 }
 public sealed record HiddenWindow(Guid Id,SavedWindow Saved,string DesktopName,string? DesktopId,DateTime HiddenAt,string Status) {
     public bool Closed {get;init;}
-    [System.Text.Json.Serialization.JsonIgnore] public string DisplayStatus=>Closed?"原窗口已关闭 / 进程已重启":Status.Replace("ERROR|","").Split("|desktop=")[0];
-    public override string ToString()=>$"{Saved.Title}\n桌面：{DesktopName} · {HiddenAt:MM-dd HH:mm}\n{Status}";
+    [System.Text.Json.Serialization.JsonIgnore] public string DisplayStatus=>Closed?L.T("原窗口已关闭 / 进程已重启"):L.External(Status.Replace("ERROR|","").Split("|desktop=")[0]);
+    public override string ToString()=>L.F("{0}\n桌面：{1} · {2:MM-dd HH:mm}\n{3}", Saved.Title, DesktopName, HiddenAt, DisplayStatus);
 }
 public sealed class HiddenWindows {
     readonly object gate=new();
@@ -62,7 +62,7 @@ public sealed class HiddenWindows {
         try {
             if(Read().Count>0)Reconcile();
             if(Read().Any(x=>x.Saved.Handle==window.Handle.ToInt64()&&MoveHistory.Alive(x.Saved)))
-                return new(window.Title,false,"此窗口已有隐藏记录，请先从「已隐藏」找回");
+                return new(window.Title,false,L.T("此窗口已有隐藏记录，请先从「已隐藏」找回"));
             var saved=MoveHistory.Capture(window);
             using var target=Process.GetProcessById(window.Pid);
             string name=window.ProcessName;
@@ -75,23 +75,23 @@ public sealed class HiddenWindows {
                 string desktop=result.Output.Split('|')[1];
                 bool minimized=!result.Output.EndsWith("|desktop-only",StringComparison.Ordinal);
                 Put(entry with{DesktopId=desktop,Status=minimized?"已隐藏 · 已最小化":"已隐藏在独立桌面 · 应用未接受最小化"});
-                return new(window.Title,true,minimized?$"已最小化至「{name}」，可从「已隐藏」一键找回":$"已移至独立桌面「{name}」；应用未接受最小化，保留隐藏位置，可一键找回");
+                return new(window.Title,true,minimized?L.F("已最小化至「{0}」，可从「已隐藏」一键找回", name):L.F("已移至独立桌面「{0}」；应用未接受最小化，保留隐藏位置，可一键找回", name));
             }
             string? failedDesktop=result.Output.Split('|').FirstOrDefault(x=>x.StartsWith("desktop="))?[8..];
             Put(entry with{DesktopId=Guid.TryParse(failedDesktop,out var desktopId)?desktopId.ToString():null,Status=result.Output});
-            return new(window.Title,false,result.Output+"；恢复记录已保留");
+            return new(window.Title,false,L.External(result.Output)+L.T("；恢复记录已保留"));
         }catch(Exception ex){
-            return new(window.Title,false,ex.Message+(entry==null?"":"；请查看已隐藏记录或任务视图"));
+            return new(window.Title,false,ex.Message+(entry==null?"":L.T("；请查看已隐藏记录或任务视图")));
         }
     }
     public OperationResult Recover(HiddenWindow entry) {
         try {
-            if(!MoveHistory.Alive(entry.Saved))return new(entry.Saved.Title,false,"原窗口已关闭或进程已重启；可移除此失效记录");
+            if(!MoveHistory.Alive(entry.Saved))return new(entry.Saved.Title,false,L.T("原窗口已关闭或进程已重启；可移除此失效记录"));
             var s=entry.Saved;
             var result=VirtualDesktopService.Run("restore",s.Handle.ToString(),s.Pid.ToString(),s.Placement.showCmd.ToString(),s.ProcessStarted.ToString());
-            if(!result.Success){Put(entry with{Status=result.Output});return new(s.Title,false,result.Output);}
+            if(!result.Success){Put(entry with{Status=result.Output});return new(s.Title,false,L.External(result.Output));}
             Forget(entry.Id);
-            return new(s.Title,true,"已找回当前虚拟桌面并还原；原虚拟桌面保留");
-        }catch(Exception ex){return new(entry.Saved.Title,false,ex.Message+"；记录保留，可重试");}
+            return new(s.Title,true,L.T("已找回当前虚拟桌面并还原；原虚拟桌面保留"));
+        }catch(Exception ex){return new(entry.Saved.Title,false,ex.Message+L.T("；记录保留，可重试"));}
     }
 }

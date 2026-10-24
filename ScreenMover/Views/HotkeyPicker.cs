@@ -11,10 +11,10 @@ namespace ScreenMover.Views;
 public sealed class HotkeyPicker : UserControl {
     readonly StackPanel body=new();
     UIElementCollection Children=>body.Children;
-    readonly TextBox display=new(){IsReadOnly=true,PlaceholderText="按组合键，或从右侧选择",Padding=new Thickness(12,5,42,5)};
+    readonly TextBox display=new(){IsReadOnly=true,PlaceholderText=L.T("按组合键，或从右侧选择"),Padding=new Thickness(12,5,42,5)};
     readonly Flyout flyout=new();
     readonly ToggleButton ctrl=new(){Content="Ctrl"},alt=new(){Content="Alt"},shift=new(){Content="Shift"},win=new(){Content="Win"};
-    readonly ComboBox key=new(){Header="主键",HorizontalAlignment=HorizontalAlignment.Stretch};
+    readonly ComboBox key=new(){Header=L.T("主键"),HorizontalAlignment=HorizontalAlignment.Stretch};
     readonly TextBlock error=new(){TextWrapping=TextWrapping.Wrap,FontSize=12};
     readonly DispatcherTimer compose=new(){Interval=TimeSpan.FromMilliseconds(350)};
     bool updating;
@@ -26,14 +26,14 @@ public sealed class HotkeyPicker : UserControl {
         var field=new Grid();field.Children.Add(display);
         AutomationProperties.SetName(display,title);
         var arrow=new Button{Content=new FontIcon{Glyph="\uE70D",FontSize=12},Style=(Style)Application.Current.Resources["SubtleButtonStyle"],HorizontalAlignment=HorizontalAlignment.Right,VerticalAlignment=VerticalAlignment.Stretch,Width=36,Padding=new Thickness(0),BorderThickness=new Thickness(0)};
-        ToolTipService.SetToolTip(arrow,"选择预设或自由组合");AutomationProperties.SetName(arrow,"选择快捷键");field.Children.Add(arrow);Children.Add(field);Children.Add(error);
+        ToolTipService.SetToolTip(arrow,L.T("选择预设或自由组合"));AutomationProperties.SetName(arrow,L.T("选择快捷键"));field.Children.Add(arrow);Children.Add(field);Children.Add(error);
         var panel=new StackPanel{Spacing=10,Margin=new Thickness(0,0,24,0)};
-        panel.Children.Add(new TextBlock{Text="常用组合",FontWeight=Microsoft.UI.Text.FontWeights.SemiBold});
+        panel.Children.Add(new TextBlock{Text=L.T("常用组合"),FontWeight=Microsoft.UI.Text.FontWeights.SemiBold});
         foreach(string preset in new[]{"Ctrl+Alt+Space","Ctrl+Alt+H","Ctrl+Alt+M","Ctrl+Shift+Space","Win+Alt+M"}){
             var button=new Button{Content=preset,HorizontalAlignment=HorizontalAlignment.Stretch,HorizontalContentAlignment=HorizontalAlignment.Left};
             button.Click+=(_,_)=>{TrySet(preset);flyout.Hide();};panel.Children.Add(button);
         }
-        panel.Children.Add(new TextBlock{Text="自由搭配",FontWeight=Microsoft.UI.Text.FontWeights.SemiBold});
+        panel.Children.Add(new TextBlock{Text=L.T("自由搭配"),FontWeight=Microsoft.UI.Text.FontWeights.SemiBold});
         var modifiers=new StackPanel{Orientation=Orientation.Horizontal,Spacing=6};
         foreach(var toggle in new[]{ctrl,alt,shift,win}){modifiers.Children.Add(toggle);toggle.Checked+=ComposeChanged;toggle.Unchecked+=ComposeChanged;}
         panel.Children.Add(modifiers);

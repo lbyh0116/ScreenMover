@@ -7,12 +7,12 @@ public static class LocalData {
     public static T Read<T>(string path, Func<T> defaults, out string? warning) {
         warning=null;
         if(!File.Exists(path))return defaults();
-        try {return JsonSerializer.Deserialize<T>(File.ReadAllText(path),Json) ?? throw new InvalidDataException("文件内容为空");}
+        try {return JsonSerializer.Deserialize<T>(File.ReadAllText(path),Json) ?? throw new InvalidDataException(L.T("文件内容为空"));}
         catch(Exception ex) {
-            warning=$"{Path.GetFileName(path)} 无法读取：{ex.Message}";
+            warning=L.F("{0} 无法读取：{1}", Path.GetFileName(path), ex.Message);
             // Keep the original recoverable rather than silently overwrite it.
             string backup=path+"."+DateTime.UtcNow.ToString("yyyyMMddHHmmssfff")+".backup";
-            File.Copy(path,backup); warning+="；已备份至 "+backup;
+            File.Copy(path,backup); warning+=L.T("；已备份至 ")+backup;
             return defaults();
         }
     }
@@ -25,6 +25,7 @@ public static class LocalData {
 }
 
 public sealed record AppSettings {
+    public string Language {get;set;}="System";
     public bool IconFallback {get;set;}=true;
     public bool TrayEnabled {get;set;}=true;
     public bool CloseToTray {get;set;}=true;
@@ -45,6 +46,7 @@ public sealed record AppSettings {
     public int Width {get;set;}=1320;
     public int Height {get;set;}=1080;
     public void Normalize() {
+        if(Language is not ("System" or "zh-CN" or "en" or "de" or "fr" or "es"))Language="System";
         try{QuickHotkey=HotkeySpec.Parse(QuickHotkey)?.Name??"";}catch(FormatException){QuickHotkey="";}
         try{HideHotkey=HotkeySpec.Parse(HideHotkey)?.Name??"";}catch(FormatException){HideHotkey="";}
         if(HideHotkey!=""&&HideHotkey==QuickHotkey)HideHotkey="";
