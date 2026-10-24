@@ -42,7 +42,7 @@ public sealed partial class QuickWindow : Window {
         QuickRoot.AddHandler(UIElement.PointerMovedEvent,new PointerEventHandler(Moved),true);
         QuickRoot.AddHandler(UIElement.PointerReleasedEvent,new PointerEventHandler(Released),true);
         QuickRoot.AddHandler(UIElement.PointerCanceledEvent,new PointerEventHandler(Canceled),true);
-        QuickRoot.AddHandler(UIElement.PointerCaptureLostEvent,new PointerEventHandler(Canceled),true);
+        QuickRoot.AddHandler(UIElement.PointerCaptureLostEvent,new PointerEventHandler(CaptureLost),true);
         var escape=new KeyboardAccelerator{Key=VirtualKey.Escape};escape.Invoked+=(_,e)=>{Cancel();Dismiss();e.Handled=true;};QuickRoot.KeyboardAccelerators.Add(escape);
         var refresh=new KeyboardAccelerator{Key=VirtualKey.F5};refresh.Invoked+=async(_,e)=>{e.Handled=true;await Reload(true);};QuickRoot.KeyboardAccelerators.Add(refresh);
     }
@@ -95,15 +95,20 @@ public sealed partial class QuickWindow : Window {
     void PlacePanel(){
         if(anchor==null)return;
         double scale=WindowChrome.ScaleAt(new(){X=anchor.Work.Left+10,Y=anchor.Work.Top+10});
-        var placement=SurfaceLayout.Flyout(anchor.Bounds,anchor.Work,panelAnchor,scale,QuickList.Items.Count,targets.Count,targets.Values.Select(b=>SurfaceLayout.Ratio(((DisplayInfo)b.Tag).Bounds)).DefaultIfEmpty(16.0/9).Max());
-        edge=placement.Edge;var rect=placement.Bounds;
-        WindowColumn.Width=new GridLength(Math.Min(176,Math.Max(80,(rect.Width/scale-30)*.55)));
-        double available=Math.Max(1,rect.Width/scale-30-WindowColumn.Width.Value-16);
+        var textWidths=QuickList.Items.OfType<WindowInfo>().Select(w=>{
+            var label=new TextBlock{Text=w.AppName,FontSize=14};label.Measure(new(double.PositiveInfinity,double.PositiveInfinity));return label.DesiredSize.Width;
+        });
+        double column=SurfaceLayout.ApplicationColumn(textWidths);
         double maxRatio=targets.Values.Select(b=>SurfaceLayout.Ratio(((DisplayInfo)b.Tag).Bounds)).DefaultIfEmpty(16.0/9).Max();
+        var placement=SurfaceLayout.Flyout(anchor.Bounds,anchor.Work,panelAnchor,scale,QuickList.Items.Count,targets.Count,maxRatio,column);
+        edge=placement.Edge;var rect=placement.Bounds;
+        double requestedTargets=Math.Max(104,14+64*maxRatio)+24;
+        WindowColumn.Width=new GridLength(Math.Min(column,Math.Max(80,(rect.Width/scale-30)*column/(column+requestedTargets))));
+        double available=Math.Max(1,rect.Width/scale-30-WindowColumn.Width.Value-38);
         double previewHeight=Math.Min(64,available/maxRatio);
         foreach(var b in targets.Values)if(b.Child is StackPanel stack&&stack.Children.FirstOrDefault() is Image image){
             var size=SurfaceLayout.ScreenPreview(SurfaceLayout.Ratio(((DisplayInfo)b.Tag).Bounds),previewHeight);
-            image.Width=size.Width;image.Height=size.Height;b.Width=size.Width+14;b.HorizontalAlignment=HorizontalAlignment.Left;
+            image.Width=size.Width;image.Height=size.Height;b.Width=Math.Max(Math.Min(104,available+14),size.Width+14);b.HorizontalAlignment=HorizontalAlignment.Left;
         }
         AppWindow.MoveAndResize(new(rect.Left,rect.Top,rect.Width,rect.Height));
     }
@@ -140,12 +145,13 @@ public sealed partial class QuickWindow : Window {
     }
     void SelectionChanged(object sender,SelectionChangedEventArgs e){foreach(var w in QuickList.Items.OfType<WindowInfo>())w.SetSelected(ReferenceEquals(QuickList.SelectedItem,w));}
     static WindowInfo? Find(DependencyObject? node){
-        while(node!=null){if(node is FrameworkElement f&&f.DataContext is WindowInfo w)return w;node=VisualTreeHelper.GetParent(node);}return null;
+        while(node!=null){if(node is ListViewItem item&&item.Content is WindowInfo row)return row;if(node is FrameworkElement f&&f.DataContext is WindowInfo w)return w;node=VisualTreeHelper.GetParent(node);}return null;
     }
     void Pressed(object sender,PointerRoutedEventArgs e){
         if(acting||!e.GetCurrentPoint(QuickRoot).Properties.IsLeftButtonPressed)return;
         pressed=Find(e.OriginalSource as DependencyObject);if(pressed==null){if(SelectionInput.IsBackground(e.OriginalSource as DependencyObject,QuickRoot))QuickList.SelectedItem=null;return;}
         start=e.GetCurrentPoint(QuickRoot).Position;QuickList.SelectedItem=pressed;
+        e.Handled=true;
         if(!QuickRoot.CapturePointer(e.Pointer))pressed=null;else dragFeedback.Press(QuickList.ContainerFromItem(pressed) as FrameworkElement,start,pressed.AppIcon as ImageSource);
     }
     DisplayInfo? Hit(Point point){
@@ -175,12 +181,13 @@ public sealed partial class QuickWindow : Window {
         var item=pressed;var target=dragging?Hit(e.GetCurrentPoint(QuickRoot).Position):null;Cancel();
         if(target==null)return;
         acting=true;SourceScreen.IsEnabled=false;
-        try{ShowNotice(await owner.QuickDrop(item,target));}
+        try{var result=await owner.QuickDrop(item,target);if(!result.Success)ShowNotice(result.Message);else{noticeVersion++;QuickNotice.Visibility=Visibility.Collapsed;}}
         catch(Exception ex){ShowNotice("操作失败："+ex.Message);}
         finally{acting=false;SourceScreen.IsEnabled=true;await Reload(true);if(!panelActive||pendingDismiss)Dismiss();}
         e.Handled=true;
     }
     void Canceled(object sender,PointerRoutedEventArgs e)=>Cancel();
+    void CaptureLost(object sender,PointerRoutedEventArgs e){if(ReferenceEquals(e.OriginalSource,QuickRoot))Cancel();}
     void Cancel(){pressed=null;dragging=false;hover=null;dragFeedback.End();QuickRoot.ReleasePointerCaptures();foreach(var b in targets.Values)b.IsDropTarget=false;}
     void DismissClicked(object sender,RoutedEventArgs e)=>Dismiss();
     void MainClicked(object sender,RoutedEventArgs e){Dismiss();owner.ShowMain();}

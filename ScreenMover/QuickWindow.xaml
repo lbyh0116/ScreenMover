@@ -15,14 +15,15 @@
                     <Grid.RowDefinitions><RowDefinition Height="32"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                     <ComboBox x:Name="SourceScreen" HorizontalAlignment="Stretch" SelectionChanged="SourceChanged" AutomationProperties.Name="窗口所在屏幕"/>
                     <Grid Grid.Row="1" Background="Transparent">
-                        <ListView x:Name="QuickList" SelectionMode="Single" SelectionChanged="SelectionChanged" ItemContainerStyle="{StaticResource WindowItemStyle}" ScrollViewer.HorizontalScrollMode="Disabled">
+                        <ListView x:Name="QuickList" SelectionMode="Single" SelectionChanged="SelectionChanged" ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemContainerStyle><Style TargetType="ListViewItem" BasedOn="{StaticResource WindowItemStyle}"><Setter Property="HorizontalAlignment" Value="Stretch"/><Setter Property="Margin" Value="3,3,27,3"/></Style></ListView.ItemContainerStyle>
                             <ListView.ItemContainerTransitions><TransitionCollection><AddDeleteThemeTransition/><RepositionThemeTransition/></TransitionCollection></ListView.ItemContainerTransitions>
-                            <ListView.ItemTemplate><DataTemplate><Grid Padding="8,7" ColumnSpacing="8" MinHeight="34"><Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Image Source="{Binding AppIcon}" Width="20" Height="20"/><views:MiddleTitle Grid.Column="1" FullText="{Binding AppName}" ToolTipService.ToolTip="{Binding Title}" VerticalAlignment="Center"/></Grid></DataTemplate></ListView.ItemTemplate>
+                            <ListView.ItemTemplate><DataTemplate><Grid Background="Transparent" Padding="8,7" ColumnSpacing="8" MinHeight="34"><Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Image Source="{Binding AppIcon}" Width="20" Height="20"/><TextBlock Grid.Column="1" Text="{Binding AppName}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" ToolTipService.ToolTip="{Binding AppName}" VerticalAlignment="Center"/></Grid></DataTemplate></ListView.ItemTemplate>
                         </ListView>
                         <TextBlock x:Name="QuickEmpty" Text="暂无窗口" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity=".6" IsHitTestVisible="False"/>
                     </Grid>
                 </Grid>
-                <ScrollViewer Grid.Column="1" x:Name="ScreenScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled"><StackPanel x:Name="Screens" Spacing="6"/></ScrollViewer>
+                <ScrollViewer Grid.Column="1" x:Name="ScreenScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"><StackPanel x:Name="Screens" Spacing="6" Margin="0,0,24,0"/></ScrollViewer>
                 <Border x:Name="QuickNotice" Grid.ColumnSpan="2" Visibility="Collapsed" VerticalAlignment="Bottom" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="8" Padding="10" Margin="4"><TextBlock x:Name="QuickStatus" TextWrapping="Wrap" FontSize="12"/></Border>
             </Grid>
             <Canvas Grid.RowSpan="2" x:Name="QuickDragLayer" IsHitTestVisible="False"><Border x:Name="QuickGhost" Visibility="Collapsed" Background="Transparent" BorderThickness="0" Padding="0"><Grid><StackPanel><Image x:Name="QuickGhostImage" Stretch="Uniform"/><TextBlock x:Name="QuickGhostText" Visibility="Collapsed"/></StackPanel><TextBlock x:Name="QuickGhostCount" Visibility="Collapsed"/></Grid></Border></Canvas>

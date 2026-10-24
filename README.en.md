@@ -6,9 +6,9 @@
 
 ## Download and run
 
-Latest stable release: **v0.2.0 · Windows x64 portable**.
+Latest stable release: **v0.2.1 · Windows x64 portable**.
 
-1. Download [ScreenMover-v0.2.0-win-x64.zip](https://github.com/lbyh0116/ScreenMover/releases/download/v0.2.0/ScreenMover-v0.2.0-win-x64.zip).
+1. Download [ScreenMover-v0.2.1-win-x64.zip](https://github.com/lbyh0116/ScreenMover/releases/download/v0.2.1/ScreenMover-v0.2.1-win-x64.zip).
 2. Extract the entire archive and run `ScreenMover.exe`. Keep all bundled files together.
 3. When upgrading, exit the old version from its tray menu first. Settings, window order, and hidden-window recovery records are retained.
 
@@ -19,7 +19,7 @@ The required runtimes are included; no separate .NET installation is needed. Thi
 - **Visual overview:** static monitor and window previews in a gallery, with application icons when capture is unavailable.
 - **Drag between displays:** move selected windows to a monitor card, including batch moves and undoing the last move.
 - **Tray quick panel:** a compact window list beside monitor previews; closes when you click outside.
-- **Park and recover windows:** on supported Windows builds, move a window to a separate virtual desktop named after its application and minimize it; recover it from the main window.
+- **Park and recover windows:** on supported Windows builds, move a window to a separate virtual desktop named after its application and attempt to minimize it; recover it from the main window. Refused minimization does not undo a completed desktop move. Recovery records update after manual moves.
 - **Personal preferences:** persistent window ordering, light/dark appearance, system or custom accent colors, configurable hotkeys, and automatically saved settings.
 - **In-app updates:** check GitHub Releases, download and verify the matching package, then install and restart.
 

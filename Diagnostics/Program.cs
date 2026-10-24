@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using ScreenMover.Services;
 using static ScreenMover.Interop.Native;
+if(args.Length==1&&args[0]=="--tray-tip"){Console.WriteLine(TrayTip.Read());return;}
 if(args.Length==2&&args[0]=="--update-helper"){UpdateRegression.HelperSmoke(Path.GetFullPath(args[1]));return;}
 if(args.Length==2&&args[0]=="--update-package"){await UpdateRegression.PackageSmoke(Path.GetFullPath(args[1]));return;}
 if(args.Length==1&&(args[0]=="--check-updates"||args[0]=="--check-stable-updates")){

@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using VirtualDesktop;
+using ScreenMover.DesktopLogic;
 class Program {
  [DllImport("user32.dll")] static extern bool IsWindow(IntPtr h);
  [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr h,out int pid);
@@ -16,6 +17,7 @@ class Program {
  Console.OutputEncoding=new System.Text.UTF8Encoding(false);
  IVirtualDesktop created=null, original=null; IApplicationView view=null;
  bool moved=false; IntPtr h=IntPtr.Zero; Placement placement=new Placement();placement.Length=Marshal.SizeOf(placement);
+ string stage="初始化";Guid createdId=Guid.Empty;
  try {
  string build=(string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion","CurrentBuildNumber","");
 if(build!="26100"&&build!="26200")throw new Exception("隐藏模式当前支持 Windows 11 24H2/25H2；此系统版本尚未适配");
@@ -40,6 +42,7 @@ var m=DesktopManager.VirtualDesktopManagerInternal;
  Guid id=DesktopManager.VirtualDesktopManager.GetWindowDesktopId(h);
  original=m.FindDesktop(ref id);if(!GetWindowPlacement(h,ref placement))throw new Exception("无法读取窗口状态");
   if(args[0]=="restore"){
+ stage="找回窗口";
  var destination=m.GetCurrentDesktop();
  m.MoveViewToDesktop(view,destination);moved=true;
  if(DesktopManager.VirtualDesktopManager.GetWindowDesktopId(h)!=destination.GetId())throw new Exception("窗口未回到当前桌面");
@@ -50,14 +53,24 @@ var m=DesktopManager.VirtualDesktopManagerInternal;
  if(!confirmed)throw new Exception("窗口已移回当前桌面，但应用未确认还原状态，请重试");
  Console.WriteLine("OK|"+destination.GetId()+"|restored");return 0;
  }
- created=m.CreateDesktop(); m.SetDesktopName(created,args[3]);
+ stage="创建桌面";
+ created=m.CreateDesktop();createdId=created.GetId();m.SetDesktopName(created,args[3]);
  if(created.GetName()!=args[3])throw new Exception("桌面命名未生效");
+ stage="移动窗口";
  m.MoveViewToDesktop(view,created);moved=true;
- if(DesktopManager.VirtualDesktopManager.GetWindowDesktopId(h)!=created.GetId())throw new Exception("窗口未进入新桌面");
- ShowWindowAsync(h,2);
- for(int i=0;i<20&&!IsIconic(h);i++)Thread.Sleep(50);
- if(!IsIconic(h))throw new Exception("窗口最小化失败");
- Console.WriteLine("OK|"+created.GetId()+"|"+args[3]);
+ Guid targetId=created.GetId();
+ for(int i=0;i<20&&DesktopManager.VirtualDesktopManager.GetWindowDesktopId(h)!=targetId;i++)Thread.Sleep(50);
+ if(DesktopManager.VirtualDesktopManager.GetWindowDesktopId(h)!=targetId)throw new Exception("窗口未进入新桌面");
+ stage="确认隐藏";
+ ShowWindowAsync(h,7); // SW_SHOWMINNOACTIVE: do not activate the moved game.
+ HideOutcome outcome=HideVerification.Observe(delegate {
+     int actualPid;GetWindowThreadProcessId(h,out actualPid);bool exists=IsWindow(h)&&actualPid==pid;
+     return new HideSample{Exists=exists,OnTarget=exists&&DesktopManager.VirtualDesktopManager.GetWindowDesktopId(h)==targetId,
+         TargetIsCurrent=m.GetCurrentDesktop().GetId()==targetId,Minimized=exists&&IsIconic(h)};
+ },Thread.Sleep);
+ if(outcome==HideOutcome.Closed)throw new Exception("应用关闭或替换了原窗口；桌面与恢复记录已保留");
+ if(outcome==HideOutcome.Returned)throw new Exception("应用返回了可见桌面或桌面已切换，未确认隐藏；桌面与恢复记录已保留。全屏游戏可尝试无边框窗口模式");
+ Console.WriteLine("OK|"+targetId+"|"+(outcome==HideOutcome.Minimized?"minimized":"desktop-only"));
  if(args[0]=="selftest"){
  m.MoveViewToDesktop(view,original);moved=false;
  m.RemoveDesktop(created,original);created=null;
@@ -68,9 +81,14 @@ var m=DesktopManager.VirtualDesktopManagerInternal;
  return 0;
  }catch(Exception ex){
  string recovery="";
- try {if(created!=null&&original!=null){if(moved)DesktopManager.VirtualDesktopManagerInternal.MoveViewToDesktop(view,original);DesktopManager.VirtualDesktopManagerInternal.RemoveDesktop(created,original);if(h!=IntPtr.Zero)SetWindowPlacement(h,ref placement);}}
+ // Never expose a successfully moved window just because it refuses minimization.
+ try {if(created!=null&&original!=null&&!moved){
+     if(IsWindow(h)&&DesktopManager.VirtualDesktopManager.GetWindowDesktopId(h)==created.GetId())moved=true;
+     else {DesktopManager.VirtualDesktopManagerInternal.RemoveDesktop(created,original);created=null;}
+ }}
  catch(Exception rollback){recovery="；恢复失败："+rollback.Message;}
- Console.WriteLine("ERROR|"+ex.GetBaseException().Message+recovery);return 1;
+ string desktop=created==null?"":"|desktop="+createdId;
+ Console.WriteLine("ERROR|"+stage+"："+ex.GetBaseException().Message+"（0x"+ex.HResult.ToString("X8")+"）"+recovery+desktop);return 1;
  }
  }
 }

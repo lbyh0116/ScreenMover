@@ -14,10 +14,10 @@ public static class SurfaceLayout {
         return new[] {(Edge.Bottom,Math.Abs(bounds.Bottom-y)),(Edge.Top,Math.Abs(y-bounds.Top)),
             (Edge.Left,Math.Abs(x-bounds.Left)),(Edge.Right,Math.Abs(bounds.Right-x))}.MinBy(v=>v.Item2).Item1;
     }
-    public static (RECT Bounds,Edge Edge) Flyout(RECT screen,RECT work,RECT anchor,double scale,int rows,int screens,double widestRatio=16.0/9) {
+    public static (RECT Bounds,Edge Edge) Flyout(RECT screen,RECT work,RECT anchor,double scale,int rows,int screens,double widestRatio=16.0/9,double applicationWidth=180) {
         scale=Math.Clamp(scale,.75,4);
         int gap=Math.Max(1,(int)Math.Round(12*scale));
-        var size=FlyoutSize(rows,screens,widestRatio);
+        var size=FlyoutSize(rows,screens,widestRatio,applicationWidth);
         int width=Math.Min((int)Math.Round(size.Width*scale),Math.Max(1,work.Width-2*gap));
         int height=Math.Min((int)Math.Round(size.Height*scale),Math.Max(1,work.Height-2*gap));
         var edge=TaskbarEdge(screen,work,anchor);
@@ -27,12 +27,16 @@ public static class SurfaceLayout {
         y=Math.Clamp(y,work.Top+gap,Math.Max(work.Top+gap,work.Bottom-height-gap));
         return (new(){Left=x,Top=y,Right=x+width,Bottom=y+height},edge);
     }
-    public static (double Width,double Height) FlyoutSize(int rows,int screens,double widestRatio=16.0/9){
+    public static double ApplicationColumn(IEnumerable<double> measuredNames){
+        var widths=measuredNames.Where(x=>double.IsFinite(x)&&x>=0).Order().ToArray();
+        double typical=widths.Length==0?70:widths[(int)Math.Ceiling(widths.Length*.75)-1];
+        return Math.Clamp(Math.Ceiling(typical+82),168,256);
+    }
+    public static (double Width,double Height) FlyoutSize(int rows,int screens,double widestRatio=16.0/9,double applicationWidth=180){
         rows=Math.Clamp(rows,0,10000);screens=Math.Clamp(screens,1,100);
-        // Short app names need only a compact left column. Balance 4:3 for small
-        // collections, then grow vertically before resorting to scrolling.
-        double height=Math.Clamp(64+Math.Max(36+rows*44,screens*108),258,360);
-        double width=Math.Clamp(Math.Max(height*4/3,206+64*Ratio(widestRatio)),350,480);
+        double height=Math.Clamp(62+Math.Max(38+rows*44,screens*104),210,400);
+        // Width follows the two actual columns, never the height of the window list.
+        double width=Math.Clamp(applicationWidth+30+Math.Max(104,14+64*Ratio(widestRatio))+24,290,620);
         return (Math.Round(width),Math.Round(height));
     }
     public static double Ratio(double ratio)=>double.IsFinite(ratio)&&ratio>0?Math.Clamp(ratio,.2,10):16.0/9;
@@ -42,7 +46,7 @@ public static class SurfaceLayout {
         return (height*ratio,height);
     }
     public static (double Width,int Columns) GalleryGrid(double viewportWidth) {
-        double available=Math.Max(1,viewportWidth-20);
+        double available=Math.Max(1,viewportWidth-28);
         int columns=Math.Max(1,(int)(available/248));
         return (Math.Floor(available/columns),columns);
     }

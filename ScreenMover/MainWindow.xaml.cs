@@ -85,13 +85,16 @@ try {
 var knownIcons=iconCache.Keys.ToHashSet();
 var data=await Task.Run(()=>{
 var ds=displays.Read();var ws=windows.Read();
+var returned=hidden.Read().Count==0?new List<HiddenWindow>():hidden.Reconcile();
 var icons=new Dictionary<string,SnapshotFrame>();
 foreach(var w in ws.Where(w=>!knownIcons.Contains(w.OrderKey))){var frame=IconService.Read(w);if(frame!=null)icons[w.OrderKey]=frame;}
-return (ds,ws,icons);
+return (ds,ws,icons,returned);
 });if(closed||pressed!=null)return;
 foreach(var pair in data.Item3)iconCache[pair.Key]=Bitmap(pair.Value);
 foreach(var old in iconCache.Keys.Where(k=>!data.Item2.Any(w=>w.OrderKey==k)).ToList())iconCache.Remove(old);
 foreach(var w in data.Item2)w.SetIcon(iconCache.GetValueOrDefault(w.OrderKey),settings.IconFallback);
+if(data.returned.Count>0)Notice($"已检测到 {data.returned.Count} 个窗口不再位于隐藏桌面，已更新记录");
+hiddenRecordsChanged?.Invoke();tray?.RefreshTip();
 snapshot=data.Item1;allWindows=data.Item2;
 string signature=string.Join("|",snapshot.Displays.Select(d=>$"{d.Key},{d.Gdi},{d.Details},{d.Primary}"));
 if(signature!=displaySignature) {
@@ -155,7 +158,7 @@ UpdateStatus();
 void UpdateStatus() {
 if(!initialized||closed)return;
 int count=WindowsList.SelectedItems.Count;
-UndoButton.IsEnabled=moves.Count>0&&!busy;UndoButton.Content=moves.Count>0?$"撤销移动 · {moves.Count}":"撤销移动";HiddenButton.Content=$"已隐藏 · {hidden.Read().Count}";SettingsButton.IsEnabled=HiddenButton.IsEnabled=!busy;
+UndoButton.IsEnabled=moves.Count>0&&!busy;UndoButton.Content=moves.Count>0?$"撤销移动 · {moves.Count}":"撤销移动";HiddenButton.Content=$"已隐藏 · {hidden.ActiveCount}";SettingsButton.IsEnabled=HiddenButton.IsEnabled=!busy;
 SelectionStatus.Text=count>0?$"已选 {count} 个窗口":"";
 MinButton.IsEnabled=RestoreButton.IsEnabled=MaxButton.IsEnabled=count>0&&!busy;HideButton.IsEnabled=count>0&&!busy&&PlatformSupport.Current.CanHide;ToolTipService.SetToolTip(HideButton,PlatformSupport.Current.HideStatus);
 foreach(var b in MoveButtons.Children.OfType<Button>())b.IsEnabled=count>0&&!busy&&(AllScreens.IsChecked==true||(b.Tag as DisplayInfo)?.Key!=selected?.Key);
@@ -349,7 +352,7 @@ if(version==noticeVersion){ResultStatus.Text="";NoticePanel.Visibility=Visibilit
 }
 async void HistoryClicked(object sender,RoutedEventArgs e){
 if(dialogOpen)return;dialogOpen=true;
-var text=new TextBlock{Text=history.Count==0?"暂无操作记录":string.Join("\n\n",history.AsEnumerable().Reverse()),TextWrapping=TextWrapping.Wrap,IsTextSelectionEnabled=true};
+var text=new TextBlock{Text=history.Count==0?"暂无操作记录":string.Join("\n\n",history.AsEnumerable().Reverse()),TextWrapping=TextWrapping.Wrap,IsTextSelectionEnabled=true,Margin=new Thickness(0,0,24,0),LineHeight=22};
 var dialog=new ContentDialog{XamlRoot=Root.XamlRoot,Title="操作记录 · 最近 500 条",CloseButtonText="关闭",Content=new ScrollViewer{Content=text,MaxHeight=520}};
 try{await dialog.ShowAsync();}finally{dialogOpen=false;}
 }void AdminClicked(object sender,RoutedEventArgs e) {

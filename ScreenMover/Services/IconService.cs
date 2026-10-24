@@ -3,6 +3,13 @@ using System.Runtime.InteropServices;
 using ScreenMover.Models;
 namespace ScreenMover.Services;
 public static class IconService {
+    [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern nint LoadImageW(nint instance,string path,uint type,int width,int height,uint flags);
+    public static nint Tray(nint window){
+        double scale=TrayIcon.TryGetBounds(window,out var bounds)?Interop.WindowChrome.ScaleAt(new(){X=bounds.Left,Y=bounds.Top}):TrayIcon.GetDpiForWindow(window)/96.0;
+        int size=Math.Clamp((int)Math.Round(16*scale),16,64);
+        var icon=LoadImageW(0,Path.Combine(AppContext.BaseDirectory,"Assets","TrayIcon.ico"),1,size,size,0x10);
+        return icon!=0?icon:Extract(Environment.ProcessPath!);
+    }
     [DllImport("user32.dll",SetLastError=true)] static extern nint SendMessageTimeoutW(nint h,uint msg,nint w,nint l,uint flags,uint timeout,out nint result);
     [DllImport("user32.dll",EntryPoint="GetClassLongPtrW")] static extern nint GetClassLongPtr(nint h,int index);
     [DllImport("user32.dll")] static extern nint CopyIcon(nint icon);

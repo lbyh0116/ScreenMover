@@ -14,7 +14,7 @@ public sealed partial class MainWindow {
             var startupState=StartupService.ReadState(out var startupError);bool wasStartup=startupState==true;
             editor=new(settings,startupState,startupError);
             statusChanged=text=>{SettingsState.Text=text;ToolTipService.SetToolTip(SettingsState,text);};editor.StatusChanged+=statusChanged;
-            SettingsState.Text="设置变化后自动保存";
+            SettingsState.Text="";
             bool Save(){
                 debounce.Stop();if(closed)return true;
                 try{
@@ -27,7 +27,7 @@ public sealed partial class MainWindow {
                         if(previous.ShowInactive!=next.ShowInactive){displaySignature="";refreshRequested=true;}
                         if(next.ScreenPreviews&&!previous.ScreenPreviews||next.WindowPreviews&&!previous.WindowPreviews)refreshRequested=true;
                     }
-                    editor.SetStatus("已自动保存");return true;
+                    editor.SetStatus("");return true;
                 }catch(Exception ex){editor.SetStatus(ex is AggregateException?"保存未能完整回退："+ex.Message:"未保存："+ex.Message+"；已保留上次有效设置");return false;}
             }
             editor.Export=async()=>{if(!Save())return "请先修正无效设置";return await ExportSettings()?"已导出设置":"已取消";};

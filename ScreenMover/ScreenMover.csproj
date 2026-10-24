@@ -25,6 +25,8 @@
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="Assets\AppIcon.svg" />
+    <Content Include="Assets\TrayIcon.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="Assets\TrayIcon.svg" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
 
@@ -89,7 +91,7 @@
     <Content Include="Helpers\ScreenMover.UpdateHelper.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
   </ItemGroup>
   <Target Name="BuildDesktopHelper" BeforeTargets="BeforeBuild">
-    <Exec Command="&quot;$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\csc.exe&quot; /nologo /target:exe /platform:x64 /out:&quot;$(MSBuildProjectDirectory)\Helpers\ScreenMover.DesktopHelper.exe&quot; &quot;$(MSBuildProjectDirectory)\..\DesktopHelper\Vendor.cs&quot; &quot;$(MSBuildProjectDirectory)\..\DesktopHelper\Program.cs&quot;"/>
+    <Exec Command="&quot;$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\csc.exe&quot; /nologo /target:exe /platform:x64 /out:&quot;$(MSBuildProjectDirectory)\Helpers\ScreenMover.DesktopHelper.exe&quot; &quot;$(MSBuildProjectDirectory)\..\DesktopHelper\Vendor.cs&quot; &quot;$(MSBuildProjectDirectory)\..\DesktopHelper\Program.cs&quot; &quot;$(MSBuildProjectDirectory)\..\DesktopHelper\HideVerification.cs&quot;"/>
     <Exec Command="&quot;$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\csc.exe&quot; /nologo /target:winexe /platform:x64 /r:System.Xml.Linq.dll /r:System.Windows.Forms.dll /out:&quot;$(MSBuildProjectDirectory)\Helpers\ScreenMover.UpdateHelper.exe&quot; &quot;$(MSBuildProjectDirectory)\..\UpdateHelper\UpdateEngine.cs&quot; &quot;$(MSBuildProjectDirectory)\..\UpdateHelper\Program.cs&quot;"/>
   </Target>
   <Target Name="CopyCaptureWorker" AfterTargets="Build">

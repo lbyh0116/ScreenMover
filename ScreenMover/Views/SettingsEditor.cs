@@ -21,7 +21,7 @@ public sealed class SettingsEditor : UserControl {
     public event EventHandler? Changed;
     public Func<Task<string>>? Export,Import,Diagnose;
     public SettingsEditor(AppSettings settings,bool? startupState,string? startupError){
-        Content=body;body.Spacing=18;MaxWidth=820;HorizontalAlignment=HorizontalAlignment.Stretch;
+        Content=body;body.Spacing=18;MaxWidth=820;Margin=new Thickness(0,0,24,0);HorizontalAlignment=HorizontalAlignment.Stretch;
         Section("个性化");
         theme=Choice("外观",["跟随系统","浅色","深色"]);
         accentMode=Choice("主题色",["跟随系统","自定义颜色"]);
@@ -53,7 +53,7 @@ public sealed class SettingsEditor : UserControl {
             };row.Children.Add(button);
         }
         data.Children.Add(row);data.Children.Add(dataStatus);
-        data.Children.Add(new TextBlock{Text="设置变化后自动保存。无效数字或快捷键冲突会保留上次有效设置。导入不迁移启动项、设备尺寸、排序或隐藏记录。诊断包不包含窗口标题、截图或原始日志。",TextWrapping=TextWrapping.Wrap,Opacity=.7});
+        data.Children.Add(new TextBlock{Text="无效数字或快捷键冲突会保留上次有效设置。导入不迁移启动项、设备尺寸、排序或隐藏记录。诊断包不包含窗口标题、截图或原始日志。",TextWrapping=TextWrapping.Wrap,Opacity=.7});
         Children.Add(new Expander{Header="设置备份与诊断",Content=data,HorizontalAlignment=HorizontalAlignment.Stretch});
         Children.Add(new Expander{Header="操作说明与快捷键",HorizontalAlignment=HorizontalAlignment.Stretch,Content=new TextBlock{TextWrapping=TextWrapping.Wrap,Text="主界面：单击选择，Ctrl / Shift 多选，点击空白取消。拖动卡片排序；拖到屏幕移动；双击激活窗口。\n\n快捷面板：点击托盘图标打开或收起。拖到其他屏幕移动，拖到当前屏幕隐藏（仅已适配系统）；按 Esc 或点击外部收起。已隐藏的窗口可在主界面找回。\n\n快捷键：支持按键录入，也可点输入栏右侧箭头选择预设或组合；通过清除按钮停用。隐藏前台窗口默认为关闭。\n\n截图：静态采样，仅保存在内存中；启动、重新激活、定时或 F5 时刷新。最多保留 64 个窗口缩略图，超额时优先当前屏幕，其余使用图标。\n\n离开设置页前会保存有效变更。右键托盘图标可彻底退出。"}});
         Section("软件更新");updater=new();Children.Add(updater);
@@ -64,7 +64,7 @@ public sealed class SettingsEditor : UserControl {
         about.Children.Add(new HyperlinkButton{Content="反馈问题",NavigateUri=new Uri("https://github.com/lbyh0116/ScreenMover/issues/new/choose")});
         var folder=new Button{Content="打开数据与完整操作记录"};folder.Click+=(_,_)=>{try{Directory.CreateDirectory(LocalData.Folder);System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(LocalData.Folder){UseShellExecute=true});}catch(Exception ex){SetStatus("无法打开："+ex.Message);}};about.Children.Add(folder);
         Children.Add(new Expander{Header="关于与隐私",Content=about,HorizontalAlignment=HorizontalAlignment.Stretch});
-        SetValues(settings,startupState==true);ready=true;SetStatus("设置变化后自动保存");
+        SetValues(settings,startupState==true);ready=true;
     }
     void Section(string text)=>Children.Add(new TextBlock{Text=text,FontSize=20,FontWeight=Microsoft.UI.Text.FontWeights.SemiBold,Margin=new Thickness(0,12,0,0)});
     ComboBox Choice(string title,string[] labels){var c=new ComboBox{Header=title,HorizontalAlignment=HorizontalAlignment.Stretch};foreach(var label in labels)c.Items.Add(label);c.SelectionChanged+=(_,_)=>Signal();Children.Add(c);return c;}

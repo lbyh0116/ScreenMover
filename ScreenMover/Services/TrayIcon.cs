@@ -24,20 +24,24 @@ public sealed class TrayIcon : IDisposable {
     [DllImport("user32.dll")] static extern uint TrackPopupMenu(nint menu,uint flags,int x,int y,int reserved,nint hwnd,nint rect);
     [DllImport("user32.dll")] static extern bool DestroyMenu(nint menu);
     [DllImport("user32.dll")] static extern bool PostMessageW(nint h,uint msg,nint w,nint l);
-    readonly nint hwnd,icon;
+    readonly nint hwnd;
+    nint icon;
     readonly SubclassProc callback;
     readonly uint taskbarCreated;
     NotifyData data;
     bool disposed;
+    long lastTip;
     public bool Installed {get;private set;}
     public TrayIcon(nint window,Action<bool> show,Action main,Action quit){
-        hwnd=window;icon=IconService.Extract(Environment.ProcessPath!);
-        data=new(){Size=(uint)Marshal.SizeOf<NotifyData>(),Window=hwnd,Id=1,Flags=1|2|4,Callback=0x8000+27,Icon=icon,Tip="ScreenMover · 点击快捷操作 / 右键菜单",Info="",InfoTitle=""};
+        hwnd=window;icon=IconService.Tray(window);
+        data=new(){Size=(uint)Marshal.SizeOf<NotifyData>(),Window=hwnd,Id=1,Flags=1|2|4|0x80,Callback=0x8000+27,Icon=icon,Tip=TrayTip.Read(),Info="",InfoTitle=""};
         taskbarCreated=RegisterWindowMessageW("TaskbarCreated");
         callback=(h,msg,w,l,id,refData)=>{
             if(msg==taskbarCreated&&!disposed)Install();
+            if(msg==0x02E0&&!disposed){var next=IconService.Tray(hwnd);if(next!=0){var old=icon;icon=next;data.Icon=next;Shell_NotifyIconW(1,ref data);if(old!=0)IconService.DestroyIcon(old);}}
             if(msg==data.Callback&&!disposed){
                 int message=l.ToInt32()&0xFFFF;
+                if(message==0x200&&Environment.TickCount64-lastTip>500){lastTip=Environment.TickCount64;RefreshTip();}
                 // Version 4 supports keyboard activation and sends one selection event per click.
                 if(message is 0x400 or 0x401)show(message==0x400);
                 else if(message==0x7B){
@@ -58,8 +62,13 @@ public sealed class TrayIcon : IDisposable {
         Install();
     }
     void Install(){
+        data.Tip=TrayTip.Read();
         Installed=Shell_NotifyIconW(0,ref data);
         if(Installed){data.Version=4;Shell_NotifyIconW(4,ref data);}
+    }
+    public void RefreshTip(){
+        if(disposed)return;string tip=TrayTip.Read();if(data.Tip==tip)return;
+        data.Tip=tip;if(Installed)Shell_NotifyIconW(1,ref data);
     }
     public void Dispose(){
         if(disposed)return;disposed=true;Shell_NotifyIconW(2,ref data);Installed=false;

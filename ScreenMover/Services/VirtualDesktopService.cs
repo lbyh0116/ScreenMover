@@ -15,6 +15,8 @@ public static class VirtualDesktopService {
     }
 }
 public sealed record HiddenWindow(Guid Id,SavedWindow Saved,string DesktopName,string? DesktopId,DateTime HiddenAt,string Status) {
+    public bool Closed {get;init;}
+    [System.Text.Json.Serialization.JsonIgnore] public string DisplayStatus=>Closed?"原窗口已关闭 / 进程已重启":Status.Replace("ERROR|","").Split("|desktop=")[0];
     public override string ToString()=>$"{Saved.Title}\n桌面：{DesktopName} · {HiddenAt:MM-dd HH:mm}\n{Status}";
 }
 public sealed class HiddenWindows {
@@ -27,6 +29,24 @@ public sealed class HiddenWindows {
         records=LocalData.Read(path,()=>new List<HiddenWindow>(),out var warning);LoadWarning=warning;
     }
     public List<HiddenWindow> Read(){lock(gate)return records.ToList();}
+    public int ActiveCount {get {lock(gate)return records.Count(x=>!x.Closed);}}
+    public List<HiddenWindow> Reconcile(){using var state=new HiddenWindowState();return Reconcile(state.Read);}
+    public List<HiddenWindow> Reconcile(Func<HiddenWindow,HiddenObservation> inspect){
+        var observations=Read().Where(x=>!x.Status.StartsWith("正在隐藏",StringComparison.Ordinal))
+            .Select(entry=>(entry,state:inspect(entry))).ToList();
+        var returned=new List<HiddenWindow>();
+        lock(gate){
+            var next=records.ToList();
+            foreach(var (entry,state) in observations){
+                int index=next.FindIndex(x=>x==entry);if(index<0)continue;
+                if(state==HiddenObservation.Returned){next.RemoveAt(index);returned.Add(entry);}
+                else if(state==HiddenObservation.Closed)next[index]=entry with{Closed=true};
+                else if(state==HiddenObservation.Hidden&&entry.Closed)next[index]=entry with{Closed=false};
+            }
+            if(!next.SequenceEqual(records)){LocalData.Write(path,next);records=next;}
+        }
+        return returned;
+    }
     void Put(HiddenWindow entry) {
         lock(gate){
             var next=records.Where(x=>x.Id!=entry.Id).Append(entry).ToList();
@@ -40,6 +60,7 @@ public sealed class HiddenWindows {
         if(!PlatformSupport.Current.CanHide)return new(window.Title,false,PlatformSupport.Current.HideStatus);
         HiddenWindow? entry=null;
         try {
+            if(Read().Count>0)Reconcile();
             if(Read().Any(x=>x.Saved.Handle==window.Handle.ToInt64()&&MoveHistory.Alive(x.Saved)))
                 return new(window.Title,false,"此窗口已有隐藏记录，请先从「已隐藏」找回");
             var saved=MoveHistory.Capture(window);
@@ -52,10 +73,12 @@ public sealed class HiddenWindows {
             var result=VirtualDesktopService.Run("hide",saved.Handle.ToString(),saved.Pid.ToString(),name,saved.ProcessStarted.ToString());
             if(result.Success) {
                 string desktop=result.Output.Split('|')[1];
-                Put(entry with{DesktopId=desktop,Status="已隐藏"});
-                return new(window.Title,true,$"已最小化至「{name}」，可从「已隐藏」一键找回");
+                bool minimized=!result.Output.EndsWith("|desktop-only",StringComparison.Ordinal);
+                Put(entry with{DesktopId=desktop,Status=minimized?"已隐藏 · 已最小化":"已隐藏在独立桌面 · 应用未接受最小化"});
+                return new(window.Title,true,minimized?$"已最小化至「{name}」，可从「已隐藏」一键找回":$"已移至独立桌面「{name}」；应用未接受最小化，保留隐藏位置，可一键找回");
             }
-            Put(entry with{Status=result.Output});
+            string? failedDesktop=result.Output.Split('|').FirstOrDefault(x=>x.StartsWith("desktop="))?[8..];
+            Put(entry with{DesktopId=Guid.TryParse(failedDesktop,out var desktopId)?desktopId.ToString():null,Status=result.Output});
             return new(window.Title,false,result.Output+"；恢复记录已保留");
         }catch(Exception ex){
             return new(window.Title,false,ex.Message+(entry==null?"":"；请查看已隐藏记录或任务视图"));

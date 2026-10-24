@@ -27,7 +27,7 @@ public sealed class HotkeyPicker : UserControl {
         AutomationProperties.SetName(display,title);
         var arrow=new Button{Content=new FontIcon{Glyph="\uE70D",FontSize=12},Style=(Style)Application.Current.Resources["SubtleButtonStyle"],HorizontalAlignment=HorizontalAlignment.Right,VerticalAlignment=VerticalAlignment.Stretch,Width=36,Padding=new Thickness(0),BorderThickness=new Thickness(0)};
         ToolTipService.SetToolTip(arrow,"选择预设或自由组合");AutomationProperties.SetName(arrow,"选择快捷键");field.Children.Add(arrow);Children.Add(field);Children.Add(error);
-        var panel=new StackPanel{Spacing=10};
+        var panel=new StackPanel{Spacing=10,Margin=new Thickness(0,0,24,0)};
         panel.Children.Add(new TextBlock{Text="常用组合",FontWeight=Microsoft.UI.Text.FontWeights.SemiBold});
         foreach(string preset in new[]{"Ctrl+Alt+Space","Ctrl+Alt+H","Ctrl+Alt+M","Ctrl+Shift+Space","Win+Alt+M"}){
             var button=new Button{Content=preset,HorizontalAlignment=HorizontalAlignment.Stretch,HorizontalContentAlignment=HorizontalAlignment.Left};

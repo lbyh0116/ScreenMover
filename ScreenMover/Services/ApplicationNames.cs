@@ -9,6 +9,7 @@ public static class ApplicationNames {
             "CHROME"=>"Chrome","MSEDGE"=>"Edge","FIREFOX"=>"Firefox","EXPLORER"=>"文件资源管理器",
             "WECHAT" or "WEIXIN"=>"微信","QQ"=>"QQ","CHATGPT"=>"ChatGPT","HERMES"=>"Hermes","CODE"=>"Visual Studio Code",
             "MS-TEAMS"=>"Teams","WINDOWSTERMINAL"=>"Windows 终端","NOTEPAD"=>"记事本",
+            "DELTAFORCECLIENT-WIN64-SHIPPING" or "DELTAFORCECLIENT"=>"三角洲行动",
             "" or "已退出 / 不可访问"=>"应用",_=>name
         };
     }

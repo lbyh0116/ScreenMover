@@ -14,10 +14,10 @@ try {
     }
     dotnet publish ScreenMover\ScreenMover.csproj -c Release -r "win-$Architecture" -p:ScreenMoverArchitecture=$Architecture --self-contained true -p:PublishTrimmed=false -p:PublishReadyToRun=false -o $releasePath
     if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
-    foreach ($required in @('ScreenMover.exe','Assets\AppIcon.ico','ScreenMover.CaptureWorker.exe','ScreenMover.CaptureWorker.dll','ScreenMover.CaptureWorker.runtimeconfig.json','ScreenMover.pri','MainWindow.xbf','QuickWindow.xbf','Helpers\ScreenMover.DesktopHelper.exe','Helpers\ScreenMover.UpdateHelper.exe','Helpers\VirtualDesktop-LICENSE.txt')) {
+    foreach ($required in @('ScreenMover.exe','Assets\AppIcon.ico','Assets\TrayIcon.ico','ScreenMover.CaptureWorker.exe','ScreenMover.CaptureWorker.dll','ScreenMover.CaptureWorker.runtimeconfig.json','ScreenMover.pri','MainWindow.xbf','QuickWindow.xbf','Helpers\ScreenMover.DesktopHelper.exe','Helpers\ScreenMover.UpdateHelper.exe','Helpers\VirtualDesktop-LICENSE.txt')) {
         if (-not (Test-Path (Join-Path $releasePath $required))) { throw "Missing release resource: $required" }
     }
-    foreach ($document in @('README.md','README.en.md','CHANGELOG.md','docs\PRIVACY.md','docs\COMPATIBILITY.md','docs\UPDATES.md','SECURITY.md')) {
+    foreach ($document in @('README.md','README.en.md','CHANGELOG.md','docs\PRIVACY.md','docs\COMPATIBILITY.md','docs\UPDATES.md','docs\QUICK_PANEL_FIXES.md','SECURITY.md')) {
         if (Test-Path $document) {
             $documentTarget = Join-Path $releasePath $document
             [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($documentTarget))

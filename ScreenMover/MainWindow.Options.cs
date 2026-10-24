@@ -9,6 +9,7 @@ public sealed partial class MainWindow {
     readonly MoveHistory moves=new();
     readonly HiddenWindows hidden=new();
     bool initialized,dialogOpen;
+    Action? hiddenRecordsChanged;
 
     void SearchChanged(object sender,TextChangedEventArgs e){if(initialized)UpdateWindows();}
     void ScopeChanged(object sender,RoutedEventArgs e){if(initialized){UpdateWindows();RebuildButtons();}}
@@ -32,28 +33,40 @@ public sealed partial class MainWindow {
     async void HiddenClicked(object sender,RoutedEventArgs e) {
         if(dialogOpen||busy)return;dialogOpen=true;
         var panel=new StackPanel{Spacing=12,MinWidth=360};
-        panel.Children.Add(new TextBlock{Text="选择记录后可找回当前虚拟桌面。原桌面会保留，避免影响其中的其他窗口。记录会在软件重启后保留。",TextWrapping=TextWrapping.Wrap});
-        var list=new ListView{SelectionMode=ListViewSelectionMode.Single,MaxHeight=300};
+        panel.Children.Add(new TextBlock{Text="手动移回的窗口会自动更新；找回后保留原桌面。",TextWrapping=TextWrapping.Wrap,Opacity=.75,FontSize=13});
+        var list=new ListView{SelectionMode=ListViewSelectionMode.Single,MaxHeight=380};
         var detail=new TextBlock{TextWrapping=TextWrapping.Wrap};
         var row=new StackPanel{Orientation=Orientation.Horizontal,Spacing=8};
         var recover=new Button{Content="找回选中窗口",IsEnabled=false};
         var forget=new Button{Content="移除失效记录",IsEnabled=false};
         row.Children.Add(recover);row.Children.Add(forget);panel.Children.Add(list);panel.Children.Add(row);panel.Children.Add(detail);
+        List<HiddenWindow>? displayed=null;
         void Populate(){
+            var entries=hidden.Read().OrderByDescending(x=>x.HiddenAt).ToList();
+            if(displayed!=null&&displayed.SequenceEqual(entries))return;
+            var selectedId=((list.SelectedItem as ListViewItem)?.Tag as HiddenWindow)?.Id;
+            displayed=entries;
             list.Items.Clear();
-            foreach(var entry in hidden.Read().OrderByDescending(x=>x.HiddenAt)){
-                var text=new TextBlock{Text=entry.ToString()+(MoveHistory.Alive(entry.Saved)?"":"\n原窗口已关闭 / 进程已重启"),TextWrapping=TextWrapping.Wrap,MaxWidth=430};
-                list.Items.Add(new ListViewItem{Content=text,Tag=entry});
+            foreach(var entry in entries){
+                var card=new StackPanel{Spacing=7,Padding=new Thickness(12),MaxWidth=430};
+                card.Children.Add(new TextBlock{Text=entry.Saved.Title,FontSize=16,FontWeight=Microsoft.UI.Text.FontWeights.SemiBold,TextTrimming=TextTrimming.CharacterEllipsis,MaxLines=2,TextWrapping=TextWrapping.Wrap});
+                card.Children.Add(new TextBlock{Text=$"桌面：{entry.DesktopName}",FontSize=12,Opacity=.7,TextWrapping=TextWrapping.Wrap});
+                card.Children.Add(new TextBlock{Text=entry.DisplayStatus,FontSize=13,TextWrapping=TextWrapping.Wrap,LineHeight=20});
+                card.Children.Add(new TextBlock{Text=entry.HiddenAt.ToString("MM-dd HH:mm"),FontSize=12,Opacity=.6});
+                var item=new ListViewItem{Content=card,Tag=entry,Margin=new Thickness(0,0,24,10),HorizontalContentAlignment=HorizontalAlignment.Stretch,Style=(Style)Application.Current.Resources["WindowItemStyle"]};
+                list.Items.Add(item);
             }
-            if(list.Items.Count==0)detail.Text="暂无隐藏记录";
+            detail.Text=list.Items.Count==0?"暂无隐藏记录":"";
             recover.IsEnabled=forget.IsEnabled=false;
-            HiddenButton.Content=$"已隐藏 · {hidden.Read().Count}";
+            list.SelectedItem=list.Items.OfType<ListViewItem>().FirstOrDefault(x=>(x.Tag as HiddenWindow)?.Id==selectedId);
+            HiddenButton.Content=$"已隐藏 · {hidden.ActiveCount}";
         }
-        list.SelectionChanged+=(_,_)=>{
+        void UpdateActions(){
             var entry=(list.SelectedItem as ListViewItem)?.Tag as HiddenWindow;
-            bool alive=entry!=null&&MoveHistory.Alive(entry.Saved);
-            recover.IsEnabled=alive&&!busy&&PlatformSupport.Current.CanHide;forget.IsEnabled=entry!=null&&!alive&&!busy;
-        };
+            bool alive=entry!=null&&!entry.Closed;
+            recover.IsEnabled=alive&&!busy&&PlatformSupport.Current.CanHide;forget.IsEnabled=entry?.Closed==true&&!busy;
+        }
+        list.SelectionChanged+=(_,_)=>UpdateActions();
         var dialog=new ContentDialog{XamlRoot=Root.XamlRoot,Title="已隐藏窗口",CloseButtonText="关闭",Content=panel};
         recover.Click+=async(_,_)=>{
             if((list.SelectedItem as ListViewItem)?.Tag is not HiddenWindow entry)return;
@@ -62,14 +75,18 @@ public sealed partial class MainWindow {
                 var result=await Task.Run(()=>hidden.Recover(entry));Populate();detail.Text=result.Message;
                 Notice($"找回窗口：{entry.Saved.Title} · {result.Message}");
             }catch(Exception ex){detail.Text=ex.Message;}
-            finally{busy=false;dialog.IsEnabled=true;UpdateStatus();await Refresh();}
+            finally{busy=false;dialog.IsEnabled=true;UpdateStatus();await Refresh();UpdateActions();}
         };
         forget.Click+=(_,_)=>{
-            if((list.SelectedItem as ListViewItem)?.Tag is not HiddenWindow entry||MoveHistory.Alive(entry.Saved))return;
+            if((list.SelectedItem as ListViewItem)?.Tag is not HiddenWindow entry||!entry.Closed)return;
             try{hidden.Forget(entry.Id);Populate();Notice("已移除失效记录："+entry.Saved.Title);}
             catch(Exception ex){detail.Text=ex.Message;}
         };
-        Populate();
-        try{await dialog.ShowAsync();}finally{dialogOpen=false;}
+        try{
+            await Task.Run(()=>hidden.Reconcile());
+            Populate();hiddenRecordsChanged=Populate;
+            await dialog.ShowAsync();
+        }catch(Exception ex){Notice("读取隐藏记录失败："+ex.Message);}
+        finally{hiddenRecordsChanged=null;dialogOpen=false;}
     }
 }

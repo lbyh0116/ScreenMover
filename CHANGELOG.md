@@ -1,35 +1,35 @@
-# v0.2.0 · 2026-10-18
+# v0.2.1 · 2026-10-24
 
-[下载正式版 / Download](https://github.com/lbyh0116/ScreenMover/releases/tag/v0.2.0)
+[下载正式版 / Download](https://github.com/lbyh0116/ScreenMover/releases/tag/v0.2.1)
 
 ## 简体中文
 
-首个正式发行版，提供 Windows x64 便携包。
+- 快捷面板整行可拖拽，宽度随软件名和显示器预览调整，长名称只在末尾省略。
+- 托盘图标减少留白，并提供“ScreenMover / 当前桌面”的两行原生悬停提示。
+- 修复部分游戏拒绝最小化后，隐藏操作被撤销、窗口返回的问题；窗口已移入独立桌面时保留隐藏位置，并检查短暂延迟后的状态。
+- 自动更新手动移离隐藏桌面及已关闭窗口的记录；隐藏记录改为分层卡片排版。
+- 为快捷面板、主窗口、隐藏记录、历史记录和设置控件预留滚动条间距，修复窄窗口下滚动条覆盖下拉按钮的问题。
+- 移除快捷操作的成功浮动提示及设置页自动保存说明，错误反馈和自动保存功能继续保留。
 
-- 显示器与软件窗口静态预览、相册网格、搜索、多选、拖拽排序。
-- 窗口跨屏拖放、批量移动、撤销，以及已适配系统上的隐藏与找回。
-- 托盘快捷面板、可配置全局快捷键、主题与设置自动保存。
-- GitHub 更新检查、SHA-256 校验、独立安装与文件替换失败回退；正式渠道在 API 不可用时通过 GitHub 的 latest 入口读取稳定版本。
+升级：先从托盘退出旧版，完整解压新包后运行 `ScreenMover.exe`。已有设置、排序和恢复记录继续保留，也可通过设置中的软件更新安装。
 
-升级：退出旧版，完整解压后运行 ScreenMover.exe；已有 Preview 6 可从设置的软件更新中安装。数据继续保留。
-
-兼容：Windows 11 x64；Win10 22H2 提供基础兼容路径，尚待实机验证。独立虚拟桌面隐藏限构建 26100 / 26200。当前不含 x86/ARM64 包、英文界面或 Microsoft Store 版。
+兼容范围不变：Windows x64；独立虚拟桌面隐藏限构建 26100 / 26200。Win10 22H2 基础兼容仍待实机验证。
 
 ## English
 
-First stable release, distributed as a portable Windows x64 package.
+- Full-row dragging and content-sized quick-panel columns, with trailing ellipses for long application names.
+- A larger tray glyph and a two-line native tooltip showing ScreenMover and the current virtual desktop.
+- Fixed hiding being rolled back when a game refused minimization. Windows already moved to a separate desktop stay there, with delayed state verification.
+- Recovery records now reconcile manual moves and closed windows, displayed in spaced cards.
+- Reserved scrollbar space in the quick panel, main gallery, recovery/history lists and settings, including narrow layouts and shortcut pickers.
+- Removed successful quick-action popups and the autosave explanation. Error feedback and automatic saving remain available.
 
-- Static monitor/window previews, gallery browsing, search, multi-selection, and persistent drag ordering.
-- Cross-monitor drag-and-drop, batch moves, undo, and hiding/recovery on supported Windows builds.
-- Tray quick panel, configurable global hotkeys, appearance options, and automatically saved settings.
-- GitHub release checks, SHA-256 verification, an independent updater, and attempted rollback after file replacement failures. Stable checks can use GitHub's official latest-release redirect when the API is unavailable.
+Upgrade: exit the old version from its tray menu, extract the entire archive, and run `ScreenMover.exe`, or use the in-app updater. Settings, ordering and recovery records are preserved.
 
-Upgrade: exit the old version, extract the entire archive, and run ScreenMover.exe. Preview 6 users can install through the in-app updater. Local settings and recovery records are retained.
-
-Compatibility: Windows 11 x64. A basic Windows 10 22H2 path is included but still needs device validation. Separate virtual-desktop hiding is limited to builds 26100 / 26200. No x86/ARM64 packages, English UI, or Store edition are included.
+Compatibility is unchanged: Windows x64; separate-desktop hiding on builds 26100 / 26200 only. Windows 10 22H2 device validation remains pending.
 
 ## 验证 / Validation
 
-构建、无界面回归、临时副本更新助手重启及发行包完整性检查；未使用 computer use。更广泛的设备测试仍在进行。
+构建、无界面回归、截图助手资源检查及更新助手临时副本测试。用户已验证预览版的游戏隐藏行为；本轮未使用 computer use，最终滚动条间距仍需手动检查。
 
-Build, headless regressions, updater restart using a temporary fixture, and release-package integrity checks. No computer-use verification. Broader hardware testing remains ongoing.
+Build, headless regressions, capture-worker resource checks and updater tests using temporary fixtures. The user verified game hiding in the preview build. No computer-use validation; final scrollbar spacing requires manual visual acceptance.

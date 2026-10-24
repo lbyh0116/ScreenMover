@@ -59,8 +59,8 @@ public sealed partial class MainWindow {
         var images=data.previews.ToDictionary(p=>p.Key,p=>(ImageSource)Bitmap(p.Value));
         return (data.ds,order.Sort(data.ws),images);
     }
-    public async Task<string> QuickDrop(WindowInfo window,DisplayInfo target){
-        if(busy)return "有操作正在进行，请稍后重试";
+    public async Task<OperationResult> QuickDrop(WindowInfo window,DisplayInfo target){
+        if(busy)return new(window.Title,false,"有操作正在进行，请稍后重试");
         busy=true;UpdateStatus();
         try{
             var result=await Task.Run(()=>{
@@ -70,7 +70,7 @@ public sealed partial class MainWindow {
                 if(destination==null)return new OperationResult(window.Title,false,"目标屏幕已断开");
                 return destination.Gdi==current.Gdi?hidden.Hide(current):moves.Move([current],destination,settings.MoveMargin,settings.ShrinkToFit).Single();
             });
-            Notice($"快捷操作：{result.Title} · {result.Message}");return result.Message;
+            Notice($"快捷操作：{result.Title} · {result.Message}");return result;
         }finally{busy=false;await Refresh();UpdateStatus();}
     }
 }

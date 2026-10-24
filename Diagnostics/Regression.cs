@@ -27,11 +27,15 @@ static partial class Regression {
         }
         foreach(int rows in new[]{0,1,3,6,30,1000})foreach(int screens in new[]{1,2,4,10}){
             var size=SurfaceLayout.FlyoutSize(rows,screens);
-            Check(size.Width<=480&&size.Height<=360&&Math.Abs(size.Width/size.Height-4.0/3)<.04,"Flyout lost compact 4:3 proportions");
+            Check(size.Width<=620&&size.Height<=400&&size.Width>=290&&size.Height>=210,"Flyout content sizing exceeded bounds");
         }
         Check(SurfaceLayout.FlyoutSize(3,1).Width<400,"Short application names still receive an oversized flyout");
         Check(SurfaceLayout.FlyoutSize(6,1).Height>SurfaceLayout.FlyoutSize(1,1).Height,"Window count ignored in flyout sizing");
         Check(SurfaceLayout.FlyoutSize(1,2).Height>SurfaceLayout.FlyoutSize(1,1).Height,"Display count ignored in flyout sizing");
+        Check(SurfaceLayout.FlyoutSize(30,1).Width==SurfaceLayout.FlyoutSize(1,1).Width,"Extra rows inflated unused space to the right of monitors");
+        Check(SurfaceLayout.ApplicationColumn([50,55,60,70,900])==168,"One outlier application name widened every row");
+        Check(SurfaceLayout.ApplicationColumn([130,140,150,160,900])==242,"Column did not follow most application names");
+        Check(SurfaceLayout.ApplicationColumn([double.NaN,double.PositiveInfinity])==168,"Invalid text measurement propagated to native size");
         Check(ApplicationNames.Display("WINWORD.exe")=="Word"&&ApplicationNames.Display("Weixin")=="微信"&&ApplicationNames.Display("Hermes")=="Hermes","Friendly application names");
         var namedWindow=new WindowInfo(1,1,"WINWORD","Private document title",1,default,"one");
         Check(namedWindow.AppName=="Word"&&!namedWindow.AppName.Contains("Private"),"Quick list label used the document title");
@@ -63,6 +67,7 @@ static partial class Regression {
     static void Check(bool condition,string message){if(!condition)throw new Exception(message);}
     public static void Pure(){
         Surfaces();
+        HiddenRecoveryChecks();
         DropTargets();
         Instances();
         Preferences();
